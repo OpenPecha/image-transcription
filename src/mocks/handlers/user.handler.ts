@@ -5,7 +5,7 @@ import type { User, CreateUserDTO, UpdateUserDTO, PaginatedResponse } from '@/ty
 
 export const userHandlers = [
   // POST /api/user - Create or update user (legacy endpoint)
-  http.post('/api/user', async ({ request }) => {
+  http.post('/api/user/', async ({ request }) => {
     await delay(300)
     const body = (await request.json()) as CreateUserDTO
 
@@ -46,7 +46,7 @@ export const userHandlers = [
   }),
 
   // POST /api/users - Create new user
-  http.post('/api/users', async ({ request }) => {
+  http.post('/api/user/', async ({ request }) => {
     await delay(300)
     const body = (await request.json()) as CreateUserDTO
 
@@ -92,7 +92,7 @@ export const userHandlers = [
   }),
 
   // GET /api/users - Get all users with pagination and filters
-  http.get('/api/users', async ({ request }) => {
+  http.get('/api/user/', async ({ request }) => {
     await delay(200)
 
     const url = new URL(request.url)
@@ -107,7 +107,7 @@ export const userHandlers = [
 
     if (search) {
       filteredUsers = filteredUsers.filter((user) =>
-        user.name.toLowerCase().includes(search)
+        user.username.toLowerCase().includes(search)
       )
     }
 
@@ -124,6 +124,7 @@ export const userHandlers = [
     const startIndex = (page - 1) * limit
     const endIndex = startIndex + limit
     const paginatedUsers = filteredUsers.slice(startIndex, endIndex)
+    console.log(paginatedUsers)
     const hasMore = endIndex < total
 
     const response: PaginatedResponse<User> = {

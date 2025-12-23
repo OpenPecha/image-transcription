@@ -9,7 +9,7 @@ export enum UserRole {
 // User interface
 export interface User {
   id: string
-  name: string
+  username: string
   email: string
   role: UserRole
   groupId?: string
@@ -19,7 +19,7 @@ export interface User {
 
 // Request payload for creating users
 export interface CreateUserDTO {
-  name: string
+  username: string
   email: string
   role?: UserRole
   groupId?: string
@@ -28,7 +28,7 @@ export interface CreateUserDTO {
 
 // Request payload for updating users
 export interface UpdateUserDTO {
-  name?: string
+  username?: string
   role?: UserRole
   groupId?: string
 }

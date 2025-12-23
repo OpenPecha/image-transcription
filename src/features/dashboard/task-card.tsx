@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Clock, User, ArrowRight } from 'lucide-react'
+import { Clock, User, ArrowRight, Trash2 } from 'lucide-react'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/common/status-badge'
@@ -10,6 +10,7 @@ interface TaskCardProps {
   task: Task
   actionLabel?: string
   onAction?: (task: Task) => void
+  onDelete?: (task: Task) => void
   showImage?: boolean
 }
 
@@ -17,6 +18,7 @@ export function TaskCard({
   task,
   actionLabel = 'Open',
   onAction,
+  onDelete,
   showImage = true,
 }: TaskCardProps) {
   const navigate = useNavigate()
@@ -27,6 +29,11 @@ export function TaskCard({
     } else {
       navigate(`/editor/${task.id}`)
     }
+  }
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onDelete?.(task)
   }
 
   return (
@@ -43,6 +50,16 @@ export function TaskCard({
           <div className="absolute bottom-2 left-2">
             <StatusBadge status={task.status} />
           </div>
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 h-7 w-7 bg-background/80 hover:bg-destructive hover:text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={handleDelete}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       )}
 
@@ -55,7 +72,19 @@ export function TaskCard({
               {formatDistanceToNow(task.updatedAt)}
             </p>
           </div>
-          {!showImage && <StatusBadge status={task.status} />}
+          <div className="flex items-center gap-1">
+            {!showImage && <StatusBadge status={task.status} />}
+            {!showImage && onDelete && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 hover:bg-destructive hover:text-destructive-foreground"
+                onClick={handleDelete}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
 

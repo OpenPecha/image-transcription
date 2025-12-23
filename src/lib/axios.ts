@@ -23,7 +23,7 @@ export const apiClient = axios.create({
 
 // 3. Response Interceptor (e.g., global error handling)
 apiClient.interceptors.response.use(
-  (response) => response.data, // Return data directly to avoid .data.data in components
+  (response) => response.data,
   (error) => {
     if (error.response?.status === 401) {
       // Handle unauthorized access (e.g., redirect to login)

@@ -13,7 +13,8 @@ const getUsers = async (filters: UserFilters): Promise<PaginatedResponse<User>> 
   if (filters.limit) params.append('limit', String(filters.limit))
 
   const queryString = params.toString()
-  return apiClient.get(`/users${queryString ? `?${queryString}` : ''}`)
+  // ${!queryString ? `?${queryString}` : ''}
+  return apiClient.get(`/user/`)
 }
 
 export const useGetUsers = (filters: UserFilters = {}) => {

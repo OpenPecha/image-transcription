@@ -66,11 +66,11 @@ export function UserItem({ user, groups }: UserItemProps) {
           <Avatar className="h-10 w-10 shrink-0">
             <AvatarImage src={user.picture} alt={user.name} />
             <AvatarFallback className="bg-primary/10 text-primary text-sm">
-              {getInitials(user.name)}
+              {getInitials(user.email)}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <p className="font-medium truncate">{user.name}</p>
+            <p className="font-medium truncate">{user.username}</p>
             <p className="text-sm text-muted-foreground flex items-center gap-1 truncate">
               <Mail className="h-3 w-3 shrink-0" />
               <span className="truncate">{user.email}</span>
@@ -98,7 +98,7 @@ export function UserItem({ user, groups }: UserItemProps) {
 
         {/* Group Select */}
         <Select
-          value={user.groupId || ''}
+          value={user.group || ''}
           onValueChange={handleGroupChange}
           disabled={updateUser.isPending}
         >

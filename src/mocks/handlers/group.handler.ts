@@ -5,7 +5,7 @@ import type { Group, GroupUpdateRequest } from '@/types'
 
 export const groupHandlers = [
   // POST /api/group - Create group
-  http.post('/api/group', async ({ request }) => {
+  http.post('/api/group/', async ({ request }) => {
     await delay(300)
 
     const body = (await request.json()) as Omit<Group, 'id'>
@@ -22,7 +22,7 @@ export const groupHandlers = [
   }),
 
   // GET /api/groups - List all groups
-  http.get('/api/groups', async () => {
+  http.get('/api/group/', async () => {
     await delay(200)
     return HttpResponse.json(groups)
   }),

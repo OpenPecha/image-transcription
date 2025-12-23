@@ -42,9 +42,13 @@ export interface TaskHistoryEntry {
 export interface Task {
   id: string
   imageUrl: string
+  imageId?: string
+  imageOrder?: number
   noisyText: string
   correctedText: string
   status: TaskStatus
+  groupId?: string
+  batchName?: string
   assignedTo?: string
   assignedToName?: string
   reviewerId?: string
@@ -54,6 +58,33 @@ export interface Task {
   history: TaskHistoryEntry[]
   createdAt: Date
   updatedAt: Date
+}
+
+// Task upload JSON schema
+export interface TaskUploadItem {
+  image_url: string
+  image_id: string
+  image_order: string
+  transcription: string
+}
+
+export interface TaskUploadPayload {
+  data: TaskUploadItem[]
+}
+
+// Bulk create request/response
+export interface BulkCreateTasksRequest {
+  payload: TaskUploadPayload
+  groupId: string
+  batchName: string
+}
+
+export interface BulkCreateTasksResponse {
+  success: boolean
+  created: number
+  failed: number
+  errors: Array<{ index: number; message: string }>
+  tasks: Task[]
 }
 
 // Task assignment request

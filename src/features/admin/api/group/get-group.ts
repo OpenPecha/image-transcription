@@ -4,7 +4,7 @@ import { type Group } from '@/types';
 import { groupKeys } from './group-keys';
 
 const getGroups = async (): Promise<Group[]> => {
-  return apiClient.get('/groups'); 
+  return apiClient.get('/group/'); 
 };
 
 export const useGetGroups = () => {

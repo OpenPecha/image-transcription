@@ -4,7 +4,7 @@ import { type GroupRequest, type Group } from '@/types';
 import { groupKeys } from './group-keys';
 
 const createGroup = async (data: GroupRequest): Promise<Group> => {
-  return apiClient.post('/group', data);
+  return apiClient.post('/group/', data);
 };
 
 export const useCreateGroup = () => {

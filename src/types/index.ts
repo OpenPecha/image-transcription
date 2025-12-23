@@ -17,6 +17,10 @@ export type {
   ReviewTaskRequest,
   DashboardStats,
   TaskFilter,
+  TaskUploadItem,
+  TaskUploadPayload,
+  BulkCreateTasksRequest,
+  BulkCreateTasksResponse,
 } from './task'
 
 // Group types

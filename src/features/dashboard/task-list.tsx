@@ -8,6 +8,7 @@ interface TaskListProps {
   emptyMessage?: string
   actionLabel?: string
   onAction?: (task: Task) => void
+  onDelete?: (task: Task) => void
   showImage?: boolean
 }
 
@@ -34,6 +35,7 @@ export function TaskList({
   emptyMessage = 'No tasks found',
   actionLabel,
   onAction,
+  onDelete,
   showImage = true,
 }: TaskListProps) {
   if (isLoading) {
@@ -77,6 +79,7 @@ export function TaskList({
           task={task}
           actionLabel={actionLabel}
           onAction={onAction}
+          onDelete={onDelete}
           showImage={showImage}
         />
       ))}
