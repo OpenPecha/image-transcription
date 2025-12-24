@@ -1,6 +1,7 @@
 export const taskKeys = {
   all: ['tasks'] as const,
-  list: (username: string) => ['tasks', 'list', username] as const,
+  list: (params?: { status?: string; groupId?: string; search?: string }) => 
+    ['tasks', 'list', params] as const,
   detail: (id: string) => ['tasks', id] as const,
 };
 

@@ -8,14 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { useGetTask } from '../../api/task'
+import { useGetTasks } from '../../api/task'
 import { useGetGroups } from '../../api/group'
 import { BatchRow, BatchRowSkeleton, type BatchData } from './batch-row'
 import { DeleteBatchDialog } from './delete-batch-dialog'
 import { TaskUploadDialog } from '../task/task-upload-dialog'
 
 export function BatchList() {
-  const { data: tasks = [], isLoading: tasksLoading } = useGetTask('') ?? []
+  const { data: tasks = [], isLoading: tasksLoading } = useGetTasks()
   const { data: groups = [], isLoading: groupsLoading } = useGetGroups()
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [deleteBatch, setDeleteBatch] = useState<BatchData | null>(null)
