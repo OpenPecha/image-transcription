@@ -40,6 +40,7 @@ export const useApproveTask = (username?: string) => {
     mutationFn: approveTask,
     onSuccess: () => {
       if (username) {
+        queryClient.refetchQueries({ queryKey: workspaceKeys.assignedTask(username) })
         queryClient.invalidateQueries({ queryKey: workspaceKeys.assignedTask(username) })
       }
       queryClient.invalidateQueries({ queryKey: workspaceKeys.all })

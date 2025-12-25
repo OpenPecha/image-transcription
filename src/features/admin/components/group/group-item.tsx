@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
-import { useGetGroupWithUsers } from '../../api/group'
+import { useGetGroupUsers } from '../../api/group'
 import { GroupUserList } from './group-user-list'
 import { GroupDialog } from './group-dialog'
 import { DeleteGroupDialog } from './delete-group-dialog'
@@ -20,12 +20,12 @@ export function GroupItem({ group }: GroupItemProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   // Fetch group with users only when expanded
-  const { data: groupWithUsers, isLoading: isLoadingUsers } = useGetGroupWithUsers(
+  const { data: groupUsers, isLoading: isLoadingUsers } = useGetGroupUsers(
     group.name,
     isExpanded
   )
 
-  const users = groupWithUsers?.users ?? []
+  const users = groupUsers ?? []
   const userCount = users.length
 
   const toggleExpand = () => {

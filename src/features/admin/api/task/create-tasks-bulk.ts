@@ -1,16 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/axios';
-import type { TaskUploadPayload, BulkCreateTasksResponse } from '@/types';
+import type { TaskUploadItem, BulkCreateTasksResponse } from '@/types';
 import { taskKeys } from './task-keys';
 
 interface CreateTasksBulkParams {
-  payload: TaskUploadPayload;
-  groupId: string;
-  batchName: string;
+  tasks: TaskUploadItem[];
+  group: string;
+  batch_name: string;
 }
 
 const createTasksBulk = async (params: CreateTasksBulkParams): Promise<BulkCreateTasksResponse> => {
-  return apiClient.post('/tasks/bulk', params);
+  return apiClient.post('/tasks/', params);
 };
 
 export const useCreateTasksBulk = () => {

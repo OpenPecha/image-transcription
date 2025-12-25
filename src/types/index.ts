@@ -19,7 +19,6 @@ export type {
   DashboardStats,
   TaskFilter,
   TaskUploadItem,
-  TaskUploadPayload,
   BulkCreateTasksRequest,
   BulkCreateTasksResponse,
 } from './task'

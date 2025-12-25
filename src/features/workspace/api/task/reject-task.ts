@@ -22,7 +22,7 @@ const rejectTask = async (params: RejectTaskParams): Promise<RejectTaskResponse>
       'Content-Type': 'application/json',
       'accept': 'application/json',
     },
-    body: JSON.stringify({username: params.username,transcript: params.transcript, submit: params.reject}),
+    body: JSON.stringify({username: params.username,transcript: params.transcript, submit: false}),
   })
 
   if (!response.ok) {

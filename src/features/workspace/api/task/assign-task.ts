@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import type { AssignedTask } from '@/types'
 import { workspaceKeys } from './workspace-keys'
 
@@ -25,15 +25,5 @@ export const useGetAssignedTask = (username?: string) => {
     staleTime: 0, // Always fetch fresh
     retry: 1,
   })
-}
-
-export const useRefreshAssignedTask = () => {
-  const queryClient = useQueryClient()
-
-  return (username: string) => {
-    queryClient.invalidateQueries({
-      queryKey: workspaceKeys.assignedTask(username),
-    })
-  }
 }
 

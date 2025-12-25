@@ -20,7 +20,7 @@ import {
 import { useGetGroups } from '../../api/group'
 import { useCreateTasksBulk } from '../../api/task'
 import { useUIStore } from '@/store/use-ui-store'
-import type { TaskUploadPayload } from '@/types'
+import type { TaskUploadItem } from '@/types'
 
 interface TaskUploadDialogProps {
   open: boolean
@@ -31,13 +31,13 @@ type UploadState = 'idle' | 'validating' | 'uploading' | 'success' | 'error'
 
 interface ValidationResult {
   valid: boolean
-  payload: TaskUploadPayload | null
+  payload: TaskUploadItem[] | null
   errors: string[]
 }
 
 export function TaskUploadDialog({ open, onOpenChange }: TaskUploadDialogProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [groupId, setGroupId] = useState<string>('')
+  const [groupName, setGroupName] = useState<string>('')
   const [batchName, setBatchName] = useState<string>('')
   const [uploadState, setUploadState] = useState<UploadState>('idle')
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
@@ -51,7 +51,7 @@ export function TaskUploadDialog({ open, onOpenChange }: TaskUploadDialogProps) 
 
   const resetState = useCallback(() => {
     setSelectedFile(null)
-    setGroupId('')
+    setGroupName('')
     setBatchName('')
     setUploadState('idle')
     setValidationResult(null)
@@ -70,58 +70,58 @@ export function TaskUploadDialog({ open, onOpenChange }: TaskUploadDialogProps) 
   }, [onOpenChange, resetState])
 
   const validateJsonPayload = (data: unknown): ValidationResult => {
-    const errors: string[] = []
-
-    if (!data || typeof data !== 'object') {
-      return { valid: false, payload: null, errors: ['Invalid JSON structure'] }
+    const errors: string[] = [];
+  
+    // 1. Check if the root is an array
+    if (!Array.isArray(data)) {
+      return { valid: false, payload: null, errors: ['Invalid JSON structure: Expected an array'] };
     }
-
-    const payload = data as Record<string, unknown>
-
-    if (!Array.isArray(payload.data)) {
-      errors.push('Missing or invalid "data" array')
-      return { valid: false, payload: null, errors }
+  
+    if (data.length === 0) {
+      return { valid: false, payload: null, errors: ['Data array is empty'] };
     }
-
-    if (payload.data.length === 0) {
-      errors.push('Data array is empty')
-      return { valid: false, payload: null, errors }
-    }
-
-    // Validate each item
-    payload.data.forEach((item: unknown, index: number) => {
+  
+    // 2. Validate each item in the array
+    data.forEach((item: unknown, index: number) => {
       if (!item || typeof item !== 'object') {
-        errors.push(`Item ${index + 1}: Invalid structure`)
-        return
+        errors.push(`Item ${index + 1}: Invalid structure`);
+        return;
       }
-
-      const taskItem = item as Record<string, unknown>
-
-      if (!taskItem.image_url || typeof taskItem.image_url !== 'string') {
-        errors.push(`Item ${index + 1}: Missing or invalid "image_url"`)
+  
+      const taskItem = item as Record<string, unknown>;
+  
+      // Validate "name"
+      if (!taskItem.name || typeof taskItem.name !== 'string') {
+        errors.push(`Item ${index + 1}: Missing or invalid "name"`);
+      }
+  
+      // Validate "url"
+      if (!taskItem.url || typeof taskItem.url !== 'string') {
+        errors.push(`Item ${index + 1}: Missing or invalid "url"`);
       } else {
         try {
-          new URL(taskItem.image_url as string)
+          new URL(taskItem.url);
         } catch {
-          errors.push(`Item ${index + 1}: Invalid URL format for "image_url"`)
+          errors.push(`Item ${index + 1}: Invalid URL format for "url"`);
         }
       }
-
-      if (!taskItem.transcription || typeof taskItem.transcription !== 'string') {
-        errors.push(`Item ${index + 1}: Missing or invalid "transcription"`)
+  
+      // Validate "transcript"
+      if (!taskItem.transcript || typeof taskItem.transcript !== 'string') {
+        errors.push(`Item ${index + 1}: Missing or invalid "transcript"`);
       }
-    })
-
+    });
+  
     if (errors.length > 0) {
-      return { valid: false, payload: null, errors }
+      return { valid: false, payload: null, errors };
     }
-
+  
     return {
       valid: true,
-      payload: payload as unknown as TaskUploadPayload,
+      payload: data as unknown as TaskUploadItem[],
       errors: [],
-    }
-  }
+    };
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -163,7 +163,7 @@ export function TaskUploadDialog({ open, onOpenChange }: TaskUploadDialogProps) 
   }, [])
 
   const handleUpload = async () => {
-    if (!validationResult?.payload || !groupId || !batchName.trim()) return
+    if (!validationResult?.payload || !groupName || !batchName.trim()) return
 
     setUploadState('uploading')
     setUploadProgress(0)
@@ -181,9 +181,9 @@ export function TaskUploadDialog({ open, onOpenChange }: TaskUploadDialogProps) 
 
     try {
       const result = await createTasksBulk.mutateAsync({
-        payload: validationResult.payload,
-        groupId,
-        batchName: batchName.trim(),
+        tasks: validationResult.payload,
+        group: groupName,
+        batch_name: batchName.trim(),
       })
 
       clearInterval(progressInterval)
@@ -197,6 +197,7 @@ export function TaskUploadDialog({ open, onOpenChange }: TaskUploadDialogProps) 
         variant: result.failed > 0 ? 'default' : 'success',
       })
     } catch (error) {
+      console.error(error)
       clearInterval(progressInterval)
       setUploadState('error')
       setValidationResult({
@@ -212,7 +213,7 @@ export function TaskUploadDialog({ open, onOpenChange }: TaskUploadDialogProps) 
     }
   }
 
-  const canUpload = validationResult?.valid && groupId && batchName.trim() && uploadState !== 'uploading'
+  const canUpload = validationResult?.valid && groupName && batchName.trim() && uploadState !== 'uploading'
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -223,7 +224,7 @@ export function TaskUploadDialog({ open, onOpenChange }: TaskUploadDialogProps) 
             Upload Tasks
           </DialogTitle>
           <DialogDescription>
-            Upload a JSON file containing tasks to create. Select a group to assign them to.
+            Upload a JSON file containing tasks to create.
           </DialogDescription>
         </DialogHeader>
 
@@ -237,6 +238,7 @@ export function TaskUploadDialog({ open, onOpenChange }: TaskUploadDialogProps) 
               value={batchName}
               onChange={(e) => setBatchName(e.target.value)}
               disabled={uploadState === 'uploading' || uploadState === 'success'}
+              className="ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </div>
 
@@ -244,16 +246,16 @@ export function TaskUploadDialog({ open, onOpenChange }: TaskUploadDialogProps) 
           <div className="space-y-2">
             <Label htmlFor="group">Group</Label>
             <Select
-              value={groupId}
-              onValueChange={setGroupId}
+              value={groupName}
+              onValueChange={setGroupName}
               disabled={groupsLoading || uploadState === 'uploading' || uploadState === 'success'}
             >
-              <SelectTrigger id="group">
+              <SelectTrigger id="group" className="ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none">
                 <SelectValue placeholder="Select a group..." />
               </SelectTrigger>
               <SelectContent>
                 {groups?.map((group) => (
-                  <SelectItem key={group.id} value={group.id}>
+                  <SelectItem key={group.name} value={group.name}>
                     {group.name}
                   </SelectItem>
                 ))}
@@ -296,7 +298,7 @@ export function TaskUploadDialog({ open, onOpenChange }: TaskUploadDialogProps) 
                       {validationResult?.valid && (
                         <p className="text-xs text-success flex items-center gap-1">
                           <CheckCircle className="h-3 w-3" />
-                          {validationResult.payload?.data.length} items found
+                          {validationResult.payload?.length} items found
                         </p>
                       )}
                     </>

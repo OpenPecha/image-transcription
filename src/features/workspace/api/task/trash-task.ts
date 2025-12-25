@@ -21,7 +21,7 @@ const trashTask = async (params: TrashTaskRequest): Promise<TrashTaskResponse> =
       'Content-Type': 'application/json',
       'accept': 'application/json',
     },
-    body: JSON.stringify({username: params.username, submit: params.submit}),
+    body: JSON.stringify({username: params.username, submit: false}),
   })
 
   if (!response.ok) {

@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { Diamond, LogOut, RefreshCw, FileText, Folder, Users, AlertCircle, LayoutDashboard } from 'lucide-react'
+import { Diamond, LogOut, RefreshCw, FileText, Folder, Users, LayoutDashboard } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/features/auth'
 import { Button } from '@/components/ui/button'
@@ -13,7 +13,6 @@ interface WorkspaceSidebarProps {
   task: AssignedTask | null
   onRefresh?: () => void
   isLoading?: boolean
-  hasUnsavedChanges?: boolean
 }
 
 // Status color configuration
@@ -38,7 +37,6 @@ export function WorkspaceSidebar({
   task,
   onRefresh,
   isLoading,
-  hasUnsavedChanges = false,
 }: WorkspaceSidebarProps) {
   const { currentUser, logout } = useAuth()
 
@@ -126,16 +124,6 @@ export function WorkspaceSidebar({
                     {task.group}
                   </p>
                 </div>
-              </div>
-            )}
-
-            {/* Unsaved Changes Warning */}
-            {hasUnsavedChanges && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-warning/10 border border-warning/20">
-                <AlertCircle className="h-4 w-4 shrink-0 text-warning" />
-                <p className="text-xs text-warning">
-                  You have unsaved changes
-                </p>
               </div>
             )}
           </div>

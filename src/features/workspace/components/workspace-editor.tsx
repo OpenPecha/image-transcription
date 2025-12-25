@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react'
-import { GripHorizontal, Send, Trash2 } from 'lucide-react'
+import { GripHorizontal, Send, Trash2, XCircle } from 'lucide-react'
 import { ImageCanvas } from './image-canvas'
 import { WorkspaceSidebar } from './workspace-sidebar'
 import { TrashConfirmationDialog } from './trash-confirmation-dialog'
@@ -180,10 +180,6 @@ export function WorkspaceEditor() {
     setIsDragging(false)
   }, [])
 
-  // Character and word count
-  const charCount = text.length
-  const wordCount = text.split(/\s+/).filter(Boolean).length
-
   // Loading state
   if (isLoading) {
     return (
@@ -225,7 +221,6 @@ export function WorkspaceEditor() {
         task={task}
         onRefresh={() => refetch()}
         isLoading={isLoading}
-        hasUnsavedChanges={hasUnsavedChanges}
       />
 
       {/* Main Content */}
@@ -284,68 +279,66 @@ export function WorkspaceEditor() {
         </div>
 
         {/* Footer */}
-        <footer className="flex items-center justify-between border-t border-border bg-card px-6 py-3">
-          {/* Character/Word Count */}
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span>
-              {charCount} <span className="opacity-60">char</span>
-            </span>
-            <span className="w-px h-4 bg-border" />
-            <span>
-              {wordCount} <span className="opacity-60">words</span>
-            </span>
-            {hasUnsavedChanges && (
-              <>
-                <span className="w-px h-4 bg-border" />
-                <span className="text-warning">Unsaved changes</span>
-              </>
-            )}
-          </div>
+        <footer className="grid grid-cols-3 items-center border-t border-border bg-card px-6 py-3">
+  {/* Left Section: Status (Pinned to start) */}
+  <div className="flex items-center text-sm text-muted-foreground">
+    {hasUnsavedChanges && (
+      <span className="text-warning animate-pulse font-medium">
+        Unsaved changes
+      </span>
+    )}
+  </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-3">
-            {currentUser?.role === UserRole.Annotator && 
-            <>
-            <Button
-              variant="success"
-              onClick={handleSubmit}
-              disabled={submitTask.isPending || !canEdit}
-            >
-              <Send className="h-4 w-4 mr-2" />
-              {submitTask.isPending ? 'Submitting...' : 'Submit'}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => setTrashDialogOpen(true)}
-              disabled={trashTask.isPending || !canEdit}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Trash
-            </Button>
-            </>
-            }
-            {(currentUser?.role === UserRole.Reviewer || currentUser?.role === UserRole.FinalReviewer) && 
-            <>
-            <Button
-              variant="success"
-              onClick={handleApprove}
-              disabled={approveTask.isPending || !canEdit}
-            >
-              <Send className="h-4 w-4 mr-2" />
-              {submitTask.isPending ? 'Submitting...' : 'Approve'}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleReject}
-              disabled={rejectTask.isPending || !canEdit}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Reject
-            </Button>
-            </>
-            }
-          </div>
-        </footer>
+  {/* Center Section: Actions (Perfectly centered) */}
+  <div className="flex items-center justify-center gap-3">
+    {currentUser?.role === UserRole.Annotator && (
+      <>
+        <Button
+          variant="success"
+          onClick={handleSubmit}
+          disabled={submitTask.isPending || !canEdit}
+        >
+          <Send className="h-4 w-4 mr-2" />
+          {submitTask.isPending ? 'Submitting...' : 'Submit'}
+        </Button>
+        <Button
+          variant="destructive"
+          onClick={() => setTrashDialogOpen(true)}
+          disabled={trashTask.isPending || !canEdit}
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Trash
+        </Button>
+      </>
+    )}
+
+    {(currentUser?.role === UserRole.Reviewer || currentUser?.role === UserRole.FinalReviewer) && (
+      <>
+        <Button
+          variant="success"
+          onClick={handleApprove}
+          disabled={approveTask.isPending || !canEdit}
+        >
+          <Send className="h-4 w-4 mr-2" />
+          {approveTask.isPending ? 'Approving...' : 'Approve'}
+        </Button>
+        <Button
+          variant="destructive"
+          onClick={handleReject}
+          disabled={rejectTask.isPending || !canEdit}
+        >
+          <XCircle className="h-4 w-4 mr-2" />
+          Reject
+        </Button>
+      </>
+    )}
+  </div>
+
+  {/* Right Section: Empty Spacer (Ensures center stays center) */}
+  <div className="flex justify-end">
+    {/* You can put word counts or page numbers here later */}
+  </div>
+</footer>
       </main>
 
       {/* Trash Dialog */}

@@ -62,20 +62,15 @@ export interface Task {
 
 // Task upload JSON schema
 export interface TaskUploadItem {
-  image_url: string
-  image_id: string
-  image_order: string
-  transcription: string
-}
-
-export interface TaskUploadPayload {
-  data: TaskUploadItem[]
+  name: string
+  url: string
+  transcript: string
 }
 
 // Bulk create request/response
 export interface BulkCreateTasksRequest {
-  payload: TaskUploadPayload
-  groupId: string
+  tasks: TaskUploadItem[]
+  group: string
   batchName: string
 }
 
