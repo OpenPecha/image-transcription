@@ -20,7 +20,7 @@ export interface User {
 
 // Request payload for creating users
 export interface CreateUserDTO {
-  username: string
+  username?: string
   email: string
   role?: UserRole
   group_id?: string

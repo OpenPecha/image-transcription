@@ -12,7 +12,7 @@ import {
 export function Dashboard() {
   const navigate = useNavigate()
   const { currentUser } = useAuth()
-  const { data: task, isLoading } = useGetAssignedTask(currentUser?.username)
+  const { data: task, isLoading } = useGetAssignedTask(currentUser?.id)
 
   if (!currentUser) return null
 

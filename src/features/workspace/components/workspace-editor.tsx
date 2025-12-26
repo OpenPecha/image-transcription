@@ -40,12 +40,12 @@ export function WorkspaceEditor() {
     isLoading,
     isFetching,
     refetch,
-  } = useGetAssignedTask(currentUser?.username)
+  } = useGetAssignedTask(currentUser?.id)
 
-  const submitTask = useSubmitTask(currentUser?.username)
-  const trashTask = useTrashTask(currentUser?.username)
-  const approveTask = useApproveTask(currentUser?.username)
-  const rejectTask = useRejectTask(currentUser?.username)
+  const submitTask = useSubmitTask(currentUser?.id)
+  const trashTask = useTrashTask(currentUser?.id)
+  const approveTask = useApproveTask(currentUser?.id)
+  const rejectTask = useRejectTask(currentUser?.id)
 
   // Derived states
   const hasUnsavedChanges = text !== initialText
@@ -91,7 +91,7 @@ export function WorkspaceEditor() {
     if (!task || !currentUser) return
 
     submitTask.mutate(
-      { task_id: task.task_id, username: currentUser.username!, transcript: text, submit: true },
+      { task_id: task.task_id, user_id: currentUser.id!, transcript: text, submit: true },
       {
         onSuccess: () => {
           addToast({
@@ -117,7 +117,7 @@ export function WorkspaceEditor() {
     if (!task || !currentUser) return
 
     trashTask.mutate(
-      { task_id: task.task_id, username: currentUser.username!, submit: false },
+      { task_id: task.task_id, user_id: currentUser.id!, submit: false },
       {
         onSuccess: () => {
           setTrashDialogOpen(false)
@@ -139,7 +139,7 @@ export function WorkspaceEditor() {
     if (!task || !currentUser) return
 
     approveTask.mutate(
-      { task_id: task.task_id, username: currentUser.username!, transcript: text, approve: true },
+      { task_id: task.task_id, user_id: currentUser.id!, transcript: text, approve: true },
       {
         onSuccess: () => {
           addToast({
@@ -165,7 +165,7 @@ export function WorkspaceEditor() {
     if (!task || !currentUser) return
 
     rejectTask.mutate(
-      { task_id: task.task_id, username: currentUser.username!, transcript: text, reject: true },
+      { task_id: task.task_id, user_id: currentUser.id!, transcript: text, reject: true },
       {
         onSuccess: () => {
           addToast({ title: 'Task rejected', variant: 'default' })

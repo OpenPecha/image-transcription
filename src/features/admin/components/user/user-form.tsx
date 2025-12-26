@@ -43,12 +43,12 @@ export function UserForm({
       username: defaultValues?.username ?? '',
       email: defaultValues?.email ?? '',
       role: defaultValues?.role ?? UserRole.Annotator,
-      group: defaultValues?.group ?? '',
+      group_id: defaultValues?.group_id ?? '',
     },
   })
 
   const selectedRole = watch('role')
-  const selectedGroup = watch('group')
+  const selectedGroup = watch('group_id')
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -106,7 +106,7 @@ export function UserForm({
         <Label htmlFor="group">Group</Label>
         <Select
           value={selectedGroup}
-          onValueChange={(value) => setValue('group', value)}
+          onValueChange={(value) => setValue('group_id', value)}
           disabled={isSubmitting}
         >
           <SelectTrigger id="group">
@@ -114,14 +114,14 @@ export function UserForm({
           </SelectTrigger>
           <SelectContent>
             {groups.map((group) => (
-              <SelectItem key={group.name} value={group.name}>
+              <SelectItem key={group.id} value={group.id}>
                 {group.name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        {errors.group && (
-          <p className="text-sm text-destructive">{errors.group.message}</p>
+        {errors.group_id && (
+          <p className="text-sm text-destructive">{errors.group_id.message}</p>
         )}
       </div>
 

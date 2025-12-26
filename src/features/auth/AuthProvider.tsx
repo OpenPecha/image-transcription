@@ -64,6 +64,7 @@ const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const token = await getAccessTokenSilently()
 
         const user = await getUserDetails(auth0User.email)
+        console.log('user', user)
         setCurrentUser(user)
 
         // Store token for API calls

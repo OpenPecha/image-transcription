@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { workspaceKeys } from './workspace-keys'
 import { apiClient } from '@/lib/axios'
+import { APPLICATION_NAME } from '@/lib/constant'
 
 interface RejectTaskParams {
   task_id: string
-  username: string
+  user_id: string
   transcript: string
   reject: boolean
 }
@@ -15,21 +16,21 @@ interface RejectTaskResponse {
 }
 
 const rejectTask = async (params: RejectTaskParams): Promise<RejectTaskResponse> => {
-  return apiClient.post(`/tasks/submit/${params.task_id}`, {
-    username: params.username,
+  return apiClient.post(`/tasks/${APPLICATION_NAME}/submit/${params.task_id}`, {
+    user_id: params.user_id,
     transcript: params.transcript,
     submit: false,
   })
 }
 
-export const useRejectTask = (username?: string) => {
+export const useRejectTask = (user_id?: string) => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: rejectTask,
     onSuccess: () => {
-      if (username) {
-        queryClient.invalidateQueries({ queryKey: workspaceKeys.assignedTask(username) })
+      if (user_id) {
+        queryClient.invalidateQueries({ queryKey: workspaceKeys.assignedTask(user_id!) })
       }
     },
   })

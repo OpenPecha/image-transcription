@@ -8,7 +8,7 @@ import {
 import { UserForm } from './user-form'
 import { useCreateUser, useUpdateUser } from '../../api/user'
 import { useGetGroups } from '../../api/group'
-import type { User } from '@/types'
+import type { CreateUserDTO, User } from '@/types'
 import type { UserFormData } from '@/schema/user-schema'
 
 interface UserDialogProps {
@@ -29,21 +29,23 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
     try {
       if (isEditing && user) {
         await updateUser.mutateAsync({
-          username: user.username!,
+          id: user.id!,
           data: {
-            ...(data.username ? { new_username: data.username } : {}),
-            ...(data.email ? { new_email: data.email } : {}),
+            new_username: data.username,
+            new_email: data.email,
             ...(data.role ? { new_role: data.role } : {}),
-            ...(data.group ? { new_group: data.group } : {}),
+            ...(data.group_id ? { new_group_id: data.group_id } : {}),
           },
         })
       } else {
         // Only include properties in the request if they exist in data
-        const payload: any = {}
+        // Always include email (required), optionally other fields
+        const payload: CreateUserDTO = {
+          email: data.email,
+        }
         if (data.username) payload.username = data.username
-        if (data.email) payload.email = data.email
         if (data.role) payload.role = data.role
-        if (data.group) payload.group = data.group
+        if (data.group_id) payload.group_id = data.group_id
         await createUser.mutateAsync(payload)
       }
       onOpenChange(false)
@@ -57,7 +59,7 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
         username: user.username,
         email: user.email,
         role: user.role,
-        group: user.group ?? '',
+        group_id: user.group_id ?? '',
       }
     : undefined
 

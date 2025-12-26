@@ -12,7 +12,7 @@ export const userSchema = z.object({
   role: z.nativeEnum(UserRole, {
     message: 'Please select a role',
   }),
-  group: z
+  group_id: z
     .string()
     .optional(),
 })
