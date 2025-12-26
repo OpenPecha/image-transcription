@@ -12,8 +12,8 @@ export interface User {
   username?: string
   email: string
   role?: UserRole
-  group?: string
-  groupId?: string
+  group_name?: string
+  group_id?: string
   picture?: string
   createdAt?: Date
 }
@@ -23,7 +23,7 @@ export interface CreateUserDTO {
   username: string
   email: string
   role?: UserRole
-  group?: string
+  group_id?: string
   picture?: string
 }
 
@@ -32,7 +32,7 @@ export interface UpdateUserDTO {
   new_username?: string
   new_email?: string
   new_role?: UserRole
-  new_group?: string
+  new_group_id?: string
 }
 
 // Paginated response wrapper
@@ -44,7 +44,7 @@ export interface UserListResponse {
 export interface UserFilters {
   search?: string
   role?: UserRole
-  groupId?: string
+  group_id?: string
   page?: number
   limit?: number
 }

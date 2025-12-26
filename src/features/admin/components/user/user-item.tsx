@@ -30,7 +30,7 @@ export function UserItem({ user, groups }: UserItemProps) {
     if (newRole === user.role) return
     try {
       await updateUser.mutateAsync({
-        username: user.username!,
+        id: user.id!,
         data: { new_role: newRole as UserRole },
       })
     } catch (error) {
@@ -38,12 +38,12 @@ export function UserItem({ user, groups }: UserItemProps) {
     }
   }
 
-  const handleGroupChange = async (newGroup: string) => {
-    if (newGroup === user.group) return
+  const handleGroupChange = async (new_group_id: string) => {
+    if (new_group_id === user.group_id) return
     try {
       await updateUser.mutateAsync({
-        username: user.username!,
-        data: { new_group: newGroup || undefined },
+        id: user.id!,
+        data: { new_group_id: new_group_id },
       })
     } catch (error) {
       console.error('Failed to update group:', error)
@@ -90,7 +90,7 @@ export function UserItem({ user, groups }: UserItemProps) {
 
         {/* Group Select */}
         <Select
-          value={user.group || ''}
+          value={user.group_id || ''}
           onValueChange={handleGroupChange}
           disabled={updateUser.isPending}
         >
@@ -99,7 +99,7 @@ export function UserItem({ user, groups }: UserItemProps) {
           </SelectTrigger>
           <SelectContent>
             {groups.map((group) => (
-              <SelectItem key={group.name} value={group.name}>
+              <SelectItem key={group.id} value={group.id}>
                 {group.name}
               </SelectItem>
             ))}

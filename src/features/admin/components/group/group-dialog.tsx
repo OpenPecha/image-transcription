@@ -26,7 +26,7 @@ export function GroupDialog({ open, onOpenChange, group }: GroupDialogProps) {
     try {
       if (isEditing && group) {
         await updateGroup.mutateAsync({
-          name: group.name,
+          id: group.id,
           data: {
             new_name: data.name,
             new_description: data.description || '',

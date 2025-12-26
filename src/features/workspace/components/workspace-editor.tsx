@@ -49,7 +49,7 @@ export function WorkspaceEditor() {
 
   // Derived states
   const hasUnsavedChanges = text !== initialText
-  const canEdit = task?.state === 'annotating' || task?.state === 'reviewing'
+  const canEdit = task?.state === 'annotating' || task?.state === 'reviewing' || task?.state === 'finalising'
   const isMutating = submitTask.isPending || trashTask.isPending || approveTask.isPending || rejectTask.isPending
   const isLoadingNextTask = isFetching && !isLoading
   const showOverlay = isLoadingNextTask || isMutating

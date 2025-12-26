@@ -37,7 +37,7 @@ export function DeleteGroupDialog({
     setError(null)
 
     try {
-      await deleteGroup.mutateAsync(group.name)
+      await deleteGroup.mutateAsync(group.id)
       onOpenChange(false)
     } catch (err) {
       setError('Failed to delete group. Please try again.')

@@ -21,7 +21,7 @@ export function GroupItem({ group }: GroupItemProps) {
 
   // Fetch group with users only when expanded
   const { data: groupUsers, isLoading: isLoadingUsers } = useGetGroupUsers(
-    group.name,
+    group.id,
     isExpanded
   )
 

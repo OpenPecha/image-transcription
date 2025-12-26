@@ -58,7 +58,7 @@ export const router = createBrowserRouter([
           <ProtectedRoute allowedRoles={[UserRole.Admin]}>
             <Suspense fallback={fallback}><AdminUsersPage /></Suspense>
           </ProtectedRoute>
-        ),
+        )
       },
       {
         path: '/admin/tasks',

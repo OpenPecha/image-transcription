@@ -15,10 +15,9 @@ interface AuthProviderProps {
   children: ReactNode
 }
 
-// API call to create or fetch user
+// API call to fetch user
 async function getUserDetails(email: string): Promise<User> {
-  return await apiClient.get(`/user/${email}`)
-
+  return await apiClient.get(`/user/by-identifier/${email}`)
 }
 
 // Inner provider that uses Auth0 hooks
@@ -72,8 +71,7 @@ const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } catch (err) {
         console.error('Failed to sync user:', err)
         setCurrentUser({
-          email: auth0User.email,
-          role:undefined,
+          email: auth0User.email
         })
       } finally {
         setIsUserLoading(false)
