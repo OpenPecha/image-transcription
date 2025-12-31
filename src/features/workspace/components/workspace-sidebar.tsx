@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { Diamond, LogOut, RefreshCw, FileText, Folder, Users, LayoutDashboard, Loader2 } from 'lucide-react'
+import { Diamond, LogOut, RefreshCw, FileText, Users, LayoutDashboard, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/features/auth'
 import { Button } from '@/components/ui/button'
@@ -101,19 +101,6 @@ export function WorkspaceSidebar({
                   )}>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Batch Info */}
-            <div className="space-y-2">
-              <h3 className="text-xs font-medium uppercase text-muted-foreground tracking-wider">
-                Batch
-              </h3>
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-sidebar-accent/50">
-                <Folder className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <p className="text-sm text-sidebar-foreground truncate">
-                  {task.batch_name}
-                </p>
               </div>
             </div>
 

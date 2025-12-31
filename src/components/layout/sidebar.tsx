@@ -4,6 +4,7 @@ import {
   FileText,
   Users,
   Layers,
+  Package,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -38,15 +39,15 @@ const navItems: NavItem[] = [
     roles: [UserRole.Admin],
   },
   {
-    label: 'Tasks',
-    href: '/admin/tasks',
-    icon: FileText,
-    roles: [UserRole.Admin],
-  },
-  {
     label: 'Groups',
     href: '/admin/groups',
     icon: Layers,
+    roles: [UserRole.Admin],
+  },
+  {
+    label: 'Batches',
+    href: '/admin/batches',
+    icon: Package,
     roles: [UserRole.Admin],
   },
 ]

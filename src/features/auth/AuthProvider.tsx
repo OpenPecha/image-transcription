@@ -40,9 +40,6 @@ const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // or if we are authenticated but haven't processed the user yet (race condition fix)
   const isLoading = auth0Loading || isUserLoading || (isAuthenticated && !currentUser)
 
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/46c965a1-fad8-474e-9dac-9305e8b48950',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthProvider.tsx:50',message:'Auth Provider State',data:{isAuthenticated, auth0Loading, isUserLoading, currentUser, isLoading},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'auth-race'})}).catch(()=>{});
-  // #endregion
 
   // Set up API token getter when authenticated
   useEffect(() => {

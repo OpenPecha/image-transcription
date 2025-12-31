@@ -1,18 +1,28 @@
 @import 'tailwindcss';
 
+/* Update path to point to src/assets/font relative to src/index.css */
 @font-face {
-	font-family: monlam;
-	src: url("/font/MonlamUniOuChan2.ttf") format("truetype");
-	font-weight: normal;
-	font-style: normal;
-}
-@font-face {
-	font-family: monlam-2;
-	src: url("/font/MonlamUniOuChan2.ttf") format("truetype");
-	font-weight: normal;
-	font-style: normal;
+  font-family: 'monlam';
+  /* Use relative path */
+  src: url('./assets/font/MonlamUniOuChan2.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
+/* If you intended to use the TBslim font for the second family */
+@font-face {
+  font-family: 'monlam-2';
+  /* Priority: woff2 (fastest) -> woff -> ttf */
+  src: url('./assets/font/MonlamTBslim.woff2') format('woff2'),
+       url('./assets/font/MonlamTBslim.woff') format('woff'),
+       url('./assets/font/MonlamTBslim.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ... rest of your CSS ... */
 @theme {
   /* Colors - Dark theme with cyan/teal accents */
   --color-background: oklch(0.145 0 0);
@@ -153,4 +163,15 @@
 
 .animate-pulse-glow {
   animation: pulse-glow 2s infinite;
+}
+
+/* Progress bar hatched pattern for trashed items */
+.progress-segment-hatched {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 3px,
+    rgba(255, 255, 255, 0.25) 3px,
+    rgba(255, 255, 255, 0.25) 6px
+  );
 }

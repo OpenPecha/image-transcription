@@ -1,0 +1,251 @@
+import { useCallback, useMemo } from 'react'
+import { useSearchParams, useNavigate, useParams } from 'react-router-dom'
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useUIStore } from '@/store/use-ui-store'
+import { useGetBatchTasks, useRestoreTask, useGetBatchReport } from '../../../api/batch'
+import { TaskListSidebar } from './task-list-sidebar'
+import { TaskPreview } from './task-preview'
+import { BATCH_STATS_CONFIG, type BatchTask, type BatchTaskState } from '@/types'
+import { cn } from '@/lib/utils'
+
+const STATE_OPTIONS: Array<{ value: BatchTaskState | 'all'; label: string }> = [
+  { value: 'all', label: 'All' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'annotated', label: 'Annotated' },
+  { value: 'reviewed', label: 'Reviewed' },
+  { value: 'finalised', label: 'Finalised' },
+  { value: 'trashed', label: 'Trashed' },
+]
+
+export function BatchTaskView() {
+  const { batchId } = useParams<{ batchId: string }>()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const { addToast } = useUIStore()
+
+  // Get state filter from URL, default to 'all'
+  const stateFilter = (searchParams.get('state') as BatchTaskState | 'all') || 'all'
+  const taskIdFromUrl = searchParams.get('task_id')
+
+
+  // API hooks
+  const { data: report, isLoading: isLoadingReport } = useGetBatchReport(batchId!, true)
+  const { data: tasks = [], isLoading: isLoadingTasks } = useGetBatchTasks(batchId!, stateFilter)
+  const restoreTask = useRestoreTask()
+
+  // Set selected task from URL or first task
+  const selectedTask = useMemo(() => {
+    if (tasks.length === 0) return null;
+    
+    if (taskIdFromUrl) {
+      const taskFromUrl = tasks.find((t) => t.task_id === taskIdFromUrl);
+      if (taskFromUrl) return taskFromUrl;
+    }
+    
+    return tasks[0];
+  }, [tasks, taskIdFromUrl]);
+
+  // Update URL when task is selected
+  const handleSelectTask = useCallback(
+    (task: BatchTask) => {
+      const newSearchParams = new URLSearchParams(searchParams)
+      newSearchParams.set('task_id', task.task_id)
+      setSearchParams(newSearchParams)
+    },
+    [searchParams, setSearchParams]
+  )
+
+  // Handle state filter change
+  const handleStateChange = useCallback(
+    (value: string) => {
+      setSearchParams((prev) => {
+        prev.set('state', value)
+        prev.delete('task_id') // Reset task selection when filter changes
+        return prev
+      })
+    },
+    [setSearchParams]
+  )
+
+  // Handle restore
+  const handleRestore = useCallback(() => {
+    if (!selectedTask || !batchId) return
+
+    restoreTask.mutate(
+      { taskId: selectedTask.task_id, batchId },
+      {
+        onSuccess: () => {
+          addToast({
+            title: 'Task restored',
+            description: `"${selectedTask.task_name}" has been restored successfully`,
+            variant: 'success',
+          })
+        },
+        onError: (error: Error) => {
+          addToast({
+            title: 'Failed to restore task',
+            description: error.message,
+            variant: 'destructive',
+          })
+        },
+      }
+    )
+  }, [selectedTask, batchId, restoreTask, addToast])
+
+  // Navigation helpers
+  const currentIndex = selectedTask
+    ? tasks.findIndex((t) => t.task_id === selectedTask.task_id)
+    : -1
+  const hasPrevious = currentIndex > 0
+  const hasNext = currentIndex < tasks.length - 1
+
+  const goToPrevious = useCallback(() => {
+    if (hasPrevious) {
+      handleSelectTask(tasks[currentIndex - 1])
+    }
+  }, [hasPrevious, currentIndex, tasks, handleSelectTask])
+
+  const goToNext = useCallback(() => {
+    if (hasNext) {
+      handleSelectTask(tasks[currentIndex + 1])
+    }
+  }, [hasNext, currentIndex, tasks, handleSelectTask])
+
+  // Get task count for current filter
+  const getTaskCount = useCallback(
+    (state: BatchTaskState | 'all') => {
+      if (!report) return null
+      if (state === 'all') return report.total_tasks
+      return report[state]
+    },
+    [report]
+  )
+
+  return (
+    <div className="flex flex-col h-[calc(100vh-6rem)] animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-4">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/admin/batches')}
+            className="gap-1"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <div className="h-6 w-px bg-border" />
+          <div>
+            {isLoadingReport ? (
+              <Skeleton className="h-7 w-48" />
+            ) : (
+              <h1 className="text-xl font-semibold">{report?.name || 'Batch Tasks'}</h1>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {/* Task count */}
+          <span className="text-sm text-muted-foreground">
+            {isLoadingTasks ? (
+              <Skeleton className="h-5 w-20 inline-block" />
+            ) : (
+              `${tasks.length} tasks`
+            )}
+          </span>
+
+          {/* State filter */}
+          <Select value={stateFilter} onValueChange={handleStateChange}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Filter by state" />
+            </SelectTrigger>
+            <SelectContent>
+              {STATE_OPTIONS.map((option) => {
+                const count = getTaskCount(option.value)
+                const config = option.value !== 'all' 
+                  ? BATCH_STATS_CONFIG[option.value] 
+                  : null
+                return (
+                  <SelectItem key={option.value} value={option.value}>
+                    <div className="flex items-center justify-between gap-3 w-full">
+                      <span>{option.label}</span>
+                      {count !== null && (
+                        <span
+                          className={cn(
+                            'text-xs px-1.5 py-0.5 rounded',
+                            config?.color || 'bg-muted text-muted-foreground'
+                          )}
+                        >
+                          {count}
+                        </span>
+                      )}
+                    </div>
+                  </SelectItem>
+                )
+              })}
+            </SelectContent>
+          </Select>
+
+          {/* Quick navigation */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={goToPrevious}
+              disabled={!hasPrevious || isLoadingTasks}
+              className="h-9 w-9"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-muted-foreground min-w-[60px] text-center">
+              {currentIndex >= 0 ? `${currentIndex + 1} / ${tasks.length}` : '- / -'}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={goToNext}
+              disabled={!hasNext || isLoadingTasks}
+              className="h-9 w-9"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex border border-border rounded-lg overflow-hidden bg-background">
+        {/* Task List Sidebar */}
+        <div className="w-64 shrink-0">
+          <TaskListSidebar
+            tasks={tasks}
+            selectedTaskId={selectedTask?.task_id || null}
+            onSelectTask={handleSelectTask}
+            isLoading={isLoadingTasks}
+          />
+        </div>
+
+        {/* Task Preview */}
+        <div className="flex-1 min-w-0">
+          <TaskPreview
+            task={selectedTask}
+            onRestore={handleRestore}
+            isRestoring={restoreTask.isPending}
+            isLoading={isLoadingTasks && !selectedTask}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+

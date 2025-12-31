@@ -20,7 +20,7 @@ export const useGetAssignedTask = (userId?: string) => {
     queryKey: workspaceKeys.assignedTask(userId ?? ''),
     queryFn: () => getAssignedTask(userId!),
     enabled: !!userId,
-    staleTime: 0,
+    staleTime: 1000 * 60 * 1 , // 1 minute
     retry: 1,
   })
 }
