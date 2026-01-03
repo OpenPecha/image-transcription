@@ -2,6 +2,7 @@ import { RefreshCw, Clock, LogOut } from 'lucide-react'
 import { useAuth } from '@/features/auth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Navigate } from 'react-router-dom'
 
 export function PendingApprovalPage() {
   const { currentUser, logout } = useAuth()
@@ -10,7 +11,10 @@ export function PendingApprovalPage() {
     window.location.reload()
   }
 
-  console.log("currentUser", currentUser)
+  if(currentUser?.role){
+    return <Navigate to="/dashboard" replace />
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4">
       <Card className="w-full max-w-md text-center">

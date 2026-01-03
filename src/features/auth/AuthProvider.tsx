@@ -17,7 +17,8 @@ interface AuthProviderProps {
 
 // API call to fetch user
 async function getUserDetails(email: string): Promise<User> {
-  return await apiClient.get(`/user/by-identifier/${email}`)
+  const date = new Date().toISOString()
+  return await apiClient.get(`/user/by-identifier/${email}?date=${date}`)
 }
 
 // Inner provider that uses Auth0 hooks
