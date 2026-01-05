@@ -82,7 +82,6 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={isEditing ? 'Update' : '+ Create'}
-          isEditMode={isEditing}
         />
       </DialogContent>
     </Dialog>

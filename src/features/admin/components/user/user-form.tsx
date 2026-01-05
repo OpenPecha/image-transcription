@@ -20,7 +20,6 @@ export interface UserFormProps {
   onSubmit: (data: UserFormData) => void
   isSubmitting?: boolean
   submitLabel?: string
-  isEditMode?: boolean
 }
 
 export function UserForm({
@@ -29,7 +28,6 @@ export function UserForm({
   onSubmit,
   isSubmitting = false,
   submitLabel = 'Create',
-  isEditMode = false,
 }: UserFormProps) {
   const {
     register,
@@ -72,7 +70,7 @@ export function UserForm({
           type="email"
           placeholder="Enter user email"
           {...register('email')}
-          disabled={isSubmitting || isEditMode}
+          disabled={isSubmitting}
         />
         {errors.email && (
           <p className="text-sm text-destructive">{errors.email.message}</p>
