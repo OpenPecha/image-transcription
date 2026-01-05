@@ -52,7 +52,7 @@ export function BatchItem({ batch }: BatchItemProps) {
           </div>
 
           <div className="flex items-center gap-2 ml-4">
-            {isExpanded && report && (
+            {report?.total_tasks && (
               <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
                 {report.total_tasks} tasks
               </span>

@@ -149,7 +149,7 @@ export function Sidebar() {
         <div
           className={cn(
             'overflow-hidden transition-all duration-300 ease-out',
-            settingsOpen ? 'max-h-40 opacity-100 mb-2' : 'max-h-0 opacity-0'
+            settingsOpen && !sidebarCollapsed ? 'max-h-40 opacity-100 mb-2' : 'max-h-0 opacity-0'
           )}
         >
           <div className="flex flex-col gap-2 rounded-lg bg-sidebar-accent/50 p-2">
@@ -236,7 +236,7 @@ export function Sidebar() {
               </p>
             </div>
           )}
-          <Button
+          {!sidebarCollapsed && <Button
             variant="ghost"
             size="icon"
             className={cn(
@@ -246,7 +246,7 @@ export function Sidebar() {
             onClick={toggleSettings}
           >
             <Settings className="h-4 w-4" />
-          </Button>
+          </Button>}
         </div>
       </div>
     </aside>

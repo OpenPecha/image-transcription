@@ -24,47 +24,47 @@ export function getSegmentConfig(status: BatchStatKey) {
 }
 
 /**
- * Build segment data from batch report for workflow statuses
+ * Build all segment data from batch report (workflow + trashed)
  */
-export function buildWorkflowSegments(report: BatchReport): ProgressSegmentData[] {
-  const total = report.total_tasks - report.trashed // Exclude trashed from total for workflow
+export function buildAllSegments(report: BatchReport): ProgressSegmentData[] {
+  const total = report.total_tasks
+  const segments: ProgressSegmentData[] = []
 
-  return WORKFLOW_STATS
-    .map((status) => {
-      const config = BATCH_STATS_CONFIG[status]
-      const count = report[status]
-      const percentage = calculatePercentage(count, total)
+  // Build workflow segments
+  for (const status of WORKFLOW_STATS) {
+    const config = BATCH_STATS_CONFIG[status]
+    const count = report[status]
+    const percentage = calculatePercentage(count, total)
 
-      return {
+    if (percentage > 0) {
+      segments.push({
         status,
         count,
         percentage,
         barColor: config.barColor,
         textColor: config.textColor,
         label: config.label,
-      }
-    })
-    .filter((segment) => segment.percentage > 0) // Filter out 0% segments
-}
-
-/**
- * Build trashed segment data
- */
-export function buildTrashedSegment(report: BatchReport): ProgressSegmentData | null {
-  if (report.trashed === 0) return null
-
-  const config = BATCH_STATS_CONFIG.trashed
-  const percentage = calculatePercentage(report.trashed, report.total_tasks)
-
-  return {
-    status: 'trashed',
-    count: report.trashed,
-    percentage,
-    barColor: config.barColor,
-    textColor: config.textColor,
-    label: config.label,
-    isHatched: true,
+      })
+    }
   }
+
+  // Add trashed segment if present
+  if (report.trashed > 0) {
+    const config = BATCH_STATS_CONFIG.trashed
+    const percentage = calculatePercentage(report.trashed, total)
+
+    segments.push({
+      status: 'trashed',
+      count: report.trashed,
+      percentage,
+      barColor: config.barColor,
+      textColor: config.textColor,
+      label: config.label,
+      isHatched: true,
+    })
+  }
+
+  return segments
 }
 
 /**
