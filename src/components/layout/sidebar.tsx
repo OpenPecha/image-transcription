@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -10,29 +10,16 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Monitor,
-  Sun,
-  Moon,
   Settings,
 } from 'lucide-react'
 import { cn, getInitials, getRoleTranslationKey } from '@/lib/utils'
 import { useAuth } from '@/features/auth'
-import { useUIStore, type Theme, type Language } from '@/store/use-ui-store'
+import { useUIStore } from '@/store/use-ui-store'
 import { UserRole } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
-
-const themeOptions: { value: Theme; icon: React.ElementType }[] = [
-  { value: 'system', icon: Monitor },
-  { value: 'light', icon: Sun },
-  { value: 'dark', icon: Moon },
-]
-
-const languageOptions: { value: Language; label: string }[] = [
-  { value: 'en', label: 'EN' },
-  { value: 'bo', label: 'BO' },
-]
+import { ThemeToggle, LanguageToggle } from '@/components/common'
 
 interface NavItem {
   labelKey: string
@@ -71,8 +58,25 @@ const navItems: NavItem[] = [
 export function Sidebar() {
   const { t } = useTranslation('common')
   const { currentUser, logout } = useAuth()
-  const { sidebarCollapsed, toggleSidebar, theme, setTheme, language, setLanguage } = useUIStore()
+  const { sidebarCollapsed, toggleSidebar } = useUIStore()
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const sidebarRef = useRef<HTMLElement>(null)
+
+  // Close settings when clicking outside sidebar
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        settingsOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setSettingsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [settingsOpen])
 
   if (!currentUser) return null
 
@@ -90,6 +94,7 @@ export function Sidebar() {
 
   return (
     <aside
+      ref={sidebarRef}
       className={cn(
         'fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300',
         sidebarCollapsed ? 'w-16' : 'w-60'
@@ -155,51 +160,10 @@ export function Sidebar() {
         >
           <div className="flex flex-col gap-2 rounded-lg bg-sidebar-accent/50 p-2">
             {/* Language Toggle */}
-            <div className="flex items-center justify-start">
-              <div className="flex items-center gap-1 rounded-full bg-sidebar-accent p-1">
-                {languageOptions.map((lang) => {
-                  const isSelected = language === lang.value
-                  return (
-                    <button
-                      key={lang.value}
-                      onClick={() => setLanguage(lang.value)}
-                      className={cn(
-                        'px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200',
-                        isSelected
-                          ? 'bg-sidebar text-sidebar-foreground'
-                          : 'text-muted-foreground hover:text-sidebar-foreground'
-                      )}
-                    >
-                      {lang.label}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+            <LanguageToggle />
 
             {/* Theme Toggle */}
-            <div className="flex items-center justify-start">
-              <div className="flex items-center gap-1 rounded-full bg-sidebar-accent p-1">
-                {themeOptions.map((themeOpt) => {
-                  const Icon = themeOpt.icon
-                  const isSelected = theme === themeOpt.value
-                  return (
-                    <button
-                      key={themeOpt.value}
-                      onClick={() => setTheme(themeOpt.value)}
-                      className={cn(
-                        'p-2 rounded-full transition-all duration-200',
-                        isSelected
-                          ? 'bg-sidebar text-sidebar-foreground'
-                          : 'text-muted-foreground hover:text-sidebar-foreground'
-                      )}
-                    >
-                      <Icon className="h-4 w-4" />
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+            <ThemeToggle />
 
             {/* Logout Button */}
             <Button
