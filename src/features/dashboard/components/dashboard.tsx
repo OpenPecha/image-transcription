@@ -1,4 +1,4 @@
-
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useGetAssignedTask } from '@/features/workspace/api'
 import { useAuth } from '@/features/auth'
@@ -10,6 +10,7 @@ import {
 } from '@/features/dashboard'
 
 export function Dashboard() {
+  const { t } = useTranslation('dashboard')
   const navigate = useNavigate()
   const { currentUser } = useAuth()
   const { data: task, isLoading } = useGetAssignedTask(currentUser?.id)
@@ -25,7 +26,7 @@ export function Dashboard() {
       <WelcomeHeader user={currentUser} />
 
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Your Current Task</h2>
+        <h2 className="text-xl font-semibold">{t('currentTask')}</h2>
 
         {isLoading ? (
           <TaskCardSkeleton />

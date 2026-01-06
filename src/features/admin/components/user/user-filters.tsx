@@ -7,7 +7,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { UserRole, ROLE_CONFIG, type Group } from '@/types'
+import { UserRole, type Group } from '@/types'
+import { useTranslation } from 'react-i18next'
+import { getRoleTranslationKey } from '@/lib/utils'
 
 interface UserFiltersProps {
   search: string
@@ -31,12 +33,14 @@ export function UserFilters({
   onGroupFilterChange,
   groups,
 }: UserFiltersProps) {
+  const { t } = useTranslation('admin')
+  const { t: tCommon } = useTranslation('common')
   return (
     <div className="flex flex-col sm:flex-row gap-3">
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Search member..."
+          placeholder={t('users.searchUsers')}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-9"
@@ -47,13 +51,13 @@ export function UserFilters({
         <Select value={roleFilter} onValueChange={onRoleFilterChange}>
           <SelectTrigger className="w-[140px]">
             <Filter className="mr-2 h-4 w-4" />
-            <SelectValue placeholder="Role" />
+            <SelectValue placeholder={tCommon('filters.role')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ALL_ROLES}>All Roles</SelectItem>
+            <SelectItem value={ALL_ROLES}>{tCommon('filters.allRoles')}</SelectItem>
             {Object.values(UserRole).map((role) => (
               <SelectItem key={role} value={role}>
-                {ROLE_CONFIG[role].label}
+                { tCommon(`roles.${getRoleTranslationKey(role)}`) }
               </SelectItem>
             ))}
           </SelectContent>
@@ -62,10 +66,10 @@ export function UserFilters({
         <Select value={groupFilter} onValueChange={onGroupFilterChange}>
           <SelectTrigger className="w-[140px]">
             <Filter className="mr-2 h-4 w-4" />
-            <SelectValue placeholder="Group" />
+            <SelectValue placeholder={tCommon('filters.group')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ALL_GROUPS}>All Groups</SelectItem>
+            <SelectItem value={ALL_GROUPS}>{tCommon('filters.allGroups')}</SelectItem>
             {groups.map((group) => (
               <SelectItem key={group.id} value={group.id}>
                 {group.name}

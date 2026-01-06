@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Eraser, Type, ALargeSmall, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -36,6 +37,7 @@ export function EditorToolbar({
   hasOriginalContent,
   isDisabled = false,
 }: EditorToolbarProps) {
+  const { t } = useTranslation('workspace')
   const {
     editorFontFamily,
     editorFontSize,
@@ -64,17 +66,17 @@ export function EditorToolbar({
 
     // Show toast with undo option
     addToast({
-      title: 'Transcription cleared',
-      description: 'The text area has been cleared',
+      title: t('editor.cleared'),
+      description: t('editor.clearedDescription'),
       variant: 'default',
       action: {
-        label: 'Undo',
+        label: t('editor.undo'),
         onClick: () => {
           onRestoreOriginal()
         },
       },
     })
-  }, [onClear, onRestoreOriginal, addToast])
+  }, [onClear, onRestoreOriginal, addToast, t])
 
   const currentFontLabel = FONT_FAMILIES.find((f) => f.value === editorFontFamily)?.label ?? 'Monlam'
 
@@ -148,10 +150,10 @@ export function EditorToolbar({
             onClick={onRestoreOriginal}
             disabled={isDisabled}
             className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground"
-            aria-label="Restore original OCR text"
+            aria-label={t('editor.restoreOriginal')}
           >
             <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-            Restore Original
+            {t('editor.restoreOriginal')}
           </Button>
           <Separator orientation="vertical" className="h-5" />
         </>
@@ -169,10 +171,10 @@ export function EditorToolbar({
             ? 'text-muted-foreground hover:text-destructive hover:bg-destructive/10'
             : 'text-muted-foreground/50'
         )}
-        aria-label="Clear transcription text"
+        aria-label={t('editor.clear')}
       >
         <Eraser className="h-3.5 w-3.5 mr-1.5" />
-        Clear
+        {t('editor.clear')}
       </Button>
     </div>
   )

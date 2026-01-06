@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Mail } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -33,10 +34,11 @@ function UserRowSkeleton() {
 }
 
 function EmptyState() {
+  const { t } = useTranslation('admin')
   return (
     <div className="py-8 text-center">
       <p className="text-sm text-muted-foreground">
-        No users in this group yet.
+        {t('groups.noUsersInGroup')}
       </p>
     </div>
   )

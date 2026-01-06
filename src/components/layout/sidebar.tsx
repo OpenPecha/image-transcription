@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   LayoutDashboard,
   FileText,
@@ -14,14 +15,13 @@ import {
   Moon,
   Settings,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, getInitials, getRoleTranslationKey } from '@/lib/utils'
 import { useAuth } from '@/features/auth'
 import { useUIStore, type Theme, type Language } from '@/store/use-ui-store'
-import { UserRole, ROLE_CONFIG } from '@/types'
+import { UserRole } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
-import { getInitials } from '@/lib/utils'
 
 const themeOptions: { value: Theme; icon: React.ElementType }[] = [
   { value: 'system', icon: Monitor },
@@ -35,7 +35,7 @@ const languageOptions: { value: Language; label: string }[] = [
 ]
 
 interface NavItem {
-  label: string
+  labelKey: string
   href: string
   icon: React.ElementType
   roles: UserRole[]
@@ -43,25 +43,25 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    label: 'Dashboard',
+    labelKey: 'nav.dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
     roles: [UserRole.Admin, UserRole.Annotator, UserRole.Reviewer, UserRole.FinalReviewer],
   },
   {
-    label: 'Users',
+    labelKey: 'nav.users',
     href: '/admin/users',
     icon: Users,
     roles: [UserRole.Admin],
   },
   {
-    label: 'Groups',
+    labelKey: 'nav.groups',
     href: '/admin/groups',
     icon: Layers,
     roles: [UserRole.Admin],
   },
   {
-    label: 'Batches',
+    labelKey: 'nav.batches',
     href: '/admin/batches',
     icon: Package,
     roles: [UserRole.Admin],
@@ -69,6 +69,7 @@ const navItems: NavItem[] = [
 ]
 
 export function Sidebar() {
+  const { t } = useTranslation('common')
   const { currentUser, logout } = useAuth()
   const { sidebarCollapsed, toggleSidebar, theme, setTheme, language, setLanguage } = useUIStore()
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -101,7 +102,7 @@ export function Sidebar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <FileText className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-sidebar-foreground">TextAlign</span>
+            <span className="font-semibold text-sidebar-foreground font-inter">TextAlign</span>
           </div>
         )}
         <Button
@@ -137,7 +138,7 @@ export function Sidebar() {
             }
           >
             <item.icon className="h-5 w-5 shrink-0" />
-            {!sidebarCollapsed && <span>{item.label}</span>}
+            {!sidebarCollapsed && <span>{t(item.labelKey)}</span>}
           </NavLink>
         ))}
       </nav>
@@ -208,7 +209,7 @@ export function Sidebar() {
               onClick={handleLogout}
             >
               <LogOut className="h-4 w-4" />
-              {!sidebarCollapsed && <span className="ml-2">Logout</span>}
+              {!sidebarCollapsed && <span className="ml-2">{t('actions.logout')}</span>}
             </Button>
           </div>
         </div>
@@ -232,7 +233,7 @@ export function Sidebar() {
                 {currentUser.username}
               </p>
               <p className="truncate text-xs text-muted-foreground">
-                {currentUser.role ? ROLE_CONFIG[currentUser.role]?.label : ''}
+                {currentUser.role ? t(`roles.${getRoleTranslationKey(currentUser.role)}`) : ''}
               </p>
             </div>
           )}

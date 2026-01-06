@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AlertTriangle, Loader2, Users } from 'lucide-react'
 import {
   Dialog,
@@ -25,6 +26,7 @@ export function DeleteGroupDialog({
   group,
   usersInGroup,
 }: DeleteGroupDialogProps) {
+  const { t } = useTranslation('admin')
   const deleteGroup = useDeleteGroup()
   const [error, setError] = useState<string | null>(null)
 
@@ -40,7 +42,7 @@ export function DeleteGroupDialog({
       await deleteGroup.mutateAsync(group.id)
       onOpenChange(false)
     } catch (err) {
-      setError('Failed to delete group. Please try again.')
+      setError(t('groups.deleteGroupFailed'))
       console.error('Failed to delete group:', err)
     }
   }
@@ -53,12 +55,12 @@ export function DeleteGroupDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            Delete Group
+            {t('groups.deleteGroupTitle')}
           </DialogTitle>
           <DialogDescription>
             {hasUsers
-              ? 'This group cannot be deleted because it has users assigned.'
-              : `Are you sure you want to delete "${group.name}"? This action cannot be undone.`}
+              ? t('groups.cannotDeleteWithUsers')
+              : t('groups.confirmDeleteGroup', { name: group.name })}
           </DialogDescription>
         </DialogHeader>
 
@@ -68,14 +70,14 @@ export function DeleteGroupDialog({
               <Users className="h-5 w-5 text-amber-600 dark:text-amber-500 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                  {usersInGroup.length} user{usersInGroup.length > 1 ? 's' : ''} assigned
+                  {t('groups.usersAssigned', { count: usersInGroup.length })}
                 </p>
                 <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                  Please reassign or remove all users from this group before deleting.
+                  {t('groups.reassignUsersFirst')}
                 </p>
                 <div className="mt-2 text-xs text-amber-600 dark:text-amber-400">
-                  Users: {usersInGroup.slice(0, 3).map(u => u.username).join(', ')}
-                  {usersInGroup.length > 3 && ` and ${usersInGroup.length - 3} more`}
+                  {usersInGroup.slice(0, 3).map(u => u.username).join(', ')}
+                  {usersInGroup.length > 3 && ` (+${usersInGroup.length - 3})`}
                 </div>
               </div>
             </div>
@@ -88,7 +90,7 @@ export function DeleteGroupDialog({
 
         <DialogFooter className="gap-2 sm:gap-0">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             variant="destructive"
@@ -96,7 +98,7 @@ export function DeleteGroupDialog({
             disabled={hasUsers || isDeleting}
           >
             {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Delete Group
+            {t('groups.deleteGroup')}
           </Button>
         </DialogFooter>
       </DialogContent>

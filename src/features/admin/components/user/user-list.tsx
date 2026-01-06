@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { UserPlus, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -20,6 +21,8 @@ const PAGE_SIZE = 15
 const ALL_FILTER = 'all'
 
 export function UserList() {
+  const { t } = useTranslation('admin')
+  const { t: tCommon } = useTranslation('common')
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState(ALL_FILTER)
@@ -62,15 +65,15 @@ export function UserList() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              All Members ({users.length})
+              {t('users.title')} ({users.length})
             </CardTitle>
             <CardDescription className="mt-1.5">
-              View and manage all users in the system
+              {t('users.description')}
             </CardDescription>
           </div>
           <Button onClick={() => setCreateDialogOpen(true)} size="sm">
             <UserPlus className="mr-2 h-4 w-4" />
-            + Add User
+            {t('users.addUser')}
           </Button>
         </CardHeader>
 
@@ -135,25 +138,26 @@ interface EmptyStateProps {
 }
 
 function EmptyState({ hasFilters, onClearFilters, onCreateClick }: EmptyStateProps) {
+  const { t } = useTranslation('admin')
+  const { t: tCommon } = useTranslation('common')
+
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
       <div className="rounded-full bg-muted p-3 mb-4">
         <Users className="h-6 w-6 text-muted-foreground" />
       </div>
-      <h3 className="text-lg font-semibold">No users found</h3>
+      <h3 className="text-lg font-semibold">{t('users.noUsers')}</h3>
       <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-        {hasFilters
-          ? 'No users match your current filters. Try adjusting your search criteria.'
-          : 'Get started by adding your first user to the system.'}
+        {hasFilters ? t('users.noUsersFiltered') : t('users.noUsersEmpty')}
       </p>
       {hasFilters ? (
         <Button onClick={onClearFilters} variant="outline" className="mt-4" size="sm">
-          Clear Filters
+          {tCommon('actions.clearFilters')}
         </Button>
       ) : (
         <Button onClick={onCreateClick} className="mt-4" size="sm">
           <UserPlus className="mr-2 h-4 w-4" />
-          Add First User
+          {t('users.addFirstUser')}
         </Button>
       )}
     </div>

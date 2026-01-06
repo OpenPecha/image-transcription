@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { RefreshCw, Clock, LogOut } from 'lucide-react'
 import { useAuth } from '@/features/auth'
 import { Button } from '@/components/ui/button'
@@ -5,6 +6,8 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Navigate } from 'react-router-dom'
 
 export function PendingApprovalPage() {
+  const { t } = useTranslation('auth')
+  const { t: tCommon } = useTranslation('common')
   const { currentUser, logout } = useAuth()
 
   const handleRefresh = () => {
@@ -23,13 +26,13 @@ export function PendingApprovalPage() {
             <Clock className="h-10 w-10 text-amber-600 dark:text-amber-400" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight">
-            Account Pending Approval
+            {t('pending.title')}
           </h1>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
-            Your account is pending approval. Please wait for an administrator to create your account.
+            {t('pending.description')}
           </p>
 
           {currentUser && (
@@ -37,7 +40,7 @@ export function PendingApprovalPage() {
               <div className="text-sm">
               </div>
               <div className="text-sm">
-                <span className="text-muted-foreground">Email: </span>
+                <span className="text-muted-foreground">{tCommon('form.email')}: </span>
                 <span className="font-medium">{currentUser.email}</span>
               </div>
             </div>
@@ -47,7 +50,7 @@ export function PendingApprovalPage() {
         <CardFooter className="flex flex-col gap-3 pt-2">
           <Button onClick={handleRefresh} className="w-full" size="lg">
             <RefreshCw className="mr-2 h-4 w-4" />
-            Check Again
+            {t('pending.checkAgain')}
           </Button>
           <Button 
             onClick={logout} 
@@ -56,7 +59,7 @@ export function PendingApprovalPage() {
             size="lg"
           >
             <LogOut className="mr-2 h-4 w-4" />
-            Sign Out
+            {tCommon('actions.signOut')}
           </Button>
         </CardFooter>
       </Card>

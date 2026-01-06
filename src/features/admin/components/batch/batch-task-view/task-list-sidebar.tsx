@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { BATCH_STATS_CONFIG, type BatchTask, type BatchTaskState } from '@/types'
@@ -15,6 +16,8 @@ export function TaskListSidebar({
   onSelectTask,
   isLoading,
 }: TaskListSidebarProps) {
+  const { t } = useTranslation('admin')
+
   if (isLoading) {
     return (
       <div className="flex flex-col h-full border-r border-border bg-card">
@@ -33,12 +36,12 @@ export function TaskListSidebar({
   return (
     <div className="flex flex-col h-full border-r border-border bg-card">
       <div className="p-3 border-b border-border">
-        <h3 className="text-sm font-semibold text-foreground">Task List</h3>
+        <h3 className="text-sm font-semibold text-foreground">{t('batches.taskList')}</h3>
       </div>
       <div className="flex-1 overflow-y-auto p-2 space-y-1">
         {tasks.length === 0 ? (
           <div className="flex items-center justify-center h-32 text-sm text-muted-foreground">
-            No tasks found
+            {t('batches.noTasksFound')}
           </div>
         ) : (
           tasks.map((task) => (

@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload, FileJson, X, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
@@ -29,6 +30,7 @@ export function BatchUploadForm({
   isSubmitting,
   uploadProgress,
 }: BatchUploadFormProps) {
+  const { t } = useTranslation('admin')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
@@ -83,10 +85,10 @@ export function BatchUploadForm({
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
       {/* Batch Name */}
       <div className="space-y-2">
-        <Label htmlFor="batch_name">Batch Name</Label>
+        <Label htmlFor="batch_name">{t('batches.upload.batchName')}</Label>
         <Input
           id="batch_name"
-          placeholder="Enter batch name"
+          placeholder={t('batches.upload.batchNamePlaceholder')}
           {...register('batch_name')}
           disabled={isSubmitting}
         />
@@ -97,13 +99,13 @@ export function BatchUploadForm({
 
       {/* Group Selection */}
       <div className="space-y-2">
-        <Label htmlFor="group_id">Group</Label>
+        <Label htmlFor="group_id">{t('batches.upload.group')}</Label>
         <Select
           disabled={isSubmitting || isLoadingGroups}
           onValueChange={(value) => setValue('group_id', value)}
         >
           <SelectTrigger>
-            <SelectValue placeholder={isLoadingGroups ? 'Loading groups...' : 'Select a group'} />
+            <SelectValue placeholder={isLoadingGroups ? t('batches.upload.loadingGroups') : t('batches.upload.selectGroup')} />
           </SelectTrigger>
           <SelectContent>
             {groups.map((group) => (
@@ -120,7 +122,7 @@ export function BatchUploadForm({
 
       {/* File Upload */}
       <div className="space-y-2">
-        <Label>Tasks File (JSON)</Label>
+        <Label>{t('batches.upload.tasksFile')}</Label>
         <input
           ref={fileInputRef}
           type="file"
@@ -140,9 +142,9 @@ export function BatchUploadForm({
             )}
           >
             <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
-            <p className="text-sm font-medium">Click to upload JSON file</p>
+            <p className="text-sm font-medium">{t('batches.upload.clickToUpload')}</p>
             <p className="text-xs text-muted-foreground mt-1">
-              File should contain an array of tasks with name, url, and optional transcript
+              {t('batches.upload.fileFormatHint')}
             </p>
           </div>
         ) : (
@@ -199,20 +201,20 @@ export function BatchUploadForm({
               {isValidating && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Validating file...
+                  {t('batches.upload.validating')}
                 </div>
               )}
               {isValid && validationResult && (
                 <div className="flex items-center gap-2 text-sm text-emerald-600">
                   <CheckCircle2 className="h-4 w-4" />
-                  {validationResult.tasks.length} tasks ready to upload
+                  {t('batches.upload.tasksReady', { count: validationResult.tasks.length })}
                 </div>
               )}
               {hasErrors && validationResult && (
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-sm text-destructive">
                     <AlertCircle className="h-4 w-4" />
-                    Validation errors:
+                    {t('batches.upload.validationErrors')}
                   </div>
                   <ul className="text-xs text-destructive space-y-0.5 ml-6 list-disc">
                     {validationResult.errors.map((error, i) => (
@@ -230,7 +232,7 @@ export function BatchUploadForm({
       {isSubmitting && uploadProgress > 0 && (
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span>Uploading...</span>
+            <span>{t('batches.upload.uploading')}</span>
             <span>{uploadProgress}%</span>
           </div>
           <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -249,7 +251,7 @@ export function BatchUploadForm({
           disabled={isSubmitting || !isValid}
         >
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Upload Batch
+          {t('batches.upload.uploadButton')}
         </Button>
       </div>
     </form>

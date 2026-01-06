@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AlertTriangle, ArrowRight, Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -13,12 +14,14 @@ export function BatchStatsFooter({
   trashedCount,
   finalizedPercentage,
 }: BatchStatsFooterProps) {
+  const { t } = useTranslation('admin')
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 pt-3 text-sm">
       {/* Left side: Status */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1.5">
-          <span className="text-muted-foreground">Status:</span>
+          <span className="text-muted-foreground">{t('batches.status')}:</span>
           <span
             className={cn(
               'font-semibold',
@@ -29,7 +32,7 @@ export function BatchStatsFooter({
                   : 'text-slate-600'
             )}
           >
-            {finalizedPercentage}% Finalized
+            {t('batches.finalized', { percentage: finalizedPercentage })}
           </span>
         </div>
       </div>
@@ -43,7 +46,7 @@ export function BatchStatsFooter({
             className="inline-flex items-center gap-1.5 text-rose-600 hover:text-rose-700 transition-colors"
           >
             <AlertTriangle className="h-3.5 w-3.5" />
-            <span className="font-medium">{trashedCount} Trashed</span>
+            <span className="font-medium">{t('batches.trashed', { count: trashedCount })}</span>
           </Link>
         )}
 
@@ -53,7 +56,7 @@ export function BatchStatsFooter({
           className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
         >
           <Eye className="h-3.5 w-3.5" />
-          View Tasks
+          {t('batches.viewTasks')}
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>

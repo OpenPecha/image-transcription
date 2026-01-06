@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronDown, Edit, Trash2, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -15,6 +16,7 @@ interface GroupItemProps {
 }
 
 export function GroupItem({ group }: GroupItemProps) {
+  const { t } = useTranslation('admin')
   const [isExpanded, setIsExpanded] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -68,7 +70,7 @@ export function GroupItem({ group }: GroupItemProps) {
                 }}
               >
                 <Edit className="h-4 w-4" />
-                <span className="sr-only">Edit group</span>
+                <span className="sr-only">{t('groups.editGroup')}</span>
               </Button>
               <Button
                 variant="ghost"
@@ -80,7 +82,7 @@ export function GroupItem({ group }: GroupItemProps) {
                 }}
               >
                 <Trash2 className="h-4 w-4" />
-                <span className="sr-only">Delete group</span>
+                <span className="sr-only">{t('groups.deleteGroup')}</span>
               </Button>
               <ChevronDown
                 className={cn(
@@ -103,7 +105,7 @@ export function GroupItem({ group }: GroupItemProps) {
               <div className="pt-4">
                 <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                   <Users className="h-4 w-4" />
-                  Members
+                  {t('groups.members', { count: userCount })}
                 </h4>
                 <GroupUserList
                   users={users}

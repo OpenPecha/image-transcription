@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { BatchReport } from '@/types'
 import { cn } from '@/lib/utils'
 import { ProgressSegment } from './progress-segment'
@@ -11,6 +12,7 @@ interface StackedProgressBarProps {
 }
 
 export function StackedProgressBar({ report, className }: StackedProgressBarProps) {
+  const { t } = useTranslation('admin')
   const [isAnimated, setIsAnimated] = useState(false)
 
   // Trigger animation after mount
@@ -26,7 +28,7 @@ export function StackedProgressBar({ report, className }: StackedProgressBarProp
   if (segments.length === 0) {
     return (
       <div className="flex items-center justify-center h-8 bg-slate-100 rounded-lg text-sm text-muted-foreground">
-        No tasks in this batch
+        {t('batches.noTasksInBatch')}
       </div>
     )
   }

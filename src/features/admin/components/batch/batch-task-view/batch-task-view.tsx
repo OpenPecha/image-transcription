@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -17,16 +18,17 @@ import { TaskPreview } from './task-preview'
 import { BATCH_STATS_CONFIG, type BatchTask, type BatchTaskState } from '@/types'
 import { cn } from '@/lib/utils'
 
-const STATE_OPTIONS: Array<{ value: BatchTaskState | 'all'; label: string }> = [
-  { value: 'all', label: 'All' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'annotated', label: 'Annotated' },
-  { value: 'reviewed', label: 'Reviewed' },
-  { value: 'finalised', label: 'Finalised' },
-  { value: 'trashed', label: 'Trashed' },
+const STATE_OPTION_KEYS: Array<{ value: BatchTaskState | 'all'; key: string }> = [
+  { value: 'all', key: 'batches.states.all' },
+  { value: 'pending', key: 'batches.states.pending' },
+  { value: 'annotated', key: 'batches.states.annotated' },
+  { value: 'reviewed', key: 'batches.states.reviewed' },
+  { value: 'finalised', key: 'batches.states.finalised' },
+  { value: 'trashed', key: 'batches.states.trashed' },
 ]
 
 export function BatchTaskView() {
+  const { t } = useTranslation('admin')
   const { batchId } = useParams<{ batchId: string }>()
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
@@ -85,21 +87,21 @@ export function BatchTaskView() {
       {
         onSuccess: () => {
           addToast({
-            title: 'Task restored',
-            description: `"${selectedTask.task_name}" has been restored successfully`,
+            title: t('batches.taskRestored'),
+            description: t('batches.taskRestoredDescription', { name: selectedTask.task_name }),
             variant: 'success',
           })
         },
         onError: (error: Error) => {
           addToast({
-            title: 'Failed to restore task',
+            title: t('batches.restoreFailed'),
             description: error.message,
             variant: 'destructive',
           })
         },
       }
     )
-  }, [selectedTask, batchId, restoreTask, addToast])
+  }, [selectedTask, batchId, restoreTask, addToast, t])
 
   // Navigation helpers
   const currentIndex = selectedTask
@@ -142,14 +144,14 @@ export function BatchTaskView() {
             className="gap-1"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back
+            {t('batches.back')}
           </Button>
           <div className="h-6 w-px bg-border" />
           <div>
             {isLoadingReport ? (
               <Skeleton className="h-7 w-48" />
             ) : (
-              <h1 className="text-xl font-semibold">{report?.name || 'Batch Tasks'}</h1>
+              <h1 className="text-xl font-semibold">{report?.name || t('batches.batchTasks')}</h1>
             )}
           </div>
         </div>
@@ -160,17 +162,17 @@ export function BatchTaskView() {
             {isLoadingTasks ? (
               <Skeleton className="h-5 w-20 inline-block" />
             ) : (
-              `${tasks.length} tasks`
+              t('batches.tasks', { count: tasks.length })
             )}
           </span>
 
           {/* State filter */}
           <Select value={stateFilter} onValueChange={handleStateChange}>
             <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Filter by state" />
+              <SelectValue placeholder={t('batches.filterByState')} />
             </SelectTrigger>
             <SelectContent>
-              {STATE_OPTIONS.map((option) => {
+              {STATE_OPTION_KEYS.map((option) => {
                 const count = getTaskCount(option.value)
                 const config = option.value !== 'all' 
                   ? BATCH_STATS_CONFIG[option.value] 
@@ -178,7 +180,7 @@ export function BatchTaskView() {
                 return (
                   <SelectItem key={option.value} value={option.value}>
                     <div className="flex items-center justify-between gap-3 w-full">
-                      <span>{option.label}</span>
+                      <span>{t(option.key)}</span>
                       {count !== null && (
                         <span
                           className={cn(

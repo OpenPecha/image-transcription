@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Package, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,6 +14,7 @@ import { BatchItem, BatchItemSkeleton } from './batch-item'
 import { BatchUploadDialog } from './batch-upload-dialog'
 
 export function BatchList() {
+  const { t } = useTranslation('admin')
   const { data: batches = [], isLoading } = useGetBatches()
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
 
@@ -23,15 +25,15 @@ export function BatchList() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Package className="h-5 w-5" />
-              Batches
+              {t('batches.cardTitle')}
             </CardTitle>
             <CardDescription className="mt-1.5">
-              Manage batch uploads and view task progress
+              {t('batches.cardDescription')}
             </CardDescription>
           </div>
           <Button onClick={() => setUploadDialogOpen(true)} size="sm">
             <Upload className="mr-2 h-4 w-4" />
-            Upload Batch
+            {t('batches.uploadBatch')}
           </Button>
         </CardHeader>
         <CardContent className="pt-0">
@@ -62,18 +64,20 @@ export function BatchList() {
 }
 
 function EmptyState({ onUploadClick }: { onUploadClick: () => void }) {
+  const { t } = useTranslation('admin')
+
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
       <div className="rounded-full bg-muted p-3 mb-4">
         <Package className="h-6 w-6 text-muted-foreground" />
       </div>
-      <h3 className="text-lg font-semibold">No batches yet</h3>
+      <h3 className="text-lg font-semibold">{t('batches.noBatches')}</h3>
       <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-        Upload your first batch of image transcription tasks to get started.
+        {t('batches.noBatchesDescription')}
       </p>
       <Button onClick={onUploadClick} className="mt-4" size="sm">
         <Upload className="mr-2 h-4 w-4" />
-        Upload First Batch
+        {t('batches.uploadFirstBatch')}
       </Button>
     </div>
   )

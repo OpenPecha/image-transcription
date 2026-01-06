@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
 import { userSchema, type UserFormData } from '@/schema/user-schema'
@@ -12,7 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { UserRole, ROLE_CONFIG, type Group } from '@/types'
+import { UserRole, type Group } from '@/types'
+import { getRoleTranslationKey } from '@/lib/utils'
 
 export interface UserFormProps {
   defaultValues?: Partial<UserFormData>
@@ -29,6 +31,8 @@ export function UserForm({
   isSubmitting = false,
   submitLabel = 'Create',
 }: UserFormProps) {
+  const { t } = useTranslation('common')
+
   const {
     register,
     handleSubmit,
@@ -50,11 +54,11 @@ export function UserForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="username">User name</Label>
+      <div className="space-y-4">
+        <Label htmlFor="username">{t('form.username')}</Label>
         <Input
           id="username"
-          placeholder="Enter user name"
+          placeholder={t('form.enterUsername')}
           {...register('username')}
           disabled={isSubmitting}
         />
@@ -63,12 +67,12 @@ export function UserForm({
         )}
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+      <div className="space-y-4">
+        <Label htmlFor="email">{t('form.email')}</Label>
         <Input
           id="email"
           type="email"
-          placeholder="Enter user email"
+          placeholder={t('form.enterEmail')}
           {...register('email')}
           disabled={isSubmitting}
         />
@@ -77,20 +81,20 @@ export function UserForm({
         )}
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="role">Role</Label>
+      <div className="space-y-4">
+        <Label htmlFor="role">{t('form.role')}</Label>
         <Select
           value={selectedRole}
           onValueChange={(value) => setValue('role', value as UserRole)}
           disabled={isSubmitting}
         >
           <SelectTrigger id="role">
-            <SelectValue placeholder="Select role" />
+            <SelectValue placeholder={t('form.selectRole')} />
           </SelectTrigger>
           <SelectContent>
             {Object.values(UserRole).map((role) => (
               <SelectItem key={role} value={role}>
-                {ROLE_CONFIG[role].label}
+                {t(`roles.${getRoleTranslationKey(role)}`)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -100,15 +104,15 @@ export function UserForm({
         )}
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="group">Group</Label>
+      <div className="space-y-4">
+        <Label htmlFor="group">{t('form.group')}</Label>
         <Select
           value={selectedGroup}
           onValueChange={(value) => setValue('group_id', value)}
           disabled={isSubmitting}
         >
           <SelectTrigger id="group">
-            <SelectValue placeholder="Select group" />
+            <SelectValue placeholder={t('form.selectGroup')} />
           </SelectTrigger>
           <SelectContent>
             {groups.map((group) => (

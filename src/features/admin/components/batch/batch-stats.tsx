@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { BatchReport } from '@/types'
 import { StackedProgressBar } from './progress-bar'
@@ -11,6 +12,8 @@ interface BatchStatsProps {
 }
 
 export function BatchStats({ batchId, report, isLoading }: BatchStatsProps) {
+  const { t } = useTranslation('admin')
+
   if (isLoading) {
     return <BatchStatsSkeleton />
   }
@@ -18,7 +21,7 @@ export function BatchStats({ batchId, report, isLoading }: BatchStatsProps) {
   if (!report) {
     return (
       <div className="text-sm text-muted-foreground py-2">
-        Failed to load batch statistics
+        {t('batches.failedToLoadStats')}
       </div>
     )
   }
@@ -27,7 +30,7 @@ export function BatchStats({ batchId, report, isLoading }: BatchStatsProps) {
   if (report.total_tasks === 0) {
     return (
       <div className="flex items-center justify-center h-16 bg-slate-50 rounded-lg text-sm text-muted-foreground border border-dashed">
-        No tasks in this batch
+        {t('batches.noTasksInBatch')}
       </div>
     )
   }

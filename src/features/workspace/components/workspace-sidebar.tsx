@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Diamond, LogOut, RefreshCw, FileText, Users, LayoutDashboard, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -38,6 +39,7 @@ export function WorkspaceSidebar({
   onRefresh,
   isLoading,
 }: WorkspaceSidebarProps) {
+  const { t } = useTranslation('workspace')
   const { currentUser, logout } = useAuth()
 
   const handleLogout = useCallback(() => {
@@ -54,7 +56,7 @@ export function WorkspaceSidebar({
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/20">
             <Diamond className="h-5 w-5 text-primary" />
           </div>
-          <span className="font-semibold text-lg text-sidebar-foreground">Text Aligner</span>
+          <span className="font-semibold text-lg text-sidebar-foreground">{t('branding.appName')}</span>
         </div>
       </div>
 
@@ -67,7 +69,7 @@ export function WorkspaceSidebar({
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
         >
           <LayoutDashboard className="h-5 w-5 shrink-0" />
-          <span>Dashboard</span>
+          <span>{t('sidebar.dashboard')}</span>
         </Link>
       </nav>
 
@@ -81,7 +83,7 @@ export function WorkspaceSidebar({
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <h3 className="text-xs font-medium uppercase text-muted-foreground tracking-wider">
-                  Current Task
+                  {t('sidebar.currentTask')}
                 </h3>
                 {isLoading && (
                   <Loader2 className="h-3 w-3 animate-spin text-primary" />
@@ -108,7 +110,7 @@ export function WorkspaceSidebar({
             {task.group && task.group !== 'string' && (
               <div className="space-y-2">
                 <h3 className="text-xs font-medium uppercase text-muted-foreground tracking-wider">
-                  Group
+                  {t('sidebar.group')}
                 </h3>
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-sidebar-accent/50">
                   <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -122,7 +124,7 @@ export function WorkspaceSidebar({
         ) : (
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <Diamond className="h-8 w-8 text-muted-foreground/30 mb-2" />
-            <p className="text-sm text-muted-foreground">No task assigned</p>
+            <p className="text-sm text-muted-foreground">{t('sidebar.noTaskAssigned')}</p>
             {onRefresh && (
               <Button
                 variant="ghost"
@@ -132,7 +134,7 @@ export function WorkspaceSidebar({
                 className="mt-2"
               >
                 <RefreshCw className={cn("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-                Get Task
+                {t('sidebar.getTask')}
               </Button>
             )}
           </div>
@@ -155,7 +157,7 @@ export function WorkspaceSidebar({
               {currentUser.username}
             </p>
             <p className="truncate text-xs text-muted-foreground">
-              {currentUser.role ? `${currentUser.role}` : 'No Role'}
+              {currentUser.role ? `${currentUser.role}` : t('sidebar.noRole')}
             </p>
           </div>
         </div>
@@ -167,7 +169,7 @@ export function WorkspaceSidebar({
           onClick={handleLogout}
         >
           <LogOut className="h-4 w-4 mr-2" />
-          Logout
+          {t('sidebar.logout')}
         </Button>
       </div>
     </aside>

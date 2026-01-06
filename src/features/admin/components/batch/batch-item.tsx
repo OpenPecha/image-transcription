@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronDown, Calendar, Users } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,6 +13,7 @@ interface BatchItemProps {
 }
 
 export function BatchItem({ batch }: BatchItemProps) {
+  const { t } = useTranslation('admin')
   const [isExpanded, setIsExpanded] = useState(false)
 
   // Fetch report only when expanded
@@ -54,7 +56,7 @@ export function BatchItem({ batch }: BatchItemProps) {
           <div className="flex items-center gap-2 ml-4">
             {report?.total_tasks && (
               <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-                {report.total_tasks} tasks
+                {t('batches.tasks', { count: report.total_tasks })}
               </span>
             )}
             <ChevronDown

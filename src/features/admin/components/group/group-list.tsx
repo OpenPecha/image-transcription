@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { FolderPlus, Layers } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,6 +14,7 @@ import { GroupItem, GroupItemSkeleton } from './group-item'
 import { GroupDialog } from './group-dialog'
 
 export function GroupList() {
+  const { t } = useTranslation('admin')
   const { data: groups = [], isLoading } = useGetGroups()
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
 
@@ -23,15 +25,15 @@ export function GroupList() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Layers className="h-5 w-5" />
-              Groups
+              {t('groups.cardTitle')}
             </CardTitle>
             <CardDescription className="mt-1.5">
-              Manage groups and their members
+              {t('groups.cardDescription')}
             </CardDescription>
           </div>
           <Button onClick={() => setCreateDialogOpen(true)} size="sm">
             <FolderPlus className="mr-2 h-4 w-4" />
-            Add Group
+            {t('groups.addGroup')}
           </Button>
         </CardHeader>
         <CardContent className="pt-0">
@@ -64,18 +66,20 @@ export function GroupList() {
 }
 
 function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
+  const { t } = useTranslation('admin')
+
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
       <div className="rounded-full bg-muted p-3 mb-4">
         <Layers className="h-6 w-6 text-muted-foreground" />
       </div>
-      <h3 className="text-lg font-semibold">No groups yet</h3>
+      <h3 className="text-lg font-semibold">{t('groups.noGroups')}</h3>
       <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-        Create your first group to organize users and manage permissions.
+        {t('groups.noGroupsDescription')}
       </p>
       <Button onClick={onCreateClick} className="mt-4" size="sm">
         <FolderPlus className="mr-2 h-4 w-4" />
-        Create First Group
+        {t('groups.createFirstGroup')}
       </Button>
     </div>
   )

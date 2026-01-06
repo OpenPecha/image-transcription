@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ interface BatchUploadDialogProps {
 }
 
 export function BatchUploadDialog({ open, onOpenChange }: BatchUploadDialogProps) {
+  const { t } = useTranslation('admin')
   const [uploadProgress, setUploadProgress] = useState(0)
   const { addToast } = useUIStore()
 
@@ -38,8 +40,8 @@ export function BatchUploadDialog({ open, onOpenChange }: BatchUploadDialogProps
       })
 
       addToast({
-        title: 'Batch uploaded successfully',
-        description: `${tasks.length} tasks have been added to the batch.`,
+        title: t('batches.upload.success'),
+        description: t('batches.upload.successDescription', { count: tasks.length }),
         variant: 'success',
       })
 
@@ -48,8 +50,8 @@ export function BatchUploadDialog({ open, onOpenChange }: BatchUploadDialogProps
     } catch (error) {
       console.error('Failed to upload batch:', error)
       addToast({
-        title: 'Upload failed',
-        description: 'Failed to upload batch. Please try again.',
+        title: t('batches.upload.failed'),
+        description: t('batches.upload.failedDescription'),
         variant: 'destructive',
       })
       setUploadProgress(0)
@@ -60,9 +62,9 @@ export function BatchUploadDialog({ open, onOpenChange }: BatchUploadDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Upload Batch</DialogTitle>
+          <DialogTitle>{t('batches.upload.title')}</DialogTitle>
           <DialogDescription>
-            Create a new batch by uploading a JSON file containing image transcription tasks.
+            {t('batches.upload.description')}
           </DialogDescription>
         </DialogHeader>
 

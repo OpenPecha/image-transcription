@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { RotateCcw } from 'lucide-react'
 import { ImageCanvas } from '@/features/workspace/components/image-canvas'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,8 @@ export function TaskPreview({
   isRestoring,
   isLoading,
 }: TaskPreviewProps) {
+  const { t } = useTranslation('admin')
+
   if (isLoading) {
     return <TaskPreviewSkeleton />
   }
@@ -27,8 +30,8 @@ export function TaskPreview({
       <div className="flex flex-col h-full bg-muted/20">
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center text-muted-foreground">
-            <p className="text-lg font-medium">No task selected</p>
-            <p className="text-sm mt-1">Select a task from the list to preview</p>
+            <p className="text-lg font-medium">{t('batches.noTaskSelected')}</p>
+            <p className="text-sm mt-1">{t('batches.selectTaskToPreview')}</p>
           </div>
         </div>
       </div>
@@ -48,7 +51,7 @@ export function TaskPreview({
       <div className="border-t border-border bg-sky-50 dark:bg-sky-900/20">
         <div className="p-4">
           <h4 className="text-sm font-medium text-muted-foreground mb-2">
-            Transcript
+            {t('batches.transcript')}
           </h4>
           <div
             className={cn(
@@ -66,7 +69,7 @@ export function TaskPreview({
             >
               {task.task_transcript || (
                 <span className="text-muted-foreground italic">
-                  No transcript available
+                  {t('batches.noTranscript')}
                 </span>
               )}
             </p>
@@ -86,7 +89,7 @@ export function TaskPreview({
           )}
         >
           <RotateCcw className={cn('h-4 w-4 mr-2', isRestoring && 'animate-spin')} />
-          {isRestoring ? 'Restoring...' : 'Restore'}
+          {isRestoring ? t('batches.restoring') : t('batches.restore')}
         </Button>
       </div>
     </div>

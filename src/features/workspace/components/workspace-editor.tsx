@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useBlocker } from 'react-router-dom'
 import { GripHorizontal, GripVertical, Send, Trash2, XCircle } from 'lucide-react'
 import { ImageCanvas } from './image-canvas'
@@ -29,6 +30,7 @@ const FONT_FAMILY_MAP = {
 } as const
 
 export function WorkspaceEditor() {
+  const { t } = useTranslation('workspace')
   const { currentUser } = useAuth()
   const { addToast, editorFontFamily, editorFontSize } = useUIStore()
 
@@ -115,22 +117,22 @@ export function WorkspaceEditor() {
       {
         onSuccess: () => {
           addToast({
-            title: 'Task submitted',
-            description: 'Your work has been submitted for review',
+            title: t('toast.submitted'),
+            description: t('toast.submittedDescription'),
             variant: 'success',
           })
           setInitialText(text)
         },
         onError: (error: Error) => {
           addToast({
-            title: 'Submit failed',
+            title: t('toast.submitFailed'),
             description: error.message,
             variant: 'destructive',
           })
         },
       }
     )
-  }, [task, currentUser, text, submitTask, addToast])
+  }, [task, currentUser, text, submitTask, addToast, t])
 
   // Trash handler
   const handleTrash = useCallback(() => {
@@ -141,18 +143,18 @@ export function WorkspaceEditor() {
       {
         onSuccess: () => {
           setTrashDialogOpen(false)
-          addToast({ title: 'Task marked as trash', variant: 'default' })
+          addToast({ title: t('toast.trashed'), variant: 'default' })
         },
         onError: (error: Error) => {
           addToast({
-            title: 'Failed to trash task',
+            title: t('toast.trashFailed'),
             description: error.message,
             variant: 'destructive',
           })
         },
       }
     )
-  }, [task, currentUser, trashTask, addToast])
+  }, [task, currentUser, trashTask, addToast, t])
 
   // Approve handler
   const handleApprove = useCallback(() => {
@@ -163,22 +165,22 @@ export function WorkspaceEditor() {
       {
         onSuccess: () => {
           addToast({
-            title: 'Task approved',
-            description: 'The task has been approved successfully',
+            title: t('toast.approved'),
+            description: t('toast.approvedDescription'),
             variant: 'success',
           })
           setInitialText(text)
         },
         onError: (error: Error) => {
           addToast({
-            title: 'Failed to approve task',
+            title: t('toast.approveFailed'),
             description: error.message,
             variant: 'destructive',
           })
         },
       }
     )
-  }, [task, currentUser, text, approveTask, addToast])
+  }, [task, currentUser, text, approveTask, addToast, t])
 
   // Reject handler
   const handleReject = useCallback(() => {
@@ -188,18 +190,18 @@ export function WorkspaceEditor() {
       { task_id: task.task_id, user_id: currentUser.id!, transcript: text, reject: true },
       {
         onSuccess: () => {
-          addToast({ title: 'Task rejected', variant: 'default' })
+          addToast({ title: t('toast.rejected'), variant: 'default' })
         },
         onError: (error: Error) => {
           addToast({
-            title: 'Failed to reject task',
+            title: t('toast.rejectFailed'),
             description: error.message,
             variant: 'destructive',
           })
         },
       }
     )
-  }, [task, currentUser, text, rejectTask, addToast])
+  }, [task, currentUser, text, rejectTask, addToast, t])
 
   // Derive layout direction from orientation
   // Portrait images → horizontal split (side-by-side)
@@ -271,7 +273,6 @@ export function WorkspaceEditor() {
           <EmptyTasksState
             onRefresh={() => refetch()}
             isLoading={isLoading}
-            message="No tasks available. Click refresh to check for new tasks."
           />
         </main>
       </div>
@@ -302,7 +303,7 @@ export function WorkspaceEditor() {
           {/* Loading/Mutation Overlay */}
           <EditorOverlay
             show={showOverlay}
-            message={isMutating ? 'Processing...' : 'Loading next task...'}
+            message={isMutating ? t('loading.processing') : t('loading.loadingNext')}
           />
 
           {/* Image Panel */}
@@ -360,7 +361,7 @@ export function WorkspaceEditor() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               readOnly={!canEdit || showOverlay}
-              placeholder="Begin typing or editing..."
+              placeholder={t('editor.placeholder')}
               className={cn(
                 'flex-1 w-full resize-none bg-card p-5',
                 'text-foreground placeholder:text-placeholder',
@@ -384,7 +385,7 @@ export function WorkspaceEditor() {
           <div className="flex items-center text-sm text-muted-foreground">
             {hasUnsavedChanges && (
               <span className="text-warning animate-pulse font-medium">
-                Unsaved changes
+                {t('editor.unsavedChanges')}
               </span>
             )}
           </div>
@@ -399,7 +400,7 @@ export function WorkspaceEditor() {
                   disabled={showOverlay || !canEdit || text.length === 0}
                 >
                   <Send className="h-4 w-4 mr-2" />
-                  {submitTask.isPending ? 'Submitting...' : 'Submit'}
+                  {submitTask.isPending ? t('actions.submitting') : t('actions.submit')}
                 </Button>
                 <Button
                   variant="destructive"
@@ -407,7 +408,7 @@ export function WorkspaceEditor() {
                   disabled={showOverlay || !canEdit}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Trash
+                  {t('actions.trash')}
                 </Button>
               </>
             )}
@@ -420,7 +421,7 @@ export function WorkspaceEditor() {
                   disabled={showOverlay || !canEdit}
                 >
                   <Send className="h-4 w-4 mr-2" />
-                  {approveTask.isPending ? 'Approving...' : 'Approve'}
+                  {approveTask.isPending ? t('actions.approving') : t('actions.approve')}
                 </Button>
                 <Button
                   variant="destructive"
@@ -428,7 +429,7 @@ export function WorkspaceEditor() {
                   disabled={showOverlay || !canEdit}
                 >
                   <XCircle className="h-4 w-4 mr-2" />
-                  Reject
+                  {t('actions.reject')}
                 </Button>
               </>
             )}

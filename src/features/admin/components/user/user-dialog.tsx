@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,8 @@ interface UserDialogProps {
 }
 
 export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
+  const { t } = useTranslation('admin')
+  const { t: tCommon } = useTranslation('common')
   const createUser = useCreateUser()
   const updateUser = useUpdateUser()
   const { data: groups = [] } = useGetGroups()
@@ -67,11 +70,9 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit User' : 'Add User'}</DialogTitle>
+          <DialogTitle>{isEditing ? t('users.editUser') : t('users.addUser').replace('+ ', '')}</DialogTitle>
           <DialogDescription>
-            {isEditing
-              ? 'Update the user details below.'
-              : 'Fill in the details to add a new user.'}
+            {isEditing ? t('users.updateUserDetails') : t('users.addUserDetails')}
           </DialogDescription>
         </DialogHeader>
 
@@ -81,7 +82,7 @@ export function UserDialog({ open, onOpenChange, user }: UserDialogProps) {
           groups={groups}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          submitLabel={isEditing ? 'Update' : '+ Create'}
+          submitLabel={isEditing ? tCommon('actions.update') : `+ ${tCommon('actions.create')}`}
         />
       </DialogContent>
     </Dialog>
