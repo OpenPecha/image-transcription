@@ -22,7 +22,6 @@ const ALL_FILTER = 'all'
 
 export function UserList() {
   const { t } = useTranslation('admin')
-  const { t: tCommon } = useTranslation('common')
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState(ALL_FILTER)
