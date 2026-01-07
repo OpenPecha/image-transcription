@@ -3,13 +3,13 @@ import { apiClient } from '@/lib/axios'
 import { type UserListResponse, type UserFilters } from '@/types'
 import { userKeys } from './user-keys'
 
-const getUsers = async (filters: UserFilters): Promise<UserListResponse['users']> => {
+const getUsers = async (filters: UserFilters): Promise<UserListResponse> => {
   const params = new URLSearchParams()
   
   if (filters.search) params.append('search', filters.search)
   if (filters.role) params.append('role', filters.role)
   if (filters.group_id) params.append('group_id', filters.group_id)
-  if (filters.page) params.append('page', String(filters.page))
+  if (filters.offset !== undefined) params.append('offset', String(filters.offset))
   if (filters.limit) params.append('limit', String(filters.limit))
 
   const queryString = params.toString()

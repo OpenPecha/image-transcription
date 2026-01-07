@@ -37,7 +37,10 @@ export interface UpdateUserDTO {
 
 // Paginated response wrapper
 export interface UserListResponse {
-  users: User[];
+  items: User[]
+  total: number
+  limit: number
+  offset: number
 }
 
 // User query filters
@@ -45,7 +48,7 @@ export interface UserFilters {
   search?: string
   role?: UserRole
   group_id?: string
-  page?: number
+  offset?: number
   limit?: number
 }
 

@@ -15,6 +15,7 @@ import { useDebouncedValue } from '@/hooks'
 import { UserFilters } from './user-filters'
 import { UserItem, UserItemSkeleton } from './user-item'
 import { UserDialog } from './user-dialog'
+import { UserPagination } from './user-pagination'
 import { UserRole } from '@/types'
 
 const PAGE_SIZE = 15
@@ -26,7 +27,7 @@ export function UserList() {
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState(ALL_FILTER)
   const [groupFilter, setGroupFilter] = useState(ALL_FILTER)
-  const [page, setPage] = useState(1)
+  const [offset, setOffset] = useState(0)
 
   const debouncedSearch = useDebouncedValue(search, 300)
   const { data: groups = [] } = useGetGroups()
@@ -35,36 +36,43 @@ export function UserList() {
     search: debouncedSearch || undefined,
     role: roleFilter !== ALL_FILTER ? (roleFilter as UserRole) : undefined,
     group_id: groupFilter !== ALL_FILTER ? groupFilter : undefined,
-    page,
+    offset,
     limit: PAGE_SIZE,
   })
 
-  const users = data ?? []
+  const users = data?.items ?? []
+  const total = data?.total ?? 0
+  const totalPages = Math.ceil(total / PAGE_SIZE)
+  const currentPage = Math.floor(offset / PAGE_SIZE) + 1
 
-  // Reset page when filters change
+  // Reset offset when filters change
   const handleSearchChange = (value: string) => {
     setSearch(value)
-    setPage(1)
+    setOffset(0)
   }
 
   const handleRoleFilterChange = (value: string) => {
     setRoleFilter(value)
-    setPage(1)
+    setOffset(0)
   }
 
   const handleGroupFilterChange = (value: string) => {
     setGroupFilter(value)
-    setPage(1)
+    setOffset(0)
+  }
+
+  const handlePageChange = (page: number) => {
+    setOffset((page - 1) * PAGE_SIZE)
   }
 
   return (
     <>
-      <Card>
+      <Card className="flex flex-col h-[calc(100vh-3rem)] overflow-hidden">
         <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
           <div>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              {t('users.title')} ({users.length})
+              {t('users.title')} ({total})
             </CardTitle>
             <CardDescription className="mt-1.5">
               {t('users.description')}
@@ -76,7 +84,7 @@ export function UserList() {
           </Button>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-1 flex-col gap-4 overflow-hidden">
           {/* Filters */}
           <UserFilters
             search={search}
@@ -88,10 +96,8 @@ export function UserList() {
             groups={groups}
           />
 
-          {/* Table Header */}
-          <div className="rounded-lg border border-border overflow-hidden">
-
-            {/* Table Body */}
+          {/* User List - Scrollable */}
+          <div className="flex-1 overflow-y-auto rounded-lg border border-border">
             {isLoading ? (
               <div>
                 {[...Array(5)].map((_, i) => (
@@ -105,7 +111,7 @@ export function UserList() {
                   setSearch('')
                   setRoleFilter(ALL_FILTER)
                   setGroupFilter(ALL_FILTER)
-                  setPage(1)
+                  setOffset(0)
                 }}
                 onCreateClick={() => setCreateDialogOpen(true)}
               />
@@ -117,6 +123,18 @@ export function UserList() {
               </div>
             )}
           </div>
+
+          {/* Pagination - Sticky at bottom */}
+          {totalPages > 1 && (
+            <div className="sticky bottom-0 border-t border-border bg-card pt-2">
+              <UserPagination
+                page={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                isLoading={isFetching}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 
