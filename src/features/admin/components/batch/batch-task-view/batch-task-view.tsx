@@ -133,7 +133,7 @@ export function BatchTaskView() {
   )
 
   return (
-    <div className="flex flex-col h-[calc(100vh-6rem)] animate-fade-in">
+    <div className="flex flex-col h-[calc(100vh-3rem)] animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between pb-4">
         <div className="flex items-center gap-4">

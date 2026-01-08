@@ -1,5 +1,6 @@
+import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RotateCcw } from 'lucide-react'
+import { GripHorizontal, GripVertical, RotateCcw } from 'lucide-react'
 import { ImageCanvas } from '@/features/workspace/components/image-canvas'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -20,6 +21,33 @@ export function TaskPreview({
   isLoading,
 }: TaskPreviewProps) {
   const { t } = useTranslation('admin')
+  const [splitPosition, setSplitPosition] = useState(50)
+  const [isDragging, setIsDragging] = useState(false)
+
+  const isHorizontalLayout = task?.orientation === 'portrait'
+
+  const handleMouseDown = useCallback(() => {
+    setIsDragging(true)
+  }, [])
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isDragging) return
+      const container = e.currentTarget as HTMLElement
+      const rect = container.getBoundingClientRect()
+
+      const position = isHorizontalLayout
+        ? ((e.clientX - rect.left) / rect.width) * 100
+        : ((e.clientY - rect.top) / rect.height) * 100
+
+      setSplitPosition(Math.max(20, Math.min(80, position)))
+    },
+    [isDragging, isHorizontalLayout]
+  )
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
 
   if (isLoading) {
     return <TaskPreviewSkeleton />
@@ -40,11 +68,6 @@ export function TaskPreview({
 
   const canRestore = task.state === 'trashed'
 
-  // Derive layout direction from orientation
-  // Portrait images → horizontal layout (side-by-side)
-  // Landscape images → vertical layout (stacked)
-  const isHorizontalLayout = task.orientation === 'portrait'
-
   return (
     <div className="flex flex-col h-full">
       {/* Content Area - Dynamic Layout */}
@@ -53,40 +76,57 @@ export function TaskPreview({
           'flex-1 min-h-0 flex overflow-hidden',
           isHorizontalLayout ? 'flex-row' : 'flex-col'
         )}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
       >
         {/* Image Section */}
         <div
           className={cn(
-            'overflow-hidden',
+            'overflow-hidden flex-shrink-0',
             isHorizontalLayout
-              ? 'w-1/2 h-full border-r border-border'
-              : 'flex-1 min-h-0 border-b border-border'
+              ? 'h-full border-r border-border'
+              : 'w-full border-b border-border'
           )}
+          style={
+            isHorizontalLayout
+              ? { width: `calc(${splitPosition}% - 6px)` }
+              : { height: `${splitPosition}%` }
+          }
         >
           <ImageCanvas imageUrl={task.task_url} />
+        </div>
+
+        {/* Resize Handle */}
+        <div
+          className={cn(
+            'flex-shrink-0 flex items-center justify-center bg-border/80 transition-colors select-none',
+            isHorizontalLayout
+              ? 'w-3 cursor-col-resize hover:bg-primary/40'
+              : 'h-2 cursor-row-resize hover:bg-primary/50',
+            isDragging && 'bg-primary/60'
+          )}
+          onMouseDown={handleMouseDown}
+        >
+          {isHorizontalLayout ? (
+            <GripVertical className="h-6 w-4 text-muted-foreground/70" />
+          ) : (
+            <GripHorizontal className="h-3 w-5 text-muted-foreground" />
+          )}
         </div>
 
         {/* Transcript Section */}
         <div
           className={cn(
-            'bg-sky-50 dark:bg-sky-900/20 overflow-hidden',
-            isHorizontalLayout
-              ? 'w-1/2 h-full flex flex-col'
-              : 'flex-shrink-0'
+            'bg-sky-50 dark:bg-sky-900/20 overflow-hidden flex-1 flex flex-col',
+            isHorizontalLayout ? 'h-full pt-12' : 'w-full'
           )}
         >
-          <div className={cn('p-4', isHorizontalLayout && 'flex-1 flex flex-col')}>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2">
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* <h4 className="text-sm font-medium text-muted-foreground mb-2 flex-shrink-0">
               {t('batches.transcript')}
-            </h4>
-            <div
-              className={cn(
-                'p-3 rounded-md bg-background border border-border overflow-y-auto',
-                isHorizontalLayout
-                  ? 'flex-1 min-h-0'
-                  : 'min-h-[80px] max-h-[120px]'
-              )}
-            >
+            </h4> */}
+            <div className="flex-1 min-h-0 p-3 bg-background border border-border overflow-y-auto">
               <p
                 className="text-sm leading-relaxed whitespace-pre-wrap"
                 style={{
@@ -107,7 +147,7 @@ export function TaskPreview({
       </div>
 
       {/* Footer with Restore Button */}
-      <div className="border-t border-border bg-card px-4 py-3 flex justify-center flex-shrink-0">
+      {canRestore && <div className="border-t border-border bg-card px-4 py-3 flex justify-center flex-shrink-0">
         <Button
           variant="outline"
           onClick={onRestore}
@@ -120,7 +160,7 @@ export function TaskPreview({
           <RotateCcw className={cn('h-4 w-4 mr-2', isRestoring && 'animate-spin')} />
           {isRestoring ? t('batches.restoring') : t('batches.restore')}
         </Button>
-      </div>
+      </div>}
     </div>
   )
 }
@@ -128,12 +168,11 @@ export function TaskPreview({
 function TaskPreviewSkeleton() {
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 p-2">
         <Skeleton className="h-full w-full" />
       </div>
-      <div className="border-t border-border bg-sky-50 dark:bg-sky-900/20 p-4">
-        <Skeleton className="h-4 w-20 mb-2" />
-        <Skeleton className="h-20 w-full" />
+      <div className="flex-1 border-t border-border bg-sky-50 dark:bg-sky-900/20 p-2">
+        <Skeleton className="h-full w-full" />
       </div>
       <div className="border-t border-border bg-card px-4 py-3 flex justify-center">
         <Skeleton className="h-10 w-[140px]" />
@@ -141,4 +180,3 @@ function TaskPreviewSkeleton() {
     </div>
   )
 }
-

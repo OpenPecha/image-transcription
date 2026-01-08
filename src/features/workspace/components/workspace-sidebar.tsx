@@ -78,12 +78,15 @@ export function WorkspaceSidebar({
     >
       {/* Logo / Brand */}
       <div className="flex h-16 items-center px-4">
-        <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/20">
-            <Diamond className="h-5 w-5 text-primary" />
+      <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+              <FileText className="h-4 w-4 text-primary-foreground" />
+            </div>
+            <div className="flex flex-col leading-tight">
+              <span className="font-bold text-sidebar-foreground font-inter">Image</span>
+              <span className="text-xs text-sidebar-foreground/70 font-inter">Transcription</span>
+            </div>
           </div>
-          <span className="font-semibold text-lg text-sidebar-foreground">{t('branding.appName')}</span>
-        </div>
       </div>
 
       <Separator className="bg-sidebar-border" />
@@ -108,9 +111,9 @@ export function WorkspaceSidebar({
             {/* Task Header */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <h3 className="text-xs font-medium uppercase text-muted-foreground tracking-wider">
+                <div className="text-xs font-medium uppercase text-muted-foreground">
                   {t('sidebar.currentTask')}
-                </h3>
+                </div>
                 {isLoading && (
                   <Loader2 className="h-3 w-3 animate-spin text-primary" />
                 )}

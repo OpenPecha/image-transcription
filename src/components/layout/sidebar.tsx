@@ -107,7 +107,10 @@ export function Sidebar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <FileText className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-sidebar-foreground font-inter">TextAlign</span>
+            <div className="flex flex-col leading-tight">
+              <span className="font-bold text-sidebar-foreground font-inter">Image</span>
+              <span className="text-xs text-sidebar-foreground/70 font-inter">Transcription</span>
+            </div>
           </div>
         )}
         <Button

@@ -8,6 +8,10 @@
     "clearedDescription": "ཡི་གེའི་ས་ཁོངས་གཙང་བཟོས།",
     "undo": "ཕྱིར་འཐེན།"
   },
+  "imageCanvas": {
+    "sourceImage": "སྒོ་ནས་སྒྲིག།",
+    "converting": "སྒོ་ནས་སྒྲིག་བཀོལ་བཞིན་པ།..."
+  },
   "actions": {
     "submit": "འབུལ་བ།",
     "submitting": "འབུལ་བཞིན་པ།...",
@@ -66,6 +70,6 @@
     "noRole": "འགན་མེད།"
   },
   "branding": {
-    "appName": "ཡིག་འགྲིག"
+    "appName": "ཡིག་འགྲིག་མིང་འགྲིག"
   }
 }

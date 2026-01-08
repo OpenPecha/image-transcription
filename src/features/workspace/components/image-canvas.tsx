@@ -4,6 +4,7 @@ import { ZoomIn, ZoomOut, RotateCcw, Maximize2, AlertTriangle } from 'lucide-rea
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTiffImage } from '../hooks'
+import { useTranslation } from 'react-i18next'
 
 interface ImageCanvasProps {
   imageUrl: string
@@ -11,14 +12,16 @@ interface ImageCanvasProps {
 }
 
 export function ImageCanvas({ imageUrl, isLoading }: ImageCanvasProps) {
+  const { t } = useTranslation('workspace')
   const containerRef = useRef<HTMLDivElement>(null)
   const { displayUrl, isConverting, error } = useTiffImage(imageUrl)
+  console.log("isconverting", isConverting)
 
   if (isLoading) {
     return (
       <div className="flex h-full flex-col">
         <div className="flex items-center justify-between border-b border-border bg-muted/30 px-3 py-2">
-          <span className="text-sm font-medium">Source Image</span>
+          <span className="text-sm font-medium">{t('imageCanvas.sourceImage')}</span>
           <div className="flex gap-1">
             <Skeleton className="h-8 w-8" />
             <Skeleton className="h-8 w-8" />
@@ -36,7 +39,7 @@ export function ImageCanvas({ imageUrl, isLoading }: ImageCanvasProps) {
     <div className="flex-1 h-full flex items-center justify-center bg-muted/20">
       <div className="flex flex-col items-center gap-3">
         <Skeleton className="h-64 w-64" />
-          <span className="text-sm text-muted-foreground">Converting TIFF image...</span>
+          <span className="text-sm text-muted-foreground">{t('imageCanvas.converting')}</span>
         </div>
     </div>
     }
@@ -69,7 +72,7 @@ export function ImageCanvas({ imageUrl, isLoading }: ImageCanvasProps) {
           <>
             {/* Toolbar */}
             <div className="flex items-center justify-between border-b border-border bg-muted/30 px-3 py-2">
-              <span className="text-sm font-medium text-foreground">Source Image</span>
+              <span className="text-sm font-medium text-foreground">{t('imageCanvas.sourceImage')}</span>
               <div className="flex gap-1">
                 <Button
                   variant="ghost"

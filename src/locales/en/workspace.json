@@ -8,6 +8,10 @@
     "clearedDescription": "The text area has been cleared",
     "undo": "Undo"
   },
+  "imageCanvas": {
+    "sourceImage": "Source Image",
+    "converting": "Converting TIFF image..."
+  },
   "actions": {
     "submit": "Submit",
     "submitting": "Submitting...",
@@ -66,6 +70,6 @@
     "noRole": "No Role"
   },
   "branding": {
-    "appName": "Text Aligner"
+    "appName": "Image Transcription"
   }
 }
