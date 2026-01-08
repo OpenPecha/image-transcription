@@ -22,7 +22,7 @@ export function GroupItem({ group }: GroupItemProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   // Fetch group with users only when expanded
-  const { data: groupUsers, isLoading: isLoadingUsers } = useGetGroupUsers(
+  const { data: groupUsers, isLoading: isLoadingUsers, isFetched } = useGetGroupUsers(
     group.id,
     isExpanded
   )
@@ -45,7 +45,7 @@ export function GroupItem({ group }: GroupItemProps) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-base truncate">{group.name}</h3>
-                {isExpanded && !isLoadingUsers && (
+                {isFetched && (
                   <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                     <Users className="h-3 w-3" />
                     {userCount}

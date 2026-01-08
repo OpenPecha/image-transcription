@@ -25,8 +25,9 @@ declare global {
   }
 }
 
-// This code is for all users
-window.__TANSTACK_QUERY_CLIENT__ = queryClient;
+if (import.meta.env.DEV) {
+  window.__TANSTACK_QUERY_CLIENT__ = queryClient;
+}
 
 function App() {
   // Sync i18n language with Zustand store

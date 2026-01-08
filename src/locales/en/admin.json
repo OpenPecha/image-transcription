@@ -10,7 +10,30 @@
     "noUsers": "No users found",
     "noUsersFiltered": "No users match your current filters. Try adjusting your search criteria.",
     "noUsersEmpty": "Get started by adding your first user to the system.",
-    "searchUsers": "Search users..."
+    "searchUsers": "Search users...",
+    "viewReport": "View Report",
+    "report": {
+      "title": "Contribution Report",
+      "description": "View user contributions within the selected date range",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "apply": "Apply",
+      "contributions": "Contributions",
+      "summary": {
+        "tasksCompleted": "Tasks Completed",
+        "totalChars": "Total Characters",
+        "batchesWorked": "Batches Worked"
+      },
+      "table": {
+        "imageName": "Image Name",
+        "batch": "Batch",
+        "role": "Role",
+        "chars": "Chars",
+        "date": "Date"
+      },
+      "noContributions": "No contributions found",
+      "noContributionsHint": "Try selecting a different date range"
+    }
   },
   "groups": {
     "title": "Group Management",

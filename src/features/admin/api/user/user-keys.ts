@@ -1,4 +1,4 @@
-import type { UserFilters } from '@/types'
+import type { UserFilters, UserContributionFilters } from '@/types'
 
 export const userKeys = {
   all: ['users'] as const,
@@ -6,4 +6,6 @@ export const userKeys = {
   list: (filters: UserFilters) => [...userKeys.lists(), filters] as const,
   details: () => [...userKeys.all, 'detail'] as const,
   detail: (id: string) => [...userKeys.details(), id] as const,
+  contributions: (userId: string, filters: UserContributionFilters) =>
+    [...userKeys.detail(userId), 'contributions', filters] as const,
 }

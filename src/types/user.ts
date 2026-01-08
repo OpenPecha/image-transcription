@@ -60,3 +60,19 @@ export const ROLE_CONFIG: Record<UserRole, { label: string; description: string 
   [UserRole.FinalReviewer]: { label: 'Final Reviewer', description: 'Performs final quality check' },
 }
 
+// User contribution from report endpoint
+export interface UserContribution {
+  task_id: string
+  name: string
+  char_diff: number
+  batch_name: string
+  updated_time: string
+  role: 'annotator' | 'reviewer' | 'final reviewer'
+}
+
+// User contribution filters
+export interface UserContributionFilters {
+  start_date: string
+  end_date: string
+}
+
