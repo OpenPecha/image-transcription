@@ -7,8 +7,8 @@ interface DeleteGroupResponse {
   message?: string;
 }
 
-const deleteGroup = async (name: string): Promise<DeleteGroupResponse> => {
-  return apiClient.delete(`/group/${name}`);
+const deleteGroup = async (id: string): Promise<DeleteGroupResponse> => {
+  return apiClient.delete(`/group/${id}`);
 };
 
 export const useDeleteGroup = () => {

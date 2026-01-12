@@ -1,16 +1,19 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useBlocker } from 'react-router-dom'
-import { GripHorizontal, Send, Trash2, XCircle } from 'lucide-react'
+import { GripHorizontal, GripVertical, Send, Trash2, XCircle } from 'lucide-react'
 import { ImageCanvas } from './image-canvas'
 import { WorkspaceSidebar } from './workspace-sidebar'
 import { TrashConfirmationDialog } from './trash-confirmation-dialog'
 import { UnsavedChangesDialog } from './unsaved-changes-dialog'
 import { EditorOverlay } from './editor-overlay'
+import { EditorToolbar } from './editor-toolbar'
 import { EmptyTasksState } from './empty-tasks-state'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/features/auth'
 import { useUIStore } from '@/store/use-ui-store'
+import { FONT_FAMILY_MAP } from './constant'
 import {
   useGetAssignedTask,
   useSubmitTask,
@@ -22,12 +25,14 @@ import { cn } from '@/lib/utils'
 import { UserRole } from '@/types'
 
 export function WorkspaceEditor() {
+  const { t } = useTranslation('workspace')
   const { currentUser } = useAuth()
-  const { addToast } = useUIStore()
+  const { addToast, editorFontFamily, editorFontSize } = useUIStore()
 
   // State
   const [text, setText] = useState('')
   const [initialText, setInitialText] = useState('')
+  const [originalOcrText, setOriginalOcrText] = useState('')
   const [splitPosition, setSplitPosition] = useState(50)
   const [isDragging, setIsDragging] = useState(false)
   const [trashDialogOpen, setTrashDialogOpen] = useState(false)
@@ -40,12 +45,12 @@ export function WorkspaceEditor() {
     isLoading,
     isFetching,
     refetch,
-  } = useGetAssignedTask(currentUser?.username)
+  } = useGetAssignedTask(currentUser?.id)
 
-  const submitTask = useSubmitTask(currentUser?.username)
-  const trashTask = useTrashTask(currentUser?.username)
-  const approveTask = useApproveTask(currentUser?.username)
-  const rejectTask = useRejectTask(currentUser?.username)
+  const submitTask = useSubmitTask(currentUser?.id)
+  const trashTask = useTrashTask(currentUser?.id)
+  const approveTask = useApproveTask(currentUser?.id)
+  const rejectTask = useRejectTask(currentUser?.id)
 
   // Derived states
   const hasUnsavedChanges = text !== initialText
@@ -80,106 +85,132 @@ export function WorkspaceEditor() {
     setCurrentTaskId(task.task_id)
     setText(task.task_transcript)
     setInitialText(task.task_transcript)
+    setOriginalOcrText(task.task_transcript)
   } else if (!task && currentTaskId !== null) {
     setCurrentTaskId(null)
     setText('')
     setInitialText('')
+    setOriginalOcrText('')
   }
+
+  // Clear handler for toolbar
+  const handleClear = useCallback(() => {
+    setText('')
+  }, [])
+
+  // Restore original OCR text handler
+  const handleRestoreOriginal = useCallback(() => {
+    setText(originalOcrText)
+  }, [originalOcrText])
 
   // Submit handler
   const handleSubmit = useCallback(() => {
     if (!task || !currentUser) return
 
     submitTask.mutate(
-      { task_id: task.task_id, username: currentUser.username!, transcript: text, submit: true },
+      { task_id: task.task_id, user_id: currentUser.id!, transcript: text, submit: true },
       {
         onSuccess: () => {
           addToast({
-            title: 'Task submitted',
-            description: 'Your work has been submitted for review',
+            title: t('toast.submitted'),
+            description: t('toast.submittedDescription'),
             variant: 'success',
           })
           setInitialText(text)
         },
         onError: (error: Error) => {
           addToast({
-            title: 'Submit failed',
+            title: t('toast.submitFailed'),
             description: error.message,
             variant: 'destructive',
           })
         },
       }
     )
-  }, [task, currentUser, text, submitTask, addToast])
+  }, [task, currentUser, text, submitTask, addToast, t])
 
   // Trash handler
   const handleTrash = useCallback(() => {
     if (!task || !currentUser) return
 
     trashTask.mutate(
-      { task_id: task.task_id, username: currentUser.username!, submit: false },
+      { task_id: task.task_id, user_id: currentUser.id!, submit: false },
       {
         onSuccess: () => {
           setTrashDialogOpen(false)
-          addToast({ title: 'Task marked as trash', variant: 'default' })
+          addToast({ title: t('toast.trashed'), variant: 'default' })
         },
         onError: (error: Error) => {
           addToast({
-            title: 'Failed to trash task',
+            title: t('toast.trashFailed'),
             description: error.message,
             variant: 'destructive',
           })
         },
       }
     )
-  }, [task, currentUser, trashTask, addToast])
+  }, [task, currentUser, trashTask, addToast, t])
 
   // Approve handler
   const handleApprove = useCallback(() => {
     if (!task || !currentUser) return
 
     approveTask.mutate(
-      { task_id: task.task_id, username: currentUser.username!, transcript: text, approve: true },
+      { task_id: task.task_id, user_id: currentUser.id!, transcript: text, approve: true },
       {
         onSuccess: () => {
           addToast({
-            title: 'Task approved',
-            description: 'The task has been approved successfully',
+            title: t('toast.approved'),
+            description: t('toast.approvedDescription'),
             variant: 'success',
           })
           setInitialText(text)
         },
         onError: (error: Error) => {
           addToast({
-            title: 'Failed to approve task',
+            title: t('toast.approveFailed'),
             description: error.message,
             variant: 'destructive',
           })
         },
       }
     )
-  }, [task, currentUser, text, approveTask, addToast])
+  }, [task, currentUser, text, approveTask, addToast, t])
 
   // Reject handler
   const handleReject = useCallback(() => {
     if (!task || !currentUser) return
 
     rejectTask.mutate(
-      { task_id: task.task_id, username: currentUser.username!, transcript: text, reject: true },
+      { task_id: task.task_id, user_id: currentUser.id!, transcript: text, reject: true },
       {
         onSuccess: () => {
-          addToast({ title: 'Task rejected', variant: 'default' })
+          addToast({ title: t('toast.rejected'), variant: 'default' })
         },
         onError: (error: Error) => {
           addToast({
-            title: 'Failed to reject task',
+            title: t('toast.rejectFailed'),
             description: error.message,
             variant: 'destructive',
           })
         },
       }
     )
-  }, [task, currentUser, text, rejectTask, addToast])
+  }, [task, currentUser, text, rejectTask, addToast, t])
+
+  // Derive layout direction from orientation
+  // Portrait images → horizontal split (side-by-side)
+  // Landscape images → vertical split (stacked)
+  const isHorizontalLayout = task?.orientation === 'portrait'
+
+  // Track orientation changes to reset split position
+  const [lastOrientation, setLastOrientation] = useState<string | undefined>(undefined)
+  
+  // Reset split position to 50% when orientation changes
+  if (task?.orientation !== lastOrientation) {
+    setLastOrientation(task?.orientation)
+    setSplitPosition(50)
+  }
 
   // Split pane handlers
   const handleMouseDown = useCallback(() => {
@@ -191,10 +222,15 @@ export function WorkspaceEditor() {
       if (!isDragging) return
       const container = e.currentTarget as HTMLElement
       const rect = container.getBoundingClientRect()
-      const position = ((e.clientY - rect.top) / rect.height) * 100
+
+      // Calculate position based on layout direction
+      const position = isHorizontalLayout
+        ? ((e.clientX - rect.left) / rect.width) * 100
+        : ((e.clientY - rect.top) / rect.height) * 100
+
       setSplitPosition(Math.max(20, Math.min(80, position)))
     },
-    [isDragging]
+    [isDragging, isHorizontalLayout]
   )
 
   const handleMouseUp = useCallback(() => {
@@ -232,7 +268,6 @@ export function WorkspaceEditor() {
           <EmptyTasksState
             onRefresh={() => refetch()}
             isLoading={isLoading}
-            message="No tasks available. Click refresh to check for new tasks."
           />
         </main>
       </div>
@@ -252,7 +287,10 @@ export function WorkspaceEditor() {
       <main className="flex-1 ml-60 flex flex-col">
         {/* Split Pane Container */}
         <div
-          className="relative flex-1 flex flex-col overflow-hidden"
+          className={cn(
+            'relative flex-1 flex overflow-hidden',
+            isHorizontalLayout ? 'flex-row' : 'flex-col'
+          )}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
@@ -260,13 +298,20 @@ export function WorkspaceEditor() {
           {/* Loading/Mutation Overlay */}
           <EditorOverlay
             show={showOverlay}
-            message={isMutating ? 'Processing...' : 'Loading next task...'}
+            message={isMutating ? t('loading.processing') : t('loading.loadingNext')}
           />
 
           {/* Image Panel */}
           <div
-            className="overflow-hidden border-b border-border"
-            style={{ height: `${splitPosition}%` }}
+            className={cn(
+              'overflow-hidden flex-shrink-0',
+              isHorizontalLayout ? 'border-r border-border h-full' : 'border-b border-border w-full'
+            )}
+            style={
+              isHorizontalLayout
+                ? { width: `calc(${splitPosition}% - 6px)` }
+                : { height: `${splitPosition}%` }
+            }
           >
             <ImageCanvas imageUrl={task.task_url} />
           </div>
@@ -274,35 +319,57 @@ export function WorkspaceEditor() {
           {/* Resize Handle */}
           <div
             className={cn(
-              'flex h-2 cursor-row-resize items-center justify-center bg-border hover:bg-primary/50 transition-colors',
-              isDragging && 'bg-primary'
+              'flex-shrink-0 flex items-center justify-center bg-border/80 transition-colors select-none',
+              isHorizontalLayout
+                ? 'w-3 cursor-col-resize hover:bg-primary/40'
+                : 'h-2 cursor-row-resize hover:bg-primary/50',
+              isDragging && 'bg-primary/60'
             )}
             onMouseDown={handleMouseDown}
           >
-            <GripHorizontal className="h-3 w-5 text-muted-foreground" />
+            {isHorizontalLayout ? (
+              <GripVertical className="h-6 w-4 text-muted-foreground/70" />
+            ) : (
+              <GripHorizontal className="h-3 w-5 text-muted-foreground" />
+            )}
           </div>
 
           {/* Text Editor Panel */}
           <div
-            className="overflow-hidden bg-sky-100 dark:bg-sky-900/20"
-            style={{ height: `${100 - splitPosition}%` }}
+            className={cn(
+              'overflow-hidden bg-muted/30 flex-1 flex flex-col',
+              isHorizontalLayout ? 'h-full' : 'w-full'
+            )}
           >
+            {/* Editor Toolbar */}
+            <EditorToolbar
+              onClear={handleClear}
+              onRestoreOriginal={handleRestoreOriginal}
+              hasContent={text.length > 0}
+              hasOriginalContent={originalOcrText.length > 0 && text !== originalOcrText}
+              isDisabled={!canEdit || showOverlay}
+            />
+
+            {/* Textarea */}
             <textarea
+              id="editor-textarea"
+              name="editor-textarea"
               ref={textareaRef}
               value={text}
               onChange={(e) => setText(e.target.value)}
               readOnly={!canEdit || showOverlay}
-              placeholder="Begin typing or editing..."
+              placeholder={t('editor.placeholder')}
               className={cn(
-                'h-full w-full resize-none bg-transparent p-5 font-monlam text-sm leading-7',
-                'text-foreground placeholder:text-muted-foreground/50',
+                'flex-1 w-full resize-none bg-card p-5',
+                'text-foreground placeholder:text-placeholder',
                 'focus:outline-none focus:ring-0',
+                'transition-all duration-200',
                 (!canEdit || showOverlay) && 'cursor-default opacity-80'
               )}
               style={{
-                fontFamily: "Monlam",
-                fontSize: "1.3rem",
-                lineHeight: 1.5,
+                fontFamily: FONT_FAMILY_MAP[editorFontFamily],
+                fontSize: `${editorFontSize}px`,
+                lineHeight: 1.6,
               }}
               spellCheck={false}
             />
@@ -311,65 +378,65 @@ export function WorkspaceEditor() {
 
         {/* Footer */}
         <footer className="grid grid-cols-3 items-center border-t border-border bg-card px-6 py-3">
-  {/* Left Section: Status (Pinned to start) */}
-  <div className="flex items-center text-sm text-muted-foreground">
-    {hasUnsavedChanges && (
-      <span className="text-warning animate-pulse font-medium">
-        Unsaved changes
-      </span>
-    )}
-  </div>
+          {/* Left Section: Status (Pinned to start) */}
+          <div className="flex items-center text-sm text-muted-foreground">
+            {hasUnsavedChanges && (
+              <span className="text-warning animate-pulse font-medium">
+                {t('editor.unsavedChanges')}
+              </span>
+            )}
+          </div>
 
-  {/* Center Section: Actions (Perfectly centered) */}
-  <div className="flex items-center justify-center gap-3">
-    {currentUser?.role === UserRole.Annotator && (
-      <>
-        <Button
-          variant="success"
-          onClick={handleSubmit}
-          disabled={showOverlay || !canEdit}
-        >
-          <Send className="h-4 w-4 mr-2" />
-          {submitTask.isPending ? 'Submitting...' : 'Submit'}
-        </Button>
-        <Button
-          variant="destructive"
-          onClick={() => setTrashDialogOpen(true)}
-          disabled={showOverlay || !canEdit}
-        >
-          <Trash2 className="h-4 w-4 mr-2" />
-          Trash
-        </Button>
-      </>
-    )}
+          {/* Center Section: Actions (Perfectly centered) */}
+          <div className="flex items-center justify-center gap-3">
+            {currentUser?.role === UserRole.Annotator && (
+              <>
+                <Button
+                  variant="success"
+                  onClick={handleSubmit}
+                  disabled={showOverlay || !canEdit || text.length === 0}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  {submitTask.isPending ? t('actions.submitting') : t('actions.submit')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => setTrashDialogOpen(true)}
+                  disabled={showOverlay || !canEdit}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {t('actions.trash')}
+                </Button>
+              </>
+            )}
 
-    {(currentUser?.role === UserRole.Reviewer || currentUser?.role === UserRole.FinalReviewer) && (
-      <>
-        <Button
-          variant="success"
-          onClick={handleApprove}
-          disabled={showOverlay || !canEdit}
-        >
-          <Send className="h-4 w-4 mr-2" />
-          {approveTask.isPending ? 'Approving...' : 'Approve'}
-        </Button>
-        <Button
-          variant="destructive"
-          onClick={handleReject}
-          disabled={showOverlay || !canEdit}
-        >
-          <XCircle className="h-4 w-4 mr-2" />
-          Reject
-        </Button>
-      </>
-    )}
-  </div>
+            {(currentUser?.role === UserRole.Reviewer || currentUser?.role === UserRole.FinalReviewer) && (
+              <>
+                <Button
+                  variant="success"
+                  onClick={handleApprove}
+                  disabled={showOverlay || !canEdit}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  {approveTask.isPending ? t('actions.approving') : t('actions.approve')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleReject}
+                  disabled={showOverlay || !canEdit}
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  {t('actions.reject')}
+                </Button>
+              </>
+            )}
+          </div>
 
-  {/* Right Section: Empty Spacer (Ensures center stays center) */}
-  <div className="flex justify-end">
-    {/* You can put word counts or page numbers here later */}
-  </div>
-</footer>
+          {/* Right Section: Empty Spacer (Ensures center stays center) */}
+          <div className="flex justify-end">
+            {/* You can put word counts or page numbers here later */}
+          </div>
+        </footer>
       </main>
 
       {/* Trash Dialog */}

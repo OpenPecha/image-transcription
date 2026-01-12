@@ -1,0 +1,13 @@
+{
+  "welcome": "Welcome back, {{name}}",
+  "currentTask": "Your Current Task",
+  "noTasks": {
+    "title": "No Tasks Available",
+    "description": "You don't have any tasks assigned at the moment. Check back later or contact your admin for new assignments."
+  },
+  "taskCard": {
+    "transcript": "Transcript",
+    "continue": "Continue"
+  }
+}
+

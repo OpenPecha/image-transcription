@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { groupSchema } from '@/schema/group-schema'
@@ -23,8 +24,9 @@ export function GroupForm({
   defaultValues,
   onSubmit,
   isSubmitting = false,
-  submitLabel = 'Save',
+  submitLabel,
 }: GroupFormProps) {
+  const { t } = useTranslation('admin')
   const {
     register,
     handleSubmit,
@@ -40,10 +42,10 @@ export function GroupForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">{t('groups.form.name')}</Label>
         <Input
           id="name"
-          placeholder="Enter group name"
+          placeholder={t('groups.form.namePlaceholder')}
           {...register('name')}
           disabled={isSubmitting}
         />
@@ -53,10 +55,10 @@ export function GroupForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{t('groups.form.description')}</Label>
         <Textarea
           id="description"
-          placeholder="Enter group description (optional)"
+          placeholder={t('groups.form.descriptionPlaceholder')}
           rows={3}
           {...register('description')}
           disabled={isSubmitting}
@@ -69,7 +71,7 @@ export function GroupForm({
       <div className="flex justify-end pt-2">
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {submitLabel}
+          {submitLabel || t('groups.form.save')}
         </Button>
       </div>
     </form>

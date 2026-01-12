@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -16,6 +17,7 @@ interface GroupDialogProps {
 }
 
 export function GroupDialog({ open, onOpenChange, group }: GroupDialogProps) {
+  const { t } = useTranslation('admin')
   const createGroup = useCreateGroup()
   const updateGroup = useUpdateGroup()
 
@@ -26,7 +28,7 @@ export function GroupDialog({ open, onOpenChange, group }: GroupDialogProps) {
     try {
       if (isEditing && group) {
         await updateGroup.mutateAsync({
-          name: group.name,
+          id: group.id,
           data: {
             new_name: data.name,
             new_description: data.description || '',
@@ -48,11 +50,11 @@ export function GroupDialog({ open, onOpenChange, group }: GroupDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Group' : 'Create Group'}</DialogTitle>
+          <DialogTitle>{isEditing ? t('groups.editGroup') : t('groups.createGroup')}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? 'Update the group details below.'
-              : 'Fill in the details to create a new group.'}
+              ? t('groups.updateGroupDetails')
+              : t('groups.addGroupDetails')}
           </DialogDescription>
         </DialogHeader>
 
@@ -64,7 +66,7 @@ export function GroupDialog({ open, onOpenChange, group }: GroupDialogProps) {
           }
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          submitLabel={isEditing ? 'Update Group' : 'Create Group'}
+          submitLabel={isEditing ? t('groups.updateGroup') : t('groups.createGroup')}
         />
       </DialogContent>
     </Dialog>

@@ -1,0 +1,103 @@
+---
+description: Tailwind CSS v4 styling conventions and class organization
+globs: ["**/*.tsx", "**/*.css"]
+alwaysApply: false
+---
+
+# Tailwind CSS v4 Styling
+
+## CSS-First Configuration
+
+Tailwind v4 uses CSS-based configuration via `@tailwindcss/vite`. No `tailwind.config.js` needed unless strictly necessary for theming overrides.
+
+```css
+/* src/index.css */
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --color-primary-500: oklch(0.55 0.2 250);
+}
+```
+
+## cn() Utility (Required)
+
+Always use `cn()` for conditional classes:
+
+```typescript
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+```
+
+## Class Organization Order
+
+**Layout → Box Model → Typography → Visuals → Interactive → Transitions**
+
+```tsx
+<button
+  className={cn(
+    // Layout
+    'flex items-center justify-center gap-2',
+    // Box Model
+    'px-4 py-2 min-w-[120px]',
+    // Typography
+    'text-sm font-medium',
+    // Visuals
+    'bg-primary-500 text-white rounded-lg shadow-md',
+    // Interactive
+    'hover:bg-primary-600 focus:ring-2 focus:ring-primary-300',
+    'disabled:opacity-50 disabled:cursor-not-allowed',
+    // Transitions
+    'transition-colors duration-200',
+    // Conditional
+    isLoading && 'animate-pulse'
+  )}
+>
+  {children}
+</button>
+```
+
+## Component Variants with CVA
+
+Use `class-variance-authority` for reusable component variants:
+
+```typescript
+import { cva, type VariantProps } from 'class-variance-authority';
+
+const buttonVariants = cva(
+  'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2',
+  {
+    variants: {
+      variant: {
+        primary: 'bg-primary-500 text-white hover:bg-primary-600',
+        secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
+        ghost: 'hover:bg-gray-100',
+        destructive: 'bg-red-500 text-white hover:bg-red-600',
+      },
+      size: {
+        sm: 'h-8 px-3 text-xs',
+        md: 'h-10 px-4 text-sm',
+        lg: 'h-12 px-6 text-base',
+      },
+    },
+    defaultVariants: { variant: 'primary', size: 'md' },
+  }
+);
+
+type ButtonProps = VariantProps<typeof buttonVariants> & ComponentProps<'button'>;
+
+export function Button({ variant, size, className, ...props }: ButtonProps) {
+  return <button className={cn(buttonVariants({ variant, size }), className)} {...props} />;
+}
+```
+
+## Rules
+
+- **NO** `@apply` in CSS files - keep utilities in TSX for maintainability
+- Use CSS variables from `@theme` for consistent theming
+- Prefer Tailwind utilities over custom CSS
+

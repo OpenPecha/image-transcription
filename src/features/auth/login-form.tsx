@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Loader2, LogIn, FileText, CheckCircle, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -9,25 +10,26 @@ import {
 } from '@/components/ui/card'
 import { useAuth } from './use-auth'
 
-const features = [
+const featureKeys = [
   {
     icon: FileText,
-    title: 'Text Transcription',
-    description: 'Correct and refine noisy text transcriptions',
+    titleKey: 'features.transcription.title',
+    descriptionKey: 'features.transcription.description',
   },
   {
     icon: CheckCircle,
-    title: 'Quality Review',
-    description: 'Multi-stage review process for accuracy',
+    titleKey: 'features.review.title',
+    descriptionKey: 'features.review.description',
   },
   {
     icon: Users,
-    title: 'Team Collaboration',
-    description: 'Work together with role-based access',
+    titleKey: 'features.collaboration.title',
+    descriptionKey: 'features.collaboration.description',
   },
 ]
 
 export function LoginForm() {
+  const { t } = useTranslation('auth')
   const { login, isLoading } = useAuth()
 
   const handleLogin = () => {
@@ -43,20 +45,20 @@ export function LoginForm() {
             <FileText className="h-6 w-6 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight">
-            Image Text Aligner
+            {t('login.title')}
           </h1>
         </div>
         <p className="text-muted-foreground">
-          Streamline your text transcription workflow
+          {t('login.subtitle')}
         </p>
       </div>
 
       {/* Login Card */}
       <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
         <CardHeader className="space-y-1 text-center pb-4">
-          <CardTitle className="text-xl">Welcome</CardTitle>
+          <CardTitle className="text-xl">{t('login.welcome')}</CardTitle>
           <CardDescription>
-            Sign in to access your workspace
+            {t('login.signInPrompt')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -68,12 +70,12 @@ export function LoginForm() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Connecting...
+                {t('login.connecting')}
               </>
             ) : (
               <>
                 <LogIn className="mr-2 h-4 w-4" />
-                Sign in with Auth0
+                {t('login.signInWithAuth0')}
               </>
             )}
           </Button>
@@ -84,23 +86,23 @@ export function LoginForm() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                Features
+                {t('login.features')}
               </span>
             </div>
           </div>
 
           {/* Feature List */}
           <div className="space-y-3">
-            {features.map((feature) => (
+            {featureKeys.map((feature) => (
               <div
-                key={feature.title}
+                key={feature.titleKey}
                 className="flex items-start gap-3 rounded-lg border border-border/50 bg-muted/30 p-3"
               >
                 <feature.icon className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-sm font-medium">{feature.title}</p>
+                  <p className="text-sm font-medium">{t(feature.titleKey)}</p>
                   <p className="text-xs text-muted-foreground">
-                    {feature.description}
+                    {t(feature.descriptionKey)}
                   </p>
                 </div>
               </div>
@@ -111,7 +113,7 @@ export function LoginForm() {
 
       {/* Footer */}
       <p className="text-center text-xs text-muted-foreground">
-        Secure authentication powered by Auth0
+        {t('login.secureAuth')}
       </p>
     </div>
   )

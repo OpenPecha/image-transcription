@@ -1,0 +1,75 @@
+{
+  "editor": {
+    "placeholder": "Begin typing or editing...",
+    "restoreOriginal": "Restore Original",
+    "clear": "Clear",
+    "unsavedChanges": "Unsaved changes",
+    "cleared": "Transcription cleared",
+    "clearedDescription": "The text area has been cleared",
+    "undo": "Undo"
+  },
+  "imageCanvas": {
+    "sourceImage": "Source Image",
+    "converting": "Converting TIFF image..."
+  },
+  "actions": {
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "trash": "Trash",
+    "approve": "Approve",
+    "approving": "Approving...",
+    "reject": "Reject"
+  },
+  "loading": {
+    "processing": "Processing...",
+    "loadingNext": "Loading next task...",
+    "checking": "Checking..."
+  },
+  "empty": {
+    "title": "No Tasks Available",
+    "noMoreTasks": "No More Tasks",
+    "message": "No tasks available. Click refresh to check for new tasks.",
+    "checkForTasks": "Check for New Tasks"
+  },
+  "toast": {
+    "submitted": "Task submitted",
+    "submittedDescription": "Your work has been submitted for review",
+    "submitFailed": "Submit failed",
+    "trashed": "Task marked as trash",
+    "trashFailed": "Failed to trash task",
+    "approved": "Task approved",
+    "approvedDescription": "The task has been approved successfully",
+    "approveFailed": "Failed to approve task",
+    "rejected": "Task rejected",
+    "rejectFailed": "Failed to reject task"
+  },
+  "dialogs": {
+    "trash": {
+      "title": "Trash Task",
+      "description": "Are you sure you want to trash \"{{taskName}}\"?",
+      "confirm": "Trash Task"
+    },
+    "unsaved": {
+      "title": "Unsaved Changes",
+      "description": "You have unsaved changes. Are you sure you want to leave? Your changes will be lost.",
+      "discard": "Discard Changes",
+      "stay": "Stay"
+    }
+  },
+  "sidebar": {
+    "taskInfo": "Task Info",
+    "batch": "Batch",
+    "status": "Status",
+    "assignedTo": "Assigned To",
+    "currentTask": "Current Task",
+    "group": "Group",
+    "noTaskAssigned": "No task assigned",
+    "getTask": "Get Task",
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "noRole": "No Role"
+  },
+  "branding": {
+    "appName": "Image Transcription"
+  }
+}

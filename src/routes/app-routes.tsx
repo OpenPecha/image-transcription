@@ -10,8 +10,9 @@ const CallbackPage = lazy(() => import('@/pages/auth/callback-page').then(m => (
 const PendingApprovalPage = lazy(() => import('@/pages/auth/pending-approval-page').then(m => ({ default: m.PendingApprovalPage })))
 const DashboardPage = lazy(() => import('@/pages/dashboard/dashboard-page').then(m => ({ default: m.DashboardPage })))
 const AdminUsersPage = lazy(() => import('@/pages/admin/admin-users-page').then(m => ({ default: m.AdminUsersPage })))
-const AdminTasksPage = lazy(() => import('@/pages/admin/admin-tasks-page').then(m => ({ default: m.AdminTasksPage })))
 const AdminGroupsPage = lazy(() => import('@/pages/admin/admin-groups-page').then(m => ({ default: m.AdminGroupsPage })))
+const AdminBatchesPage = lazy(() => import('@/pages/admin/admin-batches-page').then(m => ({ default: m.AdminBatchesPage })))
+const AdminBatchTasksPage = lazy(() => import('@/pages/admin/admin-batch-tasks-page').then(m => ({ default: m.AdminBatchTasksPage })))
 const WorkspacePage = lazy(() => import('@/pages/workspace/workspace-page').then(m => ({ default: m.WorkspacePage })))
 const NotFoundPage = lazy(() => import('@/pages/not-found').then(m => ({ default: m.NotFoundPage })))
 
@@ -58,21 +59,29 @@ export const router = createBrowserRouter([
           <ProtectedRoute allowedRoles={[UserRole.Admin]}>
             <Suspense fallback={fallback}><AdminUsersPage /></Suspense>
           </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/admin/tasks',
-        element: (
-          <ProtectedRoute allowedRoles={[UserRole.Admin]}>
-            <Suspense fallback={fallback}><AdminTasksPage /></Suspense>
-          </ProtectedRoute>
-        ),
+        )
       },
       {
         path: '/admin/groups',
         element: (
           <ProtectedRoute allowedRoles={[UserRole.Admin]}>
             <Suspense fallback={fallback}><AdminGroupsPage /></Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin/batches',
+        element: (
+          <ProtectedRoute allowedRoles={[UserRole.Admin]}>
+            <Suspense fallback={fallback}><AdminBatchesPage /></Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin/batch/:batchId',
+        element: (
+          <ProtectedRoute allowedRoles={[UserRole.Admin]}>
+            <Suspense fallback={fallback}><AdminBatchTasksPage /></Suspense>
           </ProtectedRoute>
         ),
       },

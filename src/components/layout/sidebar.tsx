@@ -1,24 +1,28 @@
+import { useState, useRef, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   LayoutDashboard,
   FileText,
   Users,
   Layers,
+  Package,
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Settings,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, getInitials, getRoleTranslationKey } from '@/lib/utils'
 import { useAuth } from '@/features/auth'
 import { useUIStore } from '@/store/use-ui-store'
-import { UserRole, ROLE_CONFIG } from '@/types'
+import { UserRole } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
-import { getInitials } from '@/lib/utils'
+import { ThemeToggle, LanguageToggle } from '@/components/common'
 
 interface NavItem {
-  label: string
+  labelKey: string
   href: string
   icon: React.ElementType
   roles: UserRole[]
@@ -26,34 +30,53 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    label: 'Dashboard',
+    labelKey: 'nav.dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
     roles: [UserRole.Admin, UserRole.Annotator, UserRole.Reviewer, UserRole.FinalReviewer],
   },
   {
-    label: 'Users',
+    labelKey: 'nav.users',
     href: '/admin/users',
     icon: Users,
     roles: [UserRole.Admin],
   },
   {
-    label: 'Tasks',
-    href: '/admin/tasks',
-    icon: FileText,
+    labelKey: 'nav.groups',
+    href: '/admin/groups',
+    icon: Layers,
     roles: [UserRole.Admin],
   },
   {
-    label: 'Groups',
-    href: '/admin/groups',
-    icon: Layers,
+    labelKey: 'nav.batches',
+    href: '/admin/batches',
+    icon: Package,
     roles: [UserRole.Admin],
   },
 ]
 
 export function Sidebar() {
+  const { t } = useTranslation('common')
   const { currentUser, logout } = useAuth()
   const { sidebarCollapsed, toggleSidebar } = useUIStore()
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const sidebarRef = useRef<HTMLElement>(null)
+
+  // Close settings when clicking outside sidebar
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        settingsOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setSettingsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [settingsOpen])
 
   if (!currentUser) return null
 
@@ -65,8 +88,13 @@ export function Sidebar() {
     logout()
   }
 
+  const toggleSettings = () => {
+    setSettingsOpen((prev) => !prev)
+  }
+
   return (
     <aside
+      ref={sidebarRef}
       className={cn(
         'fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300',
         sidebarCollapsed ? 'w-16' : 'w-60'
@@ -79,7 +107,10 @@ export function Sidebar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <FileText className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-sidebar-foreground">TextAlign</span>
+            <div className="flex flex-col leading-tight">
+              <span className="font-bold text-sidebar-foreground font-inter">Image</span>
+              <span className="text-xs text-sidebar-foreground/70 font-inter">Transcription</span>
+            </div>
           </div>
         )}
         <Button
@@ -115,14 +146,42 @@ export function Sidebar() {
             }
           >
             <item.icon className="h-5 w-5 shrink-0" />
-            {!sidebarCollapsed && <span>{item.label}</span>}
+            {!sidebarCollapsed && <span>{t(item.labelKey)}</span>}
           </NavLink>
         ))}
       </nav>
       <Separator className="bg-sidebar-border" />
 
-      {/* User Profile */}
+      {/* User Profile & Settings */}
       <div className="p-2">
+        {/* Settings Panel - Animated */}
+        <div
+          className={cn(
+            'overflow-hidden transition-all duration-300 ease-out',
+            settingsOpen && !sidebarCollapsed ? 'max-h-40 opacity-100 mb-2' : 'max-h-0 opacity-0'
+          )}
+        >
+          <div className="flex flex-col gap-2 rounded-lg bg-sidebar-accent/50 p-2">
+            {/* Language Toggle */}
+            <LanguageToggle />
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* Logout Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" />
+              {!sidebarCollapsed && <span className="ml-2">{t('actions.logout')}</span>}
+            </Button>
+          </div>
+        </div>
+
+        {/* Profile Row */}
         <div
           className={cn(
             'flex items-center gap-3 rounded-lg p-2',
@@ -132,7 +191,7 @@ export function Sidebar() {
           <Avatar className="h-9 w-9 shrink-0">
             <AvatarImage src={currentUser.picture} alt={currentUser.username} />
             <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-            {getInitials(currentUser.username ?? 'No Name')}
+              {getInitials(currentUser.username ?? 'No Name')}
             </AvatarFallback>
           </Avatar>
           {!sidebarCollapsed && (
@@ -141,22 +200,21 @@ export function Sidebar() {
                 {currentUser.username}
               </p>
               <p className="truncate text-xs text-muted-foreground">
-                {currentUser.role ? ROLE_CONFIG[currentUser.role]?.label : ''}
+                {currentUser.role ? t(`roles.${getRoleTranslationKey(currentUser.role)}`) : ''}
               </p>
             </div>
           )}
-        </div>
-
-        <div className={cn('mt-2 flex gap-1', sidebarCollapsed && 'flex-col')}>
-          <Button
+          {!sidebarCollapsed && <Button
             variant="ghost"
-            size={sidebarCollapsed ? 'icon' : 'sm'}
-            className="flex-1 justify-start text-destructive hover:bg-destructive/10 hover:text-destructive"
-            onClick={handleLogout}
+            size="icon"
+            className={cn(
+              'h-8 w-8 shrink-0 text-muted-foreground hover:text-sidebar-foreground transition-transform duration-200',
+              settingsOpen && 'rotate-90'
+            )}
+            onClick={toggleSettings}
           >
-            <LogOut className="h-4 w-4" />
-            {!sidebarCollapsed && <span className="ml-2">Logout</span>}
-          </Button>
+            <Settings className="h-4 w-4" />
+          </Button>}
         </div>
       </div>
     </aside>

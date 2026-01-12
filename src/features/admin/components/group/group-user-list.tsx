@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Mail } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -33,10 +34,11 @@ function UserRowSkeleton() {
 }
 
 function EmptyState() {
+  const { t } = useTranslation('admin')
   return (
     <div className="py-8 text-center">
       <p className="text-sm text-muted-foreground">
-        No users in this group yet.
+        {t('groups.noUsersInGroup')}
       </p>
     </div>
   )
@@ -45,13 +47,11 @@ function EmptyState() {
 export function GroupUserList({ users, isLoading }: GroupUserListProps) {
   const updateUserRole = useUpdateUser()
 
-  const handleRoleChange = async (username: string, newRole: UserRole) => {
+  const handleRoleChange = async (id: string, newRole: UserRole) => {
     try {
       await updateUserRole.mutateAsync({
-        username: username,
-        data: {
-          new_role: newRole,
-        }
+        id: id,
+        data: { new_role: newRole },
       })
     } catch (error) {
       console.error('Failed to update user role:', error)
@@ -97,7 +97,7 @@ export function GroupUserList({ users, isLoading }: GroupUserListProps) {
 
           <Select
             value={user.role}
-            onValueChange={(value) => handleRoleChange(user.username ?? '', value as UserRole)}
+            onValueChange={(value) => handleRoleChange(user.id ?? '', value as UserRole)}
             disabled={updateUserRole.isPending}
           >
             <SelectTrigger className="w-32 h-8 text-xs">

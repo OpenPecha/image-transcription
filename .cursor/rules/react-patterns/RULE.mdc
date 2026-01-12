@@ -1,0 +1,126 @@
+---
+description: React 19+ patterns, hooks usage, and component best practices
+globs: ["**/*.tsx"]
+alwaysApply: false
+---
+
+# React 19+ Patterns
+
+## React Compiler (Automatic Memoization)
+
+Assume the **React Compiler** is active:
+
+- **DO NOT** manually add `useMemo`, `useCallback`, or `React.memo`
+- Only add memoization if React DevTools Profiler shows a proven bottleneck
+
+## Component Patterns
+
+### Always use Named Exports
+
+```typescript
+// ✅ GOOD: Better for HMR and stack traces
+export function TaskCard({ task }: TaskCardProps) {
+  return <article>...</article>;
+}
+
+// ❌ BAD: Avoid default exports
+export default function TaskCard() {}
+```
+
+## React 19 Hooks
+
+### `use()` - Unwrap promises/context
+
+```typescript
+// With Suspense boundary
+const user = use(userPromise);
+
+// Conditional context
+if (someCondition) {
+  const theme = use(ThemeContext);
+}
+```
+
+### `useActionState` - Form actions
+
+```typescript
+const [state, submitAction, isPending] = useActionState(
+  async (prevState, formData) => {
+    const result = await loginUser(formData);
+    return result;
+  },
+  { error: null }
+);
+```
+
+### `useOptimistic` - Optimistic UI
+
+```typescript
+const [optimisticTodos, addOptimisticTodo] = useOptimistic(
+  todos,
+  (state, newTodo) => [...state, newTodo]
+);
+```
+
+### `useFormStatus` - Submit state (child of form)
+
+```typescript
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return <button disabled={pending}>{pending ? 'Submitting...' : 'Submit'}</button>;
+}
+```
+
+## Anti-Patterns (NEVER DO)
+
+### ❌ useEffect for data fetching
+
+```typescript
+// ❌ NEVER
+useEffect(() => {
+  fetch('/api/data').then(setData);
+}, []);
+
+// ✅ USE TanStack Query
+const { data } = useQuery(taskQueryOptions(taskId));
+```
+
+### ❌ useEffect to sync state from props
+
+```typescript
+// ❌ NEVER
+useEffect(() => {
+  setLocalValue(prop);
+}, [prop]);
+
+// ✅ Derive during render or use key prop
+const derivedValue = computeValue(prop);
+// Or: <Component key={prop.id} />
+```
+
+## TanStack Query Patterns
+
+### Query Options Factory
+
+```typescript
+export const taskKeys = {
+  all: ['tasks'] as const,
+  detail: (id: string) => [...taskKeys.all, 'detail', id] as const,
+};
+
+export function taskDetailQueryOptions(taskId: string) {
+  return queryOptions({
+    queryKey: taskKeys.detail(taskId),
+    queryFn: () => fetchTaskById(taskId),
+    enabled: !!taskId,
+  });
+}
+```
+
+## Accessibility
+
+- Use semantic HTML: `<main>`, `<section>`, `<article>`, `<button>` over `<div>`
+- Add `aria-label` to icon-only buttons
+- Images must have meaningful `alt` text
+- Forms: connect `<label>` with `htmlFor`, show errors with `role="alert"`
+

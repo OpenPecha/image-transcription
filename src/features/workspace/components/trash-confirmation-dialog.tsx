@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,8 @@ export function TrashConfirmationDialog({
   isLoading,
   taskName = 'this task',
 }: TrashConfirmationDialogProps) {
+  const { t } = useTranslation('workspace')
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
@@ -35,9 +38,9 @@ export function TrashConfirmationDialog({
               <Trash2 className="h-5 w-5 text-destructive" />
             </div>
             <div>
-              <DialogTitle>Trash Task</DialogTitle>
+              <DialogTitle>{t('dialogs.trash.title')}</DialogTitle>
               <DialogDescription className="mt-1">
-                Are you sure you want to mark {taskName} as trash?.
+                {t('dialogs.trash.description', { taskName })}
               </DialogDescription>
             </div>
           </div>
@@ -48,14 +51,14 @@ export function TrashConfirmationDialog({
             onClick={onCancel}
             disabled={isLoading}
           >
-            Cancel
+            {t('dialogs.unsaved.stay')}
           </Button>
           <Button
             variant="destructive"
             onClick={onConfirm}
             disabled={isLoading}
           >
-            {isLoading ? 'Processing...' : 'Trash'}
+            {isLoading ? t('loading.processing') : t('actions.trash')}
           </Button>
         </DialogFooter>
       </DialogContent>

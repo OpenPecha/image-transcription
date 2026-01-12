@@ -4,12 +4,12 @@ import { type GroupUpdateRequest, type Group } from '@/types';
 import { groupKeys } from './group-keys';
 
 interface UpdateGroupParams {
-  name: string;
+  id: string;
   data: GroupUpdateRequest;
 }
 
-const updateGroup = async ({ name, data }: UpdateGroupParams): Promise<Group> => {
-  return apiClient.put(`/group/${name}`, data);
+const updateGroup = async ({ id, data }: UpdateGroupParams): Promise<Group> => {
+  return apiClient.put(`/group/${id}`, data);
 };
 
 export const useUpdateGroup = () => {
@@ -17,9 +17,8 @@ export const useUpdateGroup = () => {
 
   return useMutation({
     mutationFn: updateGroup,
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: groupKeys.all });
-      queryClient.invalidateQueries({ queryKey: groupKeys.detail(variables.name) });
     },
   });
 };

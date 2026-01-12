@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -24,6 +25,8 @@ export function UnsavedChangesDialog({
   onCancel,
   isSaving,
 }: UnsavedChangesDialogProps) {
+  const { t } = useTranslation('workspace')
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
@@ -33,9 +36,9 @@ export function UnsavedChangesDialog({
               <AlertTriangle className="h-5 w-5 text-warning" />
             </div>
             <div>
-              <DialogTitle>Unsaved Changes</DialogTitle>
+              <DialogTitle>{t('dialogs.unsaved.title')}</DialogTitle>
               <DialogDescription className="mt-1">
-                You have unsaved changes. What would you like to do?
+                {t('dialogs.unsaved.description')}
               </DialogDescription>
             </div>
           </div>
@@ -46,14 +49,14 @@ export function UnsavedChangesDialog({
             onClick={onCancel}
             disabled={isSaving}
           >
-            Cancel
+            {t('dialogs.unsaved.stay')}
           </Button>
           <Button
             variant="destructive"
             onClick={onDiscard}
             disabled={isSaving}
           >
-            Discard Changes
+            {t('dialogs.unsaved.discard')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { ArrowRight, Layers } from 'lucide-react'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,7 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task, onContinue }: TaskCardProps) {
+  const { t } = useTranslation('dashboard')
   const stateConfig = task.state ? STATE_CONFIG[task.state] : null
 
   return (
@@ -50,7 +52,7 @@ export function TaskCard({ task, onContinue }: TaskCardProps) {
 
       <CardContent>
         <div className="space-y-2">
-          <p className="text-sm font-medium text-muted-foreground">Transcript</p>
+          <p className="text-sm font-medium text-muted-foreground">{t('taskCard.transcript')}</p>
           <p className="text-sm bg-muted/50 p-3 rounded-md font-mono leading-relaxed">
             {task.task_transcript}
           </p>
@@ -63,7 +65,7 @@ export function TaskCard({ task, onContinue }: TaskCardProps) {
           className="w-full sm:w-auto"
           size="lg"
         >
-          Continue
+          {t('taskCard.continue')}
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </CardFooter>

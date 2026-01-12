@@ -1,5 +1,5 @@
 export const groupKeys = {
   all: ['groups'] as const,
-  detail: (name: string) => ['groups', name] as const,
-  users: (name: string) => ['groups', name, 'users'] as const,
+  detail: (id: string) => ['groups', id] as const,
+  users: (id: string) => ['groups', id, 'users'] as const,
 };

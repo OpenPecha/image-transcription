@@ -3,14 +3,14 @@ import { apiClient } from '@/lib/axios';
 import { type User } from '@/types';
 import { groupKeys } from './group-keys';
 
-const getGroupUsers = async (name: string): Promise<User[]> => {
-  return apiClient.get(`/group/${name}/users`);
+const getGroupUsers = async (id: string): Promise<User[]> => {
+  return apiClient.get(`/group/${id}/users`);
 };
 
-export const useGetGroupUsers = (name: string, enabled = true) => {
+export const useGetGroupUsers = (id: string, enabled = true) => {
   return useQuery({
-    queryKey: groupKeys.users(name),
-    queryFn: () => getGroupUsers(name),
+    queryKey: groupKeys.users(id),
+    queryFn: () => getGroupUsers(id),
     enabled,
     staleTime: 1000 * 60 * 2,
   });

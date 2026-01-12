@@ -15,10 +15,10 @@ interface AuthProviderProps {
   children: ReactNode
 }
 
-// API call to create or fetch user
+// API call to fetch user
 async function getUserDetails(email: string): Promise<User> {
-  return await apiClient.get(`/user/${email}`)
-
+  const date = new Date().toISOString()
+  return await apiClient.get(`/user/by-identifier/${email}?date=${date}`)
 }
 
 // Inner provider that uses Auth0 hooks
@@ -41,9 +41,6 @@ const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // or if we are authenticated but haven't processed the user yet (race condition fix)
   const isLoading = auth0Loading || isUserLoading || (isAuthenticated && !currentUser)
 
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/46c965a1-fad8-474e-9dac-9305e8b48950',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthProvider.tsx:50',message:'Auth Provider State',data:{isAuthenticated, auth0Loading, isUserLoading, currentUser, isLoading},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'auth-race'})}).catch(()=>{});
-  // #endregion
 
   // Set up API token getter when authenticated
   useEffect(() => {
@@ -65,6 +62,7 @@ const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const token = await getAccessTokenSilently()
 
         const user = await getUserDetails(auth0User.email)
+        console.log('user', user)
         setCurrentUser(user)
 
         // Store token for API calls
@@ -72,8 +70,7 @@ const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } catch (err) {
         console.error('Failed to sync user:', err)
         setCurrentUser({
-          email: auth0User.email,
-          role:undefined,
+          email: auth0User.email
         })
       } finally {
         setIsUserLoading(false)
@@ -157,7 +154,7 @@ const DevAuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       username: 'Pema Lhamo',
       email: 'pema@example.com',
       role: UserRole.Annotator,
-      groupId: 'g1',
+      group_id: 'g1',
     }
     localStorage.setItem('dev_user', JSON.stringify(devUser))
     setCurrentUser(devUser)

@@ -12,6 +12,7 @@ export {
 export type {
   Task,
   TaskHistoryEntry,
+  TaskOrientation,
   AssignedTask,
   AssignTaskRequest,
   SubmitTaskRequest,
@@ -25,6 +26,18 @@ export type {
 
 // Group types
 export type { Group, GroupWithUsers, GroupRequest, GroupUpdateRequest } from './group'
+
+// Batch types
+export { BATCH_STATS_CONFIG, WORKFLOW_STATS } from './batch'
+export type {
+  Batch,
+  BatchReport,
+  BatchUploadTask,
+  BatchUploadRequest,
+  BatchStatKey,
+  BatchTask,
+  BatchTaskState,
+} from './batch'
 
 // API types
 export type { ApiResponse } from './api'

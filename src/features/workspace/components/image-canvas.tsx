@@ -1,8 +1,10 @@
 import { useRef } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
-import { ZoomIn, ZoomOut, RotateCcw, Maximize2 } from 'lucide-react'
+import { ZoomIn, ZoomOut, RotateCcw, Maximize2, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useTiffImage } from '../hooks'
+import { useTranslation } from 'react-i18next'
 
 interface ImageCanvasProps {
   imageUrl: string
@@ -10,13 +12,15 @@ interface ImageCanvasProps {
 }
 
 export function ImageCanvas({ imageUrl, isLoading }: ImageCanvasProps) {
+  const { t } = useTranslation('workspace')
   const containerRef = useRef<HTMLDivElement>(null)
+  const { displayUrl, isConverting, error } = useTiffImage(imageUrl)
 
   if (isLoading) {
     return (
       <div className="flex h-full flex-col">
         <div className="flex items-center justify-between border-b border-border bg-muted/30 px-3 py-2">
-          <span className="text-sm font-medium">Source Image</span>
+          <span className="text-sm font-medium">{t('imageCanvas.sourceImage')}</span>
           <div className="flex gap-1">
             <Skeleton className="h-8 w-8" />
             <Skeleton className="h-8 w-8" />
@@ -28,6 +32,30 @@ export function ImageCanvas({ imageUrl, isLoading }: ImageCanvasProps) {
         </div>
       </div>
     )
+  }
+
+  if (isConverting) {
+    <div className="flex-1 h-full flex items-center justify-center bg-muted/20">
+      <div className="flex flex-col items-center gap-3">
+        <Skeleton className="h-64 w-64" />
+          <span className="text-sm text-muted-foreground">{t('imageCanvas.converting')}</span>
+        </div>
+    </div>
+    }
+
+  if (error) {
+    return (
+      <div className="flex-1 h-full flex items-center justify-center bg-muted/20">
+        <div className="flex flex-col items-center gap-3">
+          <AlertTriangle className="h-12 w-12 text-destructive" />
+          <span className="text-sm text-muted-foreground">{error}</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (!displayUrl) {
+    return null
   }
 
   return (
@@ -43,7 +71,7 @@ export function ImageCanvas({ imageUrl, isLoading }: ImageCanvasProps) {
           <>
             {/* Toolbar */}
             <div className="flex items-center justify-between border-b border-border bg-muted/30 px-3 py-2">
-              <span className="text-sm font-medium text-foreground">Source Image</span>
+              <span className="text-sm font-medium text-foreground">{t('imageCanvas.sourceImage')}</span>
               <div className="flex gap-1">
                 <Button
                   variant="ghost"
@@ -85,7 +113,7 @@ export function ImageCanvas({ imageUrl, isLoading }: ImageCanvasProps) {
             </div>
 
             {/* Image Container */}
-            <div className="flex-1 overflow-hidden bg-[#1a1a1a]">
+            <div className="flex-1 overflow-hidden bg-muted">
               <TransformComponent
                 wrapperStyle={{
                   width: '100%',
@@ -100,7 +128,7 @@ export function ImageCanvas({ imageUrl, isLoading }: ImageCanvasProps) {
                 }}
               >
                 <img
-                  src={imageUrl}
+                  src={displayUrl}
                   alt="Source document"
                   className="max-h-full max-w-full object-contain"
                   draggable={false}

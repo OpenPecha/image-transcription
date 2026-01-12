@@ -5,4 +5,6 @@ export * from './user-dialog'
 export * from './delete-user-dialog'
 export * from './user-filters'
 export * from './user-pagination'
+export * from './user-report-dialog'
+export * from './user-report-summary'
 

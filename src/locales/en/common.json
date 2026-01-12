@@ -1,0 +1,69 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "groups": "Groups",
+    "batches": "Batches"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "refresh": "Refresh",
+    "clear": "Clear",
+    "clearFilters": "Clear Filters",
+    "logout": "Logout",
+    "signOut": "Sign Out",
+    "undo": "Undo"
+  },
+  "status": {
+    "loading": "Loading...",
+    "processing": "Processing...",
+    "saving": "Saving...",
+    "success": "Success",
+    "error": "Error"
+  },
+  "form": {
+    "email": "Email",
+    "username": "User name",
+    "role": "Role",
+    "group": "Group",
+    "name": "Name",
+    "description": "Description",
+    "selectRole": "Select role",
+    "selectGroup": "Select group",
+    "enterEmail": "Enter user email",
+    "enterUsername": "Enter user name",
+    "enterName": "Enter name",
+    "enterDescription": "Enter description"
+  },
+  "roles": {
+    "admin": "Admin",
+    "annotator": "Annotator",
+    "reviewer": "Reviewer",
+    "finalReviewer": "Final Reviewer"
+  },
+  "roleDescriptions": {
+    "admin": "System administrator with full access",
+    "annotator": "Annotates and transcribes content",
+    "reviewer": "Reviews and validates corrections",
+    "finalReviewer": "Performs final quality check"
+  },
+  "filters": {
+    "all": "All",
+    "allRoles": "All Roles",
+    "allGroups": "All Groups",
+    "search": "Search",
+    "searchPlaceholder": "Search..."
+  },
+  "brand": {
+    "appName": "TextAlign",
+    "tagline": "Image Text Aligner"
+  }
+}
+

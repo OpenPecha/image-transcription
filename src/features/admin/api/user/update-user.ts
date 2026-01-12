@@ -5,12 +5,12 @@ import { userKeys } from './user-keys'
 import { groupKeys } from '../group/group-keys'
 
 interface UpdateUserParams {
-  username: string
+  id: string
   data: UpdateUserDTO
 }
 
-const updateUser = async ({ username, data }: UpdateUserParams): Promise<User> => {
-  return apiClient.put(`/user/${username}`, data)
+const updateUser = async ({ id, data }: UpdateUserParams): Promise<User> => {
+  return apiClient.put(`/user/${id}`, data)
 }
 
 export const useUpdateUser = () => {
@@ -19,10 +19,8 @@ export const useUpdateUser = () => {
   return useMutation({
     mutationFn: updateUser,
     onSuccess: () => {
-      // Invalidate all user queries to refresh the list
       queryClient.invalidateQueries({ queryKey: userKeys.all })
-      // Also invalidate group queries to refresh user lists in groups
-      queryClient.invalidateQueries({ queryKey: groupKeys.all })
+      queryClient.invalidateQueries({ queryKey: groupKeys.all, refetchType: 'all' })
     },
   })
 }

@@ -1,0 +1,86 @@
+---
+description: Feature-first project architecture and file organization patterns
+alwaysApply: false
+---
+
+# Project Architecture
+
+## Feature-First Structure
+
+Organize the codebase by **Feature Domain**, not by technical layer.
+
+```text
+src/
+├── components/              # Shared UI Design System
+│   ├── ui/                  # Primitives (Button, Input, Card)
+│   ├── common/              # Shared (ErrorBoundary, Spinner)
+│   └── layout/              # Layout (MainLayout, Sidebar)
+├── features/                # Domain-specific modules
+│   └── workspace/
+│       ├── api/             # API layer
+│       │   └── task/        # API calls
+│       ├── components/      # Feature-specific components
+│       ├── hooks/           # Feature-specific hooks
+│       └── index.ts         # Public API (barrel export)
+├── hooks/                   # Shared custom hooks
+├── lib/                     # Utilities & configurations
+│   ├── axios.ts             # Axios instance
+│   ├── utils.ts             # cn(), formatDate()
+│   └── constant.ts          # App-wide constants
+├── pages/                   # Route page components
+├── routes/                  # Router configuration
+├── schema/                  # Shared Zod schemas
+├── store/                   # Zustand stores
+└── types/                   # Shared TypeScript types
+```
+
+## File Naming Conventions
+
+| Type       | Convention                | Example              |
+| ---------- | ------------------------- | -------------------- |
+| Components | `kebab-case.tsx`          | `task-card.tsx`      |
+| Hooks      | `use-kebab-case.ts`       | `use-task-list.ts`   |
+| Types      | `kebab-case.ts`           | `task-types.ts`      |
+| Utilities  | `kebab-case.ts`           | `date-utils.ts`      |
+| Schemas    | `kebab-case-schema.ts`    | `task-schema.ts`     |
+| API        | `kebab-case-api.ts`       | `task-api.ts`        |
+| Queries    | `kebab-case-queries.ts`   | `task-queries.ts`    |
+
+## Barrel Exports
+
+Each feature should expose a public API via `index.ts`:
+
+```typescript
+// src/features/workspace/index.ts
+export { TaskCard } from './components/task-card';
+export { useTaskList } from './hooks/use-task-list';
+export { taskListQueryOptions } from './api/task/task-queries';
+export type { Task } from './types';
+```
+
+## Error Handling
+
+- Wrap external API calls in `try/catch` or use Query `onError` callbacks
+- Use **Error Boundaries** for component-level error handling
+- Centralize API error handling in Axios interceptors
+
+## Zustand Store Pattern
+
+```typescript
+// src/store/use-ui-store.ts
+export const useUIStore = create<UIState & UIActions>()(
+  devtools(
+    persist(
+      (set) => ({
+        sidebarOpen: true,
+        toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
+      }),
+      { name: 'ui-storage' }
+    )
+  )
+);
+
+// Use selectors to prevent unnecessary re-renders
+export const useSidebarOpen = () => useUIStore((s) => s.sidebarOpen);
+```
+

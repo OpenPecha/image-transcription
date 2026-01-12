@@ -12,18 +12,18 @@ export interface User {
   username?: string
   email: string
   role?: UserRole
-  group?: string
-  groupId?: string
+  group_name?: string
+  group_id?: string
   picture?: string
   createdAt?: Date
 }
 
 // Request payload for creating users
 export interface CreateUserDTO {
-  username: string
+  username?: string
   email: string
   role?: UserRole
-  group?: string
+  group_id?: string
   picture?: string
 }
 
@@ -32,20 +32,23 @@ export interface UpdateUserDTO {
   new_username?: string
   new_email?: string
   new_role?: UserRole
-  new_group?: string
+  new_group_id?: string
 }
 
 // Paginated response wrapper
 export interface UserListResponse {
-  users: User[];
+  items: User[]
+  total: number
+  limit: number
+  offset: number
 }
 
 // User query filters
 export interface UserFilters {
   search?: string
   role?: UserRole
-  groupId?: string
-  page?: number
+  group_id?: string
+  offset?: number
   limit?: number
 }
 
@@ -55,5 +58,21 @@ export const ROLE_CONFIG: Record<UserRole, { label: string; description: string 
   [UserRole.Annotator]: { label: 'Annotator', description: 'Annotates and transcribes content' },
   [UserRole.Reviewer]: { label: 'Reviewer', description: 'Reviews and validates corrections' },
   [UserRole.FinalReviewer]: { label: 'Final Reviewer', description: 'Performs final quality check' },
+}
+
+// User contribution from report endpoint
+export interface UserContribution {
+  task_id: string
+  name: string
+  char_diff: number
+  batch_name: string
+  updated_time: string
+  role: 'annotator' | 'reviewer' | 'final reviewer'
+}
+
+// User contribution filters
+export interface UserContributionFilters {
+  start_date: string
+  end_date: string
 }
 
