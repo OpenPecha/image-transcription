@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/features/auth'
 import { useUIStore } from '@/store/use-ui-store'
+import { FONT_FAMILY_MAP } from './constant'
 import {
   useGetAssignedTask,
   useSubmitTask,
@@ -22,12 +23,6 @@ import {
 } from '../api'
 import { cn } from '@/lib/utils'
 import { UserRole } from '@/types'
-
-// Font family CSS mapping
-const FONT_FAMILY_MAP = {
-  monlam: 'monlam',
-  'monlam-2': 'monlam-2',
-} as const
 
 export function WorkspaceEditor() {
   const { t } = useTranslation('workspace')
@@ -357,6 +352,8 @@ export function WorkspaceEditor() {
 
             {/* Textarea */}
             <textarea
+              id="editor-textarea"
+              name="editor-textarea"
               ref={textareaRef}
               value={text}
               onChange={(e) => setText(e.target.value)}

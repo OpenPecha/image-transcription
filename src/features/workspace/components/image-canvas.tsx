@@ -15,7 +15,6 @@ export function ImageCanvas({ imageUrl, isLoading }: ImageCanvasProps) {
   const { t } = useTranslation('workspace')
   const containerRef = useRef<HTMLDivElement>(null)
   const { displayUrl, isConverting, error } = useTiffImage(imageUrl)
-  console.log("isconverting", isConverting)
 
   if (isLoading) {
     return (

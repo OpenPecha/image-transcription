@@ -12,8 +12,7 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { useUIStore, type EditorFontFamily, type EditorFontSize } from '@/store/use-ui-store'
-import { FONT_FAMILIES } from './constant'
-import { FONT_SIZES } from './constant'
+import { FONT_FAMILIES, FONT_SIZES } from './constant'
 
 type EditorToolbarProps = {
   onClear: () => void
@@ -48,6 +47,7 @@ export function EditorToolbar({
 
   const handleFontSizeChange = useCallback(
     (value: string) => {
+      console.log('value', value)
       setEditorFontSize(Number(value) as EditorFontSize)
     },
     [setEditorFontSize]
