@@ -1,11 +1,9 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useBlocker } from 'react-router-dom'
 import { GripHorizontal, GripVertical, Send, Trash2, XCircle } from 'lucide-react'
 import { ImageCanvas } from './image-canvas'
 import { WorkspaceSidebar } from './workspace-sidebar'
 import { TrashConfirmationDialog } from './trash-confirmation-dialog'
-import { UnsavedChangesDialog } from './unsaved-changes-dialog'
 import { EditorOverlay } from './editor-overlay'
 import { EditorToolbar } from './editor-toolbar'
 import { EmptyTasksState } from './empty-tasks-state'
@@ -21,6 +19,7 @@ import {
   useApproveTask,
   useRejectTask,
 } from '../api'
+import { useLocalDraft } from '../hooks'
 import { cn } from '@/lib/utils'
 import { UserRole } from '@/types'
 
@@ -31,7 +30,6 @@ export function WorkspaceEditor() {
 
   // State
   const [text, setText] = useState('')
-  const [initialText, setInitialText] = useState('')
   const [originalOcrText, setOriginalOcrText] = useState('')
   const [splitPosition, setSplitPosition] = useState(50)
   const [isDragging, setIsDragging] = useState(false)
@@ -52,44 +50,32 @@ export function WorkspaceEditor() {
   const approveTask = useApproveTask(currentUser?.id)
   const rejectTask = useRejectTask(currentUser?.id)
 
+  // Local draft auto-save (500ms debounce)
+  const { savedDraft, clearDraft } = useLocalDraft({
+    taskId: task?.task_id ?? null,
+    text,
+    delay: 500,
+  })
+
   // Derived states
-  const hasUnsavedChanges = text !== initialText
   const canEdit = task?.state === 'annotating' || task?.state === 'reviewing' || task?.state === 'finalising'
   const isMutating = submitTask.isPending || trashTask.isPending || approveTask.isPending || rejectTask.isPending
   const isLoadingNextTask = isFetching && !isLoading
   const showOverlay = isLoadingNextTask || isMutating
 
-  // Block navigation when there are unsaved changes
-  const blocker = useBlocker(hasUnsavedChanges)
-
-  // Derive dialog open state from blocker
-  const isBlockerActive = blocker.state === 'blocked'
-
-  // Browser beforeunload warning for unsaved changes
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault()
-        e.returnValue = ''
-      }
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [hasUnsavedChanges])
-
   // Track task ID to detect task changes
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null)
 
-  // Load task text when task changes
+  // Load task text when task changes (restore from local draft if available)
   if (task && task.task_id !== currentTaskId) {
     setCurrentTaskId(task.task_id)
-    setText(task.task_transcript)
-    setInitialText(task.task_transcript)
+    // Restore from local draft if available, otherwise use server transcript
+    const restoredText = savedDraft ?? task.task_transcript
+    setText(restoredText)
     setOriginalOcrText(task.task_transcript)
   } else if (!task && currentTaskId !== null) {
     setCurrentTaskId(null)
     setText('')
-    setInitialText('')
     setOriginalOcrText('')
   }
 
@@ -111,12 +97,12 @@ export function WorkspaceEditor() {
       { task_id: task.task_id, user_id: currentUser.id!, transcript: text, submit: true },
       {
         onSuccess: () => {
+          clearDraft()
           addToast({
             title: t('toast.submitted'),
             description: t('toast.submittedDescription'),
             variant: 'success',
           })
-          setInitialText(text)
         },
         onError: (error: Error) => {
           addToast({
@@ -127,7 +113,7 @@ export function WorkspaceEditor() {
         },
       }
     )
-  }, [task, currentUser, text, submitTask, addToast, t])
+  }, [task, currentUser, text, submitTask, clearDraft, addToast, t])
 
   // Trash handler
   const handleTrash = useCallback(() => {
@@ -137,6 +123,7 @@ export function WorkspaceEditor() {
       { task_id: task.task_id, user_id: currentUser.id!, submit: false },
       {
         onSuccess: () => {
+          clearDraft()
           setTrashDialogOpen(false)
           addToast({ title: t('toast.trashed'), variant: 'default' })
         },
@@ -149,7 +136,7 @@ export function WorkspaceEditor() {
         },
       }
     )
-  }, [task, currentUser, trashTask, addToast, t])
+  }, [task, currentUser, trashTask, clearDraft, addToast, t])
 
   // Approve handler
   const handleApprove = useCallback(() => {
@@ -159,12 +146,12 @@ export function WorkspaceEditor() {
       { task_id: task.task_id, user_id: currentUser.id!, transcript: text, approve: true },
       {
         onSuccess: () => {
+          clearDraft()
           addToast({
             title: t('toast.approved'),
             description: t('toast.approvedDescription'),
             variant: 'success',
           })
-          setInitialText(text)
         },
         onError: (error: Error) => {
           addToast({
@@ -175,7 +162,7 @@ export function WorkspaceEditor() {
         },
       }
     )
-  }, [task, currentUser, text, approveTask, addToast, t])
+  }, [task, currentUser, text, approveTask, clearDraft, addToast, t])
 
   // Reject handler
   const handleReject = useCallback(() => {
@@ -378,14 +365,8 @@ export function WorkspaceEditor() {
 
         {/* Footer */}
         <footer className="grid grid-cols-3 items-center border-t border-border bg-card px-6 py-3">
-          {/* Left Section: Status (Pinned to start) */}
-          <div className="flex items-center text-sm text-muted-foreground">
-            {hasUnsavedChanges && (
-              <span className="text-warning animate-pulse font-medium">
-                {t('editor.unsavedChanges')}
-              </span>
-            )}
-          </div>
+          {/* Left Section: Empty Spacer */}
+          <div className="flex items-center" />
 
           {/* Center Section: Actions (Perfectly centered) */}
           <div className="flex items-center justify-center gap-3">
@@ -447,16 +428,6 @@ export function WorkspaceEditor() {
         onCancel={() => setTrashDialogOpen(false)}
         isLoading={trashTask.isPending}
         taskName={task.task_name}
-      />
-
-      {/* Unsaved Changes Dialog */}
-      <UnsavedChangesDialog
-        open={isBlockerActive}
-        onOpenChange={(open) => {
-          if (!open) blocker.reset?.()
-        }}
-        onDiscard={() => blocker.proceed?.()}
-        onCancel={() => blocker.reset?.()}
       />
     </div>
   )
