@@ -172,6 +172,7 @@ export function WorkspaceEditor() {
       { task_id: task.task_id, user_id: currentUser.id!, transcript: text, reject: true },
       {
         onSuccess: () => {
+          clearDraft()
           addToast({ title: t('toast.rejected'), variant: 'default' })
         },
         onError: (error: Error) => {
@@ -183,7 +184,7 @@ export function WorkspaceEditor() {
         },
       }
     )
-  }, [task, currentUser, text, rejectTask, addToast, t])
+  }, [task, currentUser, text, rejectTask, clearDraft, addToast, t])
 
   // Derive layout direction from orientation
   // Portrait images → horizontal split (side-by-side)
