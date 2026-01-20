@@ -99,6 +99,8 @@
     "restoring": "སླར་གསོ་བཞིན།...",
     "restore": "སླར་གསོ།",
     "filterByState": "གནས་སྟངས་ཀྱིས་ཚགས།",
+    "downloadCsv": "CSV ཕབ་ལེན།",
+    "downloadFailed": "ཕབ་ལེན་མ་ཐུབ།",
     "states": {
       "all": "ཚང་མ།",
       "pending": "སྒུག་བཞིན།",
