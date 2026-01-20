@@ -32,7 +32,9 @@ export function useLocalDraft({
   delay = 500,
 }: UseLocalDraftOptions): UseLocalDraftReturn {
   const debouncedText = useDebouncedValue(text, delay)
-  const initialLoadRef = useRef(true)
+
+  // Track the taskId we last saved for to prevent saving stale text on task change
+  const lastSavedTaskIdRef = useRef<string | null>(null)
 
   // Generate localStorage key for current task
   const getStorageKey = useCallback((id: string) => {
@@ -40,33 +42,39 @@ export function useLocalDraft({
   }, [])
 
   // Load draft from localStorage
-  const loadDraft = useCallback((id: string): string | null => {
-    try {
-      const key = getStorageKey(id)
-      const stored = localStorage.getItem(key)
-      if (stored) {
-        const data: DraftData = JSON.parse(stored)
-        return data.text
+  const loadDraft = useCallback(
+    (id: string): string | null => {
+      try {
+        const key = getStorageKey(id)
+        const stored = localStorage.getItem(key)
+        if (stored) {
+          const data: DraftData = JSON.parse(stored)
+          return data.text
+        }
+      } catch (error) {
+        console.error('Failed to load draft from localStorage:', error)
       }
-    } catch (error) {
-      console.error('Failed to load draft from localStorage:', error)
-    }
-    return null
-  }, [getStorageKey])
+      return null
+    },
+    [getStorageKey]
+  )
 
   // Save draft to localStorage
-  const saveDraft = useCallback((id: string, content: string) => {
-    try {
-      const key = getStorageKey(id)
-      const data: DraftData = {
-        text: content,
-        timestamp: Date.now(),
+  const saveDraft = useCallback(
+    (id: string, content: string) => {
+      try {
+        const key = getStorageKey(id)
+        const data: DraftData = {
+          text: content,
+          timestamp: Date.now(),
+        }
+        localStorage.setItem(key, JSON.stringify(data))
+      } catch (error) {
+        console.error('Failed to save draft to localStorage:', error)
       }
-      localStorage.setItem(key, JSON.stringify(data))
-    } catch (error) {
-      console.error('Failed to save draft to localStorage:', error)
-    }
-  }, [getStorageKey])
+    },
+    [getStorageKey]
+  )
 
   // Clear draft from localStorage
   const clearDraft = useCallback(() => {
@@ -82,23 +90,22 @@ export function useLocalDraft({
   // Get saved draft for current task (only on initial load)
   const savedDraft = taskId ? loadDraft(taskId) : null
 
-  // Auto-save debounced text to localStorage
+  // Single unified effect for auto-save
   useEffect(() => {
-    // Skip initial save to avoid overwriting restored draft
-    if (initialLoadRef.current) {
-      initialLoadRef.current = false
+    // Guard: no task to save for
+    if (!taskId) {
+      lastSavedTaskIdRef.current = null
       return
     }
 
-    if (!taskId || debouncedText === '') return
-
+    // Guard: task just changed — skip this cycle to avoid saving stale debounced text
+    if (lastSavedTaskIdRef.current !== taskId) {
+      lastSavedTaskIdRef.current = taskId
+      return
+    }
+    // Safe to save: same task, debounced text has settled
     saveDraft(taskId, debouncedText)
-  }, [taskId, debouncedText, saveDraft])
-
-  // Reset initial load flag when task changes
-  useEffect(() => {
-    initialLoadRef.current = true
-  }, [taskId])
+  }, [taskId, debouncedText, saveDraft, clearDraft])
 
   return {
     savedDraft,
