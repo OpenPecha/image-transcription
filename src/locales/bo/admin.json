@@ -22,7 +22,8 @@
       "summary": {
         "tasksCompleted": "ལས་ཀ་བསྒྲུབས།",
         "totalChars": "ཡིག་འབྲུ་བསྡོམས།",
-        "batchesWorked": "ཚོ་སྒྲིག་བཀོལ་བ།"
+        "batchesWorked": "ཚོ་སྒྲིག་བཀོལ་བ།",
+        "rejectionCount": "བསྐྱར་ཞིབ་བྱས་རྗེས།"
       },
       "table": {
         "imageName": "རི་མོའི་མིང་།",
@@ -98,6 +99,8 @@
     "restoring": "སླར་གསོ་བཞིན།...",
     "restore": "སླར་གསོ།",
     "filterByState": "གནས་སྟངས་ཀྱིས་ཚགས།",
+    "downloadCsv": "CSV ཕབ་ལེན།",
+    "downloadFailed": "ཕབ་ལེན་མ་ཐུབ།",
     "states": {
       "all": "ཚང་མ།",
       "pending": "སྒུག་བཞིན།",

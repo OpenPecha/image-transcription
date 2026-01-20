@@ -22,7 +22,8 @@
       "summary": {
         "tasksCompleted": "Tasks Completed",
         "totalChars": "Total Characters",
-        "batchesWorked": "Batches Worked"
+        "batchesWorked": "Batches Worked",
+        "rejectionCount": "Rejection Count"
       },
       "table": {
         "imageName": "Image Name",
@@ -98,6 +99,8 @@
     "restoring": "Restoring...",
     "restore": "Restore",
     "filterByState": "Filter by state",
+    "downloadCsv": "Download CSV",
+    "downloadFailed": "Download failed",
     "states": {
       "all": "All",
       "pending": "Pending",

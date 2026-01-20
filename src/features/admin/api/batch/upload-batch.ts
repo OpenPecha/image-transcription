@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { type BatchUploadRequest } from '@/types'
 import { batchKeys } from './batch-keys'
-
+import { APPLICATION_NAME } from '@/lib/constant'
 const baseURL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000'
 
 interface UploadBatchOptions {
@@ -13,7 +13,7 @@ const uploadBatch = async (
   data: BatchUploadRequest,
   options?: UploadBatchOptions
 ): Promise<void> => {
-  await axios.post(`${baseURL}tasks/imagetranscription/`, data, {
+  await axios.post(`${baseURL}tasks/${APPLICATION_NAME}/`, data, {
     headers: {
       'Content-Type': 'application/json',
     },

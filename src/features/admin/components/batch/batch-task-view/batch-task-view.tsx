@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Download, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -13,6 +13,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useUIStore } from '@/store/use-ui-store'
 import { useGetBatchTasks, useRestoreTask, useGetBatchReport } from '../../../api/batch'
+import { useBatchCsvDownload } from '../../../hooks/use-batch-csv-download'
 import { TaskListSidebar } from './task-list-sidebar'
 import { TaskPreview } from './task-preview'
 import { BATCH_STATS_CONFIG, type BatchTask, type BatchTaskState } from '@/types'
@@ -43,6 +44,19 @@ export function BatchTaskView() {
   const { data: report, isLoading: isLoadingReport } = useGetBatchReport(batchId!, true)
   const { data: tasks = [], isLoading: isLoadingTasks } = useGetBatchTasks(batchId!, stateFilter)
   const restoreTask = useRestoreTask()
+
+  // CSV download hook
+  const { download: downloadCsv, isDownloading } = useBatchCsvDownload({
+    batchId: batchId!,
+    batchName: report?.name ?? 'batch-export',
+    onError: (error) => {
+      addToast({
+        title: t('batches.downloadFailed'),
+        description: error.message,
+        variant: 'destructive',
+      })
+    },
+  })
 
   // Set selected task from URL or first task
   const selectedTask = useMemo(() => {
@@ -102,25 +116,6 @@ export function BatchTaskView() {
       }
     )
   }, [selectedTask, batchId, restoreTask, addToast, t])
-
-  // Navigation helpers
-  const currentIndex = selectedTask
-    ? tasks.findIndex((t) => t.task_id === selectedTask.task_id)
-    : -1
-  const hasPrevious = currentIndex > 0
-  const hasNext = currentIndex < tasks.length - 1
-
-  const goToPrevious = useCallback(() => {
-    if (hasPrevious) {
-      handleSelectTask(tasks[currentIndex - 1])
-    }
-  }, [hasPrevious, currentIndex, tasks, handleSelectTask])
-
-  const goToNext = useCallback(() => {
-    if (hasNext) {
-      handleSelectTask(tasks[currentIndex + 1])
-    }
-  }, [hasNext, currentIndex, tasks, handleSelectTask])
 
   // Get task count for current filter
   const getTaskCount = useCallback(
@@ -198,30 +193,21 @@ export function BatchTaskView() {
             </SelectContent>
           </Select>
 
-          {/* Quick navigation */}
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={goToPrevious}
-              disabled={!hasPrevious || isLoadingTasks}
-              className="h-9 w-9"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm text-muted-foreground min-w-[60px] text-center">
-              {currentIndex >= 0 ? `${currentIndex + 1} / ${tasks.length}` : '- / -'}
-            </span>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={goToNext}
-              disabled={!hasNext || isLoadingTasks}
-              className="h-9 w-9"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+          {/* Download CSV */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={downloadCsv}
+            disabled={isDownloading || isLoadingReport}
+            className="h-9 w-9"
+            title={t('batches.downloadCsv')}
+          >
+            {isDownloading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+          </Button>
         </div>
       </div>
 
