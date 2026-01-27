@@ -7,6 +7,34 @@ export interface Batch {
   group_name: string
 }
 
+// Individual task from batch export endpoint
+export type BatchExportTask = {
+  file_number: string
+  image_url: string
+  initial_transcription: string | null
+  status: BatchTaskState
+  annotator_username: string | null
+  annotation_transcript: string | null
+  annotator_char_count: number | null
+  annotation_rejection_count: number | null
+  reviewer_username: string | null
+  review_transcript: string | null
+  reviewer_added_char: number | null
+  reviewer_deleted_char: number | null
+  review_rejection_count: number | null
+  final_reviewer_username: string | null
+  final_transcript: string | null
+  final_reviewer_added_char: number | null
+  final_reviewer_deleted_char: number | null
+  trashed_by: string | null
+}
+
+// Response from batch export endpoint
+export type BatchExportResponse = {
+  batch_name: string
+  tasks: BatchExportTask[]
+}
+
 // Task state for batch task view
 export type BatchTaskState = 'pending' | 'annotated' | 'reviewed' | 'finalised' | 'trashed'
 

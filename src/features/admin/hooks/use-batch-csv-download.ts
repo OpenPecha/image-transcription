@@ -1,29 +1,26 @@
 import { useState, useCallback } from 'react'
 
-import { apiClient } from '@/lib/axios'
-import type { BatchTask } from '@/types'
-
+import { exportBatch } from '../api/batch'
 import { exportBatchTasksToCsv } from '../utils/batch-csv-export'
 
-interface UseBatchCsvDownloadOptions {
+type UseBatchCsvDownloadOptions = {
   batchId: string
-  batchName: string
   onError?: (error: Error) => void
 }
 
-interface UseBatchCsvDownloadReturn {
+type UseBatchCsvDownloadReturn = {
   download: () => Promise<void>
   isDownloading: boolean
 }
 
 /**
- * Hook to download all batch tasks as CSV
+ * Hook to download batch export data as CSV
  *
- * Fetches all tasks (regardless of current filter) and exports them to CSV
+ * Fetches detailed batch export data and triggers CSV download
+ * Uses batch_name from API response for the filename
  */
 export function useBatchCsvDownload({
   batchId,
-  batchName,
   onError,
 }: UseBatchCsvDownloadOptions): UseBatchCsvDownloadReturn {
   const [isDownloading, setIsDownloading] = useState(false)
@@ -34,22 +31,21 @@ export function useBatchCsvDownload({
     setIsDownloading(true)
 
     try {
-      // Fetch all tasks without state filter
-      const tasks = await apiClient.get<never, BatchTask[]>(`/batch/${batchId}/tasks`)
+      const response = await exportBatch(batchId)
 
-      if (tasks.length === 0) {
+      if (response.tasks.length === 0) {
         onError?.(new Error('No tasks to export'))
         return
       }
 
-      exportBatchTasksToCsv(tasks, batchName)
+      exportBatchTasksToCsv(response.tasks, response.batch_name)
     } catch (error) {
-      const errorMessage = error instanceof Error ? error : new Error('Failed to download batch tasks')
+      const errorMessage = error instanceof Error ? error : new Error('Failed to download batch export')
       onError?.(errorMessage)
     } finally {
       setIsDownloading(false)
     }
-  }, [batchId, batchName, isDownloading, onError])
+  }, [batchId, isDownloading, onError])
 
   return { download, isDownloading }
 }

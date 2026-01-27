@@ -1,49 +1,42 @@
 import Papa from 'papaparse'
 
-import type { BatchTask, BatchTaskState } from '@/types'
+import type { BatchExportTask } from '@/types'
 
 /**
- * CSV row structure for batch task export
+ * CSV column headers mapping to BatchExportTask fields
+ * Order determines column order in exported CSV
  */
-interface BatchTaskCsvRow {
-  filenumber: string
-  image: string
-  transcription: string
-  Annotator: string
-  Reviewer: string
-  'Final Reviewer': string
-  'Trashed By': string
-}
+const CSV_COLUMNS = [
+  { key: 'file_number', header: 'File Number' },
+  { key: 'image_url', header: 'Image URL' },
+  { key: 'initial_transcription', header: 'Initial Transcription' },
+  { key: 'status', header: 'Status' },
+  { key: 'annotator_username', header: 'Annotator' },
+  { key: 'annotation_transcript', header: 'Annotation Transcript' },
+  { key: 'annotator_char_count', header: 'Annotator Char Count' },
+  { key: 'annotation_rejection_count', header: 'Annotation Rejection Count' },
+  { key: 'reviewer_username', header: 'Reviewer' },
+  { key: 'review_transcript', header: 'Review Transcript' },
+  { key: 'reviewer_added_char', header: 'Reviewer Added Char' },
+  { key: 'reviewer_deleted_char', header: 'Reviewer Deleted Char' },
+  { key: 'review_rejection_count', header: 'Review Rejection Count' },
+  { key: 'final_reviewer_username', header: 'Final Reviewer' },
+  { key: 'final_transcript', header: 'Final Transcript' },
+  { key: 'final_reviewer_added_char', header: 'Final Reviewer Added Char' },
+  { key: 'final_reviewer_deleted_char', header: 'Final Reviewer Deleted Char' },
+  { key: 'trashed_by', header: 'Trashed By' },
+] as const satisfies ReadonlyArray<{ key: keyof BatchExportTask; header: string }>
 
 /**
- * Maps task state to the corresponding username column
+ * Transforms a BatchExportTask to a CSV row with all fields
+ * Null values are converted to empty strings
  */
-const STATE_TO_COLUMN_MAP: Record<BatchTaskState, keyof BatchTaskCsvRow | null> = {
-  pending: 'Annotator',
-  annotated: 'Annotator',
-  reviewed: 'Reviewer',
-  finalised: 'Final Reviewer',
-  trashed: 'Trashed By',
-}
+function transformTaskToCsvRow(task: BatchExportTask): Record<string, string | number> {
+  const row: Record<string, string | number> = {}
 
-/**
- * Transforms a BatchTask to a CSV row format
- */
-function transformTaskToCsvRow(task: BatchTask): BatchTaskCsvRow {
-  const row: BatchTaskCsvRow = {
-    filenumber: task.task_name,
-    image: task.task_url,
-    transcription: task.task_transcript ?? '',
-    Annotator: '',
-    Reviewer: '',
-    'Final Reviewer': '',
-    'Trashed By': '',
-  }
-
-  // Assign username to appropriate column based on state
-  const column = STATE_TO_COLUMN_MAP[task.state]
-  if (column && task.username) {
-    row[column] = task.username
+  for (const { key, header } of CSV_COLUMNS) {
+    const value = task[key]
+    row[header] = value ?? ''
   }
 
   return row
@@ -78,18 +71,20 @@ function downloadFile(content: string, filename: string): void {
 /**
  * Exports batch tasks to CSV and triggers download
  *
- * @param tasks - Array of batch tasks to export
+ * @param tasks - Array of batch export tasks to export
  * @param batchName - Name of the batch (used for filename)
  */
-export function exportBatchTasksToCsv(tasks: BatchTask[], batchName: string): void {
+export function exportBatchTasksToCsv(tasks: BatchExportTask[], batchName: string): void {
   if (tasks.length === 0) {
     return
   }
 
   const csvRows = tasks.map(transformTaskToCsvRow)
+  const headers = CSV_COLUMNS.map(({ header }) => header)
 
   const csvContent = Papa.unparse(csvRows, {
-    quotes: true, // Wrap all fields in quotes to preserve line breaks and special characters
+    columns: headers,
+    quotes: true,
     newline: '\n',
   })
 

@@ -37,6 +37,8 @@ export type {
   BatchStatKey,
   BatchTask,
   BatchTaskState,
+  BatchExportTask,
+  BatchExportResponse,
 } from './batch'
 
 // API types
