@@ -48,7 +48,6 @@ export function BatchTaskView() {
   // CSV download hook
   const { download: downloadCsv, isDownloading } = useBatchCsvDownload({
     batchId: batchId!,
-    batchName: report?.name ?? 'batch-export',
     onError: (error) => {
       addToast({
         title: t('batches.downloadFailed'),
