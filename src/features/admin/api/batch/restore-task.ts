@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/axios'
 import { batchKeys } from './batch-keys'
+import { APPLICATION_NAME } from '@/lib/constant'
 
 interface RestoreTaskParams {
   taskId: string
@@ -8,7 +9,7 @@ interface RestoreTaskParams {
 }
 
 const restoreTask = async ({ taskId }: RestoreTaskParams): Promise<void> => {
-  return apiClient.post(`/tasks/${taskId}/restore`)
+  return apiClient.post(`/tasks/${APPLICATION_NAME}/${taskId}/restore`)
 }
 
 export const useRestoreTask = () => {
@@ -17,13 +18,13 @@ export const useRestoreTask = () => {
   return useMutation({
     mutationFn: restoreTask,
     onSuccess: (_, { batchId }) => {
-      // Invalidate batch tasks queries to refresh the list
-      queryClient.invalidateQueries({ 
-        queryKey: batchKeys.tasks(batchId, 'trashed') 
-      })
       // Invalidate batch report to refresh stats
       queryClient.invalidateQueries({ 
         queryKey: batchKeys.report(batchId) 
+      })
+      // Invalidate all task lists for this batch (all states: pending, trashed, all, etc.)
+      queryClient.invalidateQueries({ 
+        queryKey: ['batches', 'tasks', batchId]
       })
     },
   })
