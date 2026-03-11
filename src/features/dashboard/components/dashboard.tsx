@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useGetAssignedTask } from '@/features/workspace/api'
+import { useGetClassificationTask } from '@/features/workspace/api'
 import { useAuth } from '@/features/auth'
 import {
   EmptyTaskState,
@@ -13,7 +13,7 @@ export function Dashboard() {
   const { t } = useTranslation('dashboard')
   const navigate = useNavigate()
   const { currentUser } = useAuth()
-  const { data: task, isLoading } = useGetAssignedTask(currentUser?.id)
+  const { data: task, isLoading } = useGetClassificationTask(currentUser?.id)
 
   if (!currentUser) return null
 

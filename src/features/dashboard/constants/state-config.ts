@@ -1,11 +1,12 @@
-export const STATE_CONFIG: Record<
-  string,
-  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
-> = {
-  annotating: { label: 'Annotating', variant: 'default' },
-  submitted: { label: 'Submitted', variant: 'secondary' },
-  reviewing: { label: 'In Review', variant: 'outline' },
-  completed: { label: 'Completed', variant: 'secondary' },
-  trashed: { label: 'Trashed', variant: 'destructive' },
+import type { ClassificationTaskState } from '@/types'
+
+interface StateDisplay {
+  label: string
+  variant: 'default' | 'secondary' | 'destructive' | 'outline'
 }
 
+export const STATE_CONFIG: Record<ClassificationTaskState, StateDisplay> = {
+  annotating: { label: 'Annotating', variant: 'default' },
+  annotating_b: { label: 'Annotating (B)', variant: 'default' },
+  reviewing: { label: 'In Review', variant: 'outline' },
+}
