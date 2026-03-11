@@ -72,6 +72,12 @@
   "branding": {
     "appName": "ཡིག་རིགས་དབྱེ་བ།"
   },
+  "guide": {
+    "title": "ཡིག་རིགས་ངོས་འཛིན་ལམ་སྟོན།",
+    "english": "English",
+    "tibetan": "བོད་ཡིག",
+    "triggerLabel": "ཡིག་རིགས་ལམ་སྟོན།"
+  },
   "classification": {
     "selectScript": "ཡིག་རིགས་འདེམས།",
     "selectFinal": "བསྐྱར་ཞིབ་པ — མཐའ་མའི་དབྱེ་བ་འདེམས།",

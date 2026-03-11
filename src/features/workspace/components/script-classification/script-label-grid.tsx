@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Trash2 } from 'lucide-react'
+import { Trash2, BookOpen } from 'lucide-react'
 import { ScriptLabelCard } from './script-label-card'
 import { SCRIPT_TYPES } from '@/types'
 import type { ScriptType, ClassificationTask } from '@/types'
@@ -11,6 +11,7 @@ interface ScriptLabelGridProps {
   disabled?: boolean
   onSelect: (label: ScriptType) => void
   onTrash?: () => void
+  onOpenGuide?: () => void
 }
 
 function getBadge(
@@ -31,6 +32,7 @@ export function ScriptLabelGrid({
   disabled,
   onSelect,
   onTrash,
+  onOpenGuide,
 }: ScriptLabelGridProps) {
   const { t } = useTranslation('workspace')
   const isReviewer = task.state === 'reviewing'
@@ -38,11 +40,23 @@ export function ScriptLabelGrid({
   return (
     <div className="border-t border-border bg-card px-6 py-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {isReviewer
-            ? t('classification.selectFinal')
-            : t('classification.selectScript')}
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {isReviewer
+              ? t('classification.selectFinal')
+              : t('classification.selectScript')}
+          </h3>
+          {onOpenGuide && (
+            <button
+              type="button"
+              onClick={onOpenGuide}
+              className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              title={t('guide.triggerLabel')}
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
         {onTrash && (
           <button
             type="button"

@@ -1,7 +1,7 @@
 import { useCallback, useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { Diamond, LogOut, RefreshCw, FileText, Users, LayoutDashboard, Loader2, Settings } from 'lucide-react'
+import { Diamond, LogOut, RefreshCw, FileText, Users, LayoutDashboard, Loader2, Settings, BookOpen } from 'lucide-react'
 import { cn, getInitials } from '@/lib/utils'
 import { useAuth } from '@/features/auth'
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,7 @@ interface WorkspaceSidebarProps {
   classificationTask?: ClassificationTask | null
   onRefresh?: () => void
   isLoading?: boolean
+  onOpenGuide?: () => void
 }
 
 const getStateColor = (state: string): string => {
@@ -50,6 +51,7 @@ export function WorkspaceSidebar({
   classificationTask,
   onRefresh,
   isLoading,
+  onOpenGuide,
 }: WorkspaceSidebarProps) {
   const { t } = useTranslation('workspace')
   const { t: tCommon } = useTranslation('common')
@@ -104,7 +106,7 @@ export function WorkspaceSidebar({
       <Separator className="bg-sidebar-border" />
 
       {/* Navigation */}
-      <nav className="p-2">
+      <nav className="space-y-1 p-2">
         <Link
           to="/dashboard"
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
@@ -112,6 +114,16 @@ export function WorkspaceSidebar({
           <LayoutDashboard className="h-5 w-5 shrink-0" />
           <span>{t('sidebar.dashboard')}</span>
         </Link>
+        {onOpenGuide && (
+          <button
+            type="button"
+            onClick={onOpenGuide}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+          >
+            <BookOpen className="h-5 w-5 shrink-0" />
+            <span>{t('guide.triggerLabel')}</span>
+          </button>
+        )}
       </nav>
 
       <Separator className="bg-sidebar-border" />

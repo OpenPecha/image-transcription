@@ -5,6 +5,7 @@ import { WorkspaceSidebar } from '../workspace-sidebar'
 import { TrashConfirmationDialog } from '../trash-confirmation-dialog'
 import { EditorOverlay } from '../editor-overlay'
 import { EmptyTasksState } from '../empty-tasks-state'
+import { ScriptGuideDialog } from '../guide/script-guide-dialog'
 import { ScriptLabelGrid } from './script-label-grid'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/features/auth'
@@ -21,6 +22,7 @@ export function ClassificationWorkspace() {
   const { addToast } = useUIStore()
 
   const [trashDialogOpen, setTrashDialogOpen] = useState(false)
+  const [guideOpen, setGuideOpen] = useState(false)
 
   const {
     data: task,
@@ -144,6 +146,8 @@ export function ClassificationWorkspace() {
 
   const isAnnotator = task?.state === 'annotating' || task?.state === 'annotating_b'
 
+  const openGuide = useCallback(() => setGuideOpen(true), [])
+
   if (isLoading) {
     return (
       <div className="flex h-screen">
@@ -151,12 +155,14 @@ export function ClassificationWorkspace() {
           task={null}
           onRefresh={() => refetch()}
           isLoading={true}
+          onOpenGuide={openGuide}
         />
         <main className="ml-60 flex flex-1 flex-col">
           <div className="flex flex-1 items-center justify-center">
             <Skeleton className="m-4 h-full w-full rounded-lg" />
           </div>
         </main>
+        <ScriptGuideDialog open={guideOpen} onOpenChange={setGuideOpen} />
       </div>
     )
   }
@@ -168,6 +174,7 @@ export function ClassificationWorkspace() {
           task={null}
           onRefresh={() => refetch()}
           isLoading={isLoading || isFetching}
+          onOpenGuide={openGuide}
         />
         <main className="ml-60 flex-1">
           <EmptyTasksState
@@ -175,6 +182,7 @@ export function ClassificationWorkspace() {
             isLoading={isLoading}
           />
         </main>
+        <ScriptGuideDialog open={guideOpen} onOpenChange={setGuideOpen} />
       </div>
     )
   }
@@ -186,6 +194,7 @@ export function ClassificationWorkspace() {
         classificationTask={task}
         onRefresh={() => refetch()}
         isLoading={isFetching}
+        onOpenGuide={openGuide}
       />
 
       <main className="ml-60 flex flex-1 flex-col">
@@ -208,6 +217,7 @@ export function ClassificationWorkspace() {
             disabled={showOverlay}
             onSelect={handleSelect}
             onTrash={isAnnotator ? () => setTrashDialogOpen(true) : undefined}
+            onOpenGuide={openGuide}
           />
         </div>
       </main>
@@ -220,6 +230,7 @@ export function ClassificationWorkspace() {
         isLoading={submitMutation.isPending}
         taskName={task.task_name}
       />
+      <ScriptGuideDialog open={guideOpen} onOpenChange={setGuideOpen} />
     </div>
   )
 }

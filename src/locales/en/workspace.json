@@ -72,6 +72,12 @@
   "branding": {
     "appName": "Script Classification"
   },
+  "guide": {
+    "title": "Scripts Identification Guide",
+    "english": "English",
+    "tibetan": "བོད་ཡིག",
+    "triggerLabel": "Script Guide"
+  },
   "classification": {
     "selectScript": "Select Script Type",
     "selectFinal": "Reviewer — Select Final Classification",
