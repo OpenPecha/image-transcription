@@ -22,7 +22,13 @@ export type {
   TaskUploadItem,
   BulkCreateTasksRequest,
   BulkCreateTasksResponse,
+  ScriptType,
+  ClassificationTaskState,
+  ClassificationTask,
+  ReviewerChoice,
 } from './task'
+
+export { SCRIPT_TYPES } from './task'
 
 // Group types
 export type { Group, GroupWithUsers, GroupRequest, GroupUpdateRequest } from './group'

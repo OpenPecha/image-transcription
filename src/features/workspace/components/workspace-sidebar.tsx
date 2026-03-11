@@ -8,23 +8,25 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import { ThemeToggle, LanguageToggle } from '@/components/common'
-import type { AssignedTask } from '@/types'
+import type { AssignedTask, ClassificationTask } from '@/types'
 
 interface WorkspaceSidebarProps {
   task: AssignedTask | null
+  classificationTask?: ClassificationTask | null
   onRefresh?: () => void
   isLoading?: boolean
 }
 
-// Status color configuration
 const getStateColor = (state: string): string => {
   switch (state) {
     case 'annotating':
+    case 'annotating_b':
       return 'text-primary fill-primary'
     case 'submitted':
     case 'reviewing':
       return 'text-warning fill-warning'
     case 'completed':
+    case 'accepted':
       return 'text-success fill-success'
     case 'trashed':
       return 'text-destructive fill-destructive'
@@ -33,9 +35,19 @@ const getStateColor = (state: string): string => {
   }
 }
 
+const getStateLabel = (state: string): string => {
+  switch (state) {
+    case 'annotating':
+    case 'annotating_b':
+      return 'annotating'
+    default:
+      return state
+  }
+}
 
 export function WorkspaceSidebar({
   task,
+  classificationTask,
   onRefresh,
   isLoading,
 }: WorkspaceSidebarProps) {
@@ -83,8 +95,8 @@ export function WorkspaceSidebar({
               <FileText className="h-4 w-4 text-primary-foreground" />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="font-bold text-sidebar-foreground font-inter">Image</span>
-              <span className="text-xs text-sidebar-foreground/70 font-inter">Transcription</span>
+              <span className="font-bold text-sidebar-foreground font-inter">Script</span>
+              <span className="text-xs text-sidebar-foreground/70 font-inter">Classification</span>
             </div>
           </div>
       </div>
@@ -106,9 +118,8 @@ export function WorkspaceSidebar({
 
       {/* Current Task Info */}
       <div className="flex-1 overflow-y-auto p-4">
-        {task ? (
+        {(task || classificationTask) ? (
           <div className="space-y-4">
-            {/* Task Header */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <div className="text-xs font-medium uppercase text-muted-foreground">
@@ -118,20 +129,22 @@ export function WorkspaceSidebar({
                   <Loader2 className="h-3 w-3 animate-spin text-primary" />
                 )}
               </div>
-              
-              {/* Task Name */}
+
               <div className="flex items-start gap-2 p-3 rounded-lg bg-sidebar-accent">
                 <FileText className="h-4 w-4 shrink-0 text-primary mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-sidebar-foreground break-all truncate">
-                    {task.task_name}
+                    {task?.task_name ?? classificationTask?.task_name}
                   </p>
                   <div className={cn(
                     'flex items-center gap-1 mt-1 text-xs',
-                    getStateColor(task.state)
+                    getStateColor(task?.state ?? classificationTask?.state ?? '')
                   )}>
+                    <span className="capitalize">
+                      {getStateLabel(task?.state ?? classificationTask?.state ?? '')}
+                    </span>
                   </div>
-                  {(task.annotation_rejection_count > 0 || task.review_rejection_count > 0) && (
+                  {task && (task.annotation_rejection_count > 0 || task.review_rejection_count > 0) && (
                     <div className="flex items-center gap-2 mt-2 text-xs text-red-600">
                       {task.annotation_rejection_count > 0 && (
                         <span>Annotation rejections: {task.annotation_rejection_count}</span>
@@ -145,8 +158,7 @@ export function WorkspaceSidebar({
               </div>
             </div>
 
-            {/* Group Info */}
-            {task.group && task.group !== 'string' && (
+            {task?.group && task.group !== 'string' && (
               <div className="space-y-2">
                 <h3 className="text-xs font-medium uppercase text-muted-foreground tracking-wider">
                   {t('sidebar.group')}
@@ -155,6 +167,20 @@ export function WorkspaceSidebar({
                   <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <p className="text-sm text-sidebar-foreground truncate">
                     {task.group}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {classificationTask?.group_id && (
+              <div className="space-y-2">
+                <h3 className="text-xs font-medium uppercase text-muted-foreground tracking-wider">
+                  {t('sidebar.group')}
+                </h3>
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-sidebar-accent/50">
+                  <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <p className="text-sm text-sidebar-foreground truncate">
+                    {classificationTask.group_id}
                   </p>
                 </div>
               </div>

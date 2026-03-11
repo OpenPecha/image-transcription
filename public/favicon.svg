@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <defs>
-    <!-- Gradient inspired by Tibetan thangka art -->
     <linearGradient id="tibetanGold" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#F4D03F"/>
       <stop offset="50%" style="stop-color:#E67E22"/>
@@ -25,7 +24,7 @@
   <!-- Stylized pecha (Tibetan book) shape -->
   <rect x="6" y="9" width="20" height="14" rx="1.5" fill="url(#paperGradient)" stroke="#5D4E37" stroke-width="0.5"/>
   
-  <!-- Tibetan letter ཨ (A) - the first letter of Tibetan alphabet, symbolizing origin/text -->
+  <!-- Tibetan letter ཨ (A) -->
   <path 
     d="M12 13.5 
        C12 12.5 13 12 14 12 
@@ -42,13 +41,13 @@
     stroke-linecap="round"
     stroke-linejoin="round"/>
   
-  <!-- Small image icon in corner representing transcription -->
+  <!-- Classification tag icon in corner -->
   <rect x="21" y="18" width="6" height="5" rx="0.5" fill="#2C3E50" opacity="0.8"/>
-  <circle cx="23" cy="20" r="0.8" fill="#F39C12"/>
-  <path d="M21.5 22 L23.5 20.5 L25 21.5 L26.5 20 L26.5 22.5 L21.5 22.5 Z" fill="#27AE60"/>
+  <line x1="22.5" y1="19.5" x2="25.5" y2="19.5" stroke="#F39C12" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="22.5" y1="20.8" x2="25.5" y2="20.8" stroke="#27AE60" stroke-width="0.6" stroke-linecap="round"/>
+  <line x1="22.5" y1="22.1" x2="24.5" y2="22.1" stroke="#3498DB" stroke-width="0.6" stroke-linecap="round"/>
   
   <!-- Decorative corner flourish -->
   <path d="M5 10 Q4 9 5 8" fill="none" stroke="#FFF8DC" stroke-width="0.5" opacity="0.7"/>
   <path d="M27 10 Q28 9 27 8" fill="none" stroke="#FFF8DC" stroke-width="0.5" opacity="0.7"/>
 </svg>
-

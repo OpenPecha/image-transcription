@@ -70,6 +70,16 @@
     "noRole": "No Role"
   },
   "branding": {
-    "appName": "Image Transcription"
+    "appName": "Script Classification"
+  },
+  "classification": {
+    "selectScript": "Select Script Type",
+    "selectFinal": "Reviewer — Select Final Classification",
+    "annotatorA": "Annotator A's pick",
+    "annotatorB": "Annotator B's pick",
+    "toast": {
+      "classificationSubmitted": "Classification submitted successfully",
+      "reviewSubmitted": "Review decision submitted successfully"
+    }
   }
 }

@@ -32,7 +32,6 @@ if (import.meta.env.DEV) {
 function App() {
   // Sync i18n language with Zustand store
   useLanguageSync()
-
   return (
     <ThemeProvider>
       <AuthProvider>

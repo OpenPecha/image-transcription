@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Loader2, LogIn, FileText, CheckCircle, Users } from 'lucide-react'
+import { Loader2, LogIn, FileText, Layers, CheckCircle, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -12,7 +12,7 @@ import { useAuth } from './use-auth'
 
 const featureKeys = [
   {
-    icon: FileText,
+    icon: Layers,
     titleKey: 'features.transcription.title',
     descriptionKey: 'features.transcription.description',
   },

@@ -105,6 +105,34 @@ export interface AssignedTask {
   review_rejection_count: number
 }
 
+// Script classification types
+export type ScriptType = 'Uchen' | 'Druma' | 'Danyig' | 'Tsugdri' | 'Cursive' | 'Unknown'
+
+export const SCRIPT_TYPES: ScriptType[] = [
+  'Uchen',
+  'Druma',
+  'Danyig',
+  'Tsugdri',
+  'Cursive',
+  'Unknown',
+]
+
+export type ClassificationTaskState = 'annotating' | 'annotating_b' | 'reviewing'
+
+export interface ClassificationTask {
+  task_id: string
+  state: ClassificationTaskState
+  batch_id: string
+  group_id: string
+  task_name: string
+  task_url: string
+  orientation: TaskOrientation
+  classification_a: ScriptType | null
+  classification_b: ScriptType | null
+}
+
+export type ReviewerChoice = 'a' | 'b' | 'own'
+
 // Task submission request
 export interface SubmitTaskRequest {
   taskId: string
