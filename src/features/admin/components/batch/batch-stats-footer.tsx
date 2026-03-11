@@ -6,13 +6,13 @@ import { cn } from '@/lib/utils'
 interface BatchStatsFooterProps {
   batchId: string
   trashedCount: number
-  finalizedPercentage: number
+  acceptedPercentage: number
 }
 
 export function BatchStatsFooter({
   batchId,
   trashedCount,
-  finalizedPercentage,
+  acceptedPercentage,
 }: BatchStatsFooterProps) {
   const { t } = useTranslation('admin')
 
@@ -25,14 +25,14 @@ export function BatchStatsFooter({
           <span
             className={cn(
               'font-semibold',
-              finalizedPercentage === 100
+              acceptedPercentage === 100
                 ? 'text-emerald-600'
-                : finalizedPercentage > 50
+                : acceptedPercentage > 50
                   ? 'text-cyan-600'
                   : 'text-slate-600'
             )}
           >
-            {t('batches.finalized', { percentage: finalizedPercentage })}
+            {t('batches.accepted', { percentage: acceptedPercentage })}
           </span>
         </div>
       </div>

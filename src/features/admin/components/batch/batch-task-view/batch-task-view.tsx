@@ -22,9 +22,9 @@ import { cn } from '@/lib/utils'
 const STATE_OPTION_KEYS: Array<{ value: BatchTaskState | 'all'; key: string }> = [
   { value: 'all', key: 'batches.states.all' },
   { value: 'pending', key: 'batches.states.pending' },
+  { value: 'half_annotated', key: 'batches.states.half_annotated' },
   { value: 'annotated', key: 'batches.states.annotated' },
-  { value: 'reviewed', key: 'batches.states.reviewed' },
-  { value: 'finalised', key: 'batches.states.finalised' },
+  { value: 'accepted', key: 'batches.states.accepted' },
   { value: 'trashed', key: 'batches.states.trashed' },
 ]
 

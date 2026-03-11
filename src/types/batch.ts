@@ -11,21 +11,14 @@ export interface Batch {
 export type BatchExportTask = {
   file_number: string
   image_url: string
-  initial_transcription: string | null
+  orientation: 'landscape' | 'portrait' | null
   status: BatchTaskState
-  annotator_username: string | null
-  annotation_transcript: string | null
-  annotator_char_count: number | null
-  annotation_rejection_count: number | null
+  annotator_a_username: string | null
+  classification_a: string | null
+  annotator_b_username: string | null
+  classification_b: string | null
   reviewer_username: string | null
-  review_transcript: string | null
-  reviewer_added_char: number | null
-  reviewer_deleted_char: number | null
-  review_rejection_count: number | null
-  final_reviewer_username: string | null
-  final_transcript: string | null
-  final_reviewer_added_char: number | null
-  final_reviewer_deleted_char: number | null
+  final_script: string | null
   trashed_by: string | null
 }
 
@@ -36,26 +29,31 @@ export type BatchExportResponse = {
 }
 
 // Task state for batch task view
-export type BatchTaskState = 'pending' | 'annotated' | 'reviewed' | 'finalised' | 'trashed'
+export type BatchTaskState = 'pending' | 'half_annotated' | 'annotated' | 'accepted' | 'trashed'
 
 // Individual task from batch tasks endpoint
 export interface BatchTask {
   task_id: string
   task_name: string
   task_url: string
-  task_transcript: string
+  orientation: 'landscape' | 'portrait'
   state: BatchTaskState
-  orientation?: 'landscape' | 'portrait'
-  username?: string
+  annotator_a_username: string | null
+  classification_a: string | null
+  annotator_b_username: string | null
+  classification_b: string | null
+  reviewer_username: string | null
+  final_script: string | null
+  trashed_by: string | null
 }
 
 // Batch with stats from report endpoint
 export interface BatchReport extends Batch {
   total_tasks: number
   pending: number
+  half_annotated: number
   annotated: number
-  reviewed: number
-  finalised: number
+  accepted: number
   trashed: number
 }
 
@@ -83,22 +81,22 @@ export const BATCH_STATS_CONFIG = {
     textColor: 'text-slate-700',
     order: 0,
   },
+  half_annotated: {
+    label: 'Half Annotated',
+    color: 'bg-amber-100 text-amber-700',
+    barColor: 'bg-amber-400',
+    textColor: 'text-white',
+    order: 1,
+  },
   annotated: {
     label: 'Annotated',
     color: 'bg-blue-100 text-blue-700',
     barColor: 'bg-indigo-500',
     textColor: 'text-white',
-    order: 1,
-  },
-  reviewed: {
-    label: 'Reviewed',
-    color: 'bg-amber-100 text-amber-700',
-    barColor: 'bg-cyan-500',
-    textColor: 'text-white',
     order: 2,
   },
-  finalised: {
-    label: 'Finalised',
+  accepted: {
+    label: 'Accepted',
     color: 'bg-emerald-100 text-emerald-700',
     barColor: 'bg-emerald-500',
     textColor: 'text-white',
@@ -117,5 +115,5 @@ export const BATCH_STATS_CONFIG = {
 export type BatchStatKey = keyof typeof BATCH_STATS_CONFIG
 
 // Workflow statuses (excluding trashed)
-export const WORKFLOW_STATS: BatchStatKey[] = ['pending', 'annotated', 'reviewed', 'finalised']
+export const WORKFLOW_STATS: BatchStatKey[] = ['pending', 'half_annotated', 'annotated', 'accepted']
 

@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import type { BatchReport } from '@/types'
 import { StackedProgressBar } from './progress-bar'
 import { BatchStatsFooter } from './batch-stats-footer'
-import { getFinalizedPercentage } from './progress-bar'
+import { getAcceptedPercentage } from './progress-bar'
 
 interface BatchStatsProps {
   batchId: string
@@ -35,7 +35,7 @@ export function BatchStats({ batchId, report, isLoading }: BatchStatsProps) {
     )
   }
 
-  const finalizedPercentage = getFinalizedPercentage(report)
+  const acceptedPercentage = getAcceptedPercentage(report)
 
   return (
     <div className="space-y-3">
@@ -44,7 +44,7 @@ export function BatchStats({ batchId, report, isLoading }: BatchStatsProps) {
       <BatchStatsFooter
         batchId={batchId}
         trashedCount={report.trashed}
-        finalizedPercentage={finalizedPercentage}
+        acceptedPercentage={acceptedPercentage}
       />
     </div>
   )

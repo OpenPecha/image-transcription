@@ -68,10 +68,10 @@ export function buildAllSegments(report: BatchReport): ProgressSegmentData[] {
 }
 
 /**
- * Calculate finalized percentage
+ * Calculate accepted percentage
  */
-export function getFinalizedPercentage(report: BatchReport): number {
+export function getAcceptedPercentage(report: BatchReport): number {
   const activeTotal = report.total_tasks - report.trashed
-  return calculatePercentage(report.finalised, activeTotal)
+  return calculatePercentage(report.accepted, activeTotal)
 }
 
