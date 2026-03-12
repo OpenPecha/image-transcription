@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { ImageCanvas } from '../image-canvas'
 import { WorkspaceSidebar } from '../workspace-sidebar'
 import { TrashConfirmationDialog } from '../trash-confirmation-dialog'
-import { EditorOverlay } from '../editor-overlay'
 import { EmptyTasksState } from '../empty-tasks-state'
 import { ScriptGuideDialog } from '../guide/script-guide-dialog'
 import { ScriptLabelGrid } from './script-label-grid'
@@ -33,9 +32,7 @@ export function ClassificationWorkspace() {
 
   const submitMutation = useSubmitClassification(currentUser?.id)
 
-  const isMutating = submitMutation.isPending
-  const isLoadingNext = isFetching && !isLoading
-  const showOverlay = isLoadingNext || isMutating
+  const isTransitioning = submitMutation.isPending || (isFetching && !isLoading)
 
   const handleSelect = useCallback(
     (scriptType: ScriptType) => {
@@ -198,23 +195,14 @@ export function ClassificationWorkspace() {
       />
 
       <main className="ml-60 flex flex-1 flex-col">
-        <div className="relative flex flex-1 flex-col overflow-hidden">
-          <EditorOverlay
-            show={showOverlay}
-            message={
-              isMutating
-                ? t('loading.processing')
-                : t('loading.loadingNext')
-            }
-          />
-
+        <div className="flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 overflow-hidden">
-            <ImageCanvas imageUrl={task.task_url} />
+            <ImageCanvas imageUrl={task.task_url} isLoading={isTransitioning} />
           </div>
 
           <ScriptLabelGrid
             task={task}
-            disabled={showOverlay}
+            disabled={isTransitioning}
             onSelect={handleSelect}
             onTrash={isAnnotator ? () => setTrashDialogOpen(true) : undefined}
             onOpenGuide={openGuide}

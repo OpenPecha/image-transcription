@@ -30,7 +30,7 @@ export function ScriptLabelCard({
         'hover:-translate-y-0.5 hover:shadow-md',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         'active:translate-y-0 active:shadow-sm',
-        disabled && 'pointer-events-none opacity-50',
+        disabled && 'cursor-not-allowed opacity-50',
       )}
     >
       {badge && <ReviewerBadge variant={badge} />}

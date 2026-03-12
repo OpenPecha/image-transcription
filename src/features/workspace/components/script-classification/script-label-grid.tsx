@@ -62,7 +62,7 @@ export function ScriptLabelGrid({
             type="button"
             disabled={disabled}
             onClick={onTrash}
-            className="flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/8 px-3 py-1.5 text-xs font-semibold text-destructive transition-colors hover:bg-destructive/15 disabled:pointer-events-none disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/8 px-3 py-1.5 text-xs font-semibold text-destructive transition-colors hover:bg-destructive/15 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Trash2 className="h-3.5 w-3.5" />
             {t('actions.trash')}
