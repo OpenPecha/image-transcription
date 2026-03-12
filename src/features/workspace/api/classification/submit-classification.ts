@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/axios'
 import { APPLICATION_NAME } from '@/lib/constant'
+import { preloadImage } from '@/lib/utils'
 import { classificationKeys } from './classification-keys'
-import type { ScriptType, ReviewerChoice } from '@/types'
+import type { ScriptType, ReviewerChoice, ClassificationTask } from '@/types'
 
 interface AnnotatorSubmitParams {
   task_id: string
@@ -31,8 +32,8 @@ export type ClassificationSubmitParams =
   | ReviewerChoiceParams
 
 interface SubmitResponse {
-  success: boolean
-  message?: string
+  message: string
+  next_task: ClassificationTask | null
 }
 
 const submitClassification = async (
@@ -50,11 +51,15 @@ export const useSubmitClassification = (userId?: string) => {
 
   return useMutation({
     mutationFn: submitClassification,
-    onSuccess: () => {
+    onSuccess: (data) => {
       if (userId) {
-        queryClient.invalidateQueries({
-          queryKey: classificationKeys.assignedTask(userId),
-        })
+        queryClient.setQueryData(
+          classificationKeys.assignedTask(userId),
+          data.next_task,
+        )
+      }
+      if (data.next_task?.task_url) {
+        preloadImage(data.next_task.task_url)
       }
     },
   })

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import * as UTIF from 'utif2'
+import { getProxiedUrl } from '@/lib/utils'
 
 export function useTiffImage(imageUrl: string) {
   const [displayUrl, setDisplayUrl] = useState<string | null>(null)
@@ -36,17 +37,17 @@ export function useTiffImage(imageUrl: string) {
   }, [])
 
   useEffect(() => {
-    if (!imageUrl) {
-      setDisplayUrl(null)
-      return
-    }
+    setDisplayUrl(null)
+    setError(null)
+
+    if (!imageUrl) return
+
     const proxiedUrl = getProxiedUrl(imageUrl)
     if (isTiffUrl(imageUrl)) {
       loadTiffImage(proxiedUrl, proxiedUrl)
     } else {
       setDisplayUrl(proxiedUrl)
       setIsConverting(false)
-      setError(null)
     }
   }, [imageUrl, loadTiffImage])
   
@@ -108,14 +109,4 @@ function isTiffBuffer(buffer: ArrayBuffer): boolean {
     bytes[0] === 0x4d && bytes[1] === 0x4d && bytes[2] === 0x00 && bytes[3] === 0x2a
 
   return isLittleEndian || isBigEndian
-}
-
-/**
- * Converts S3 URLs to use the Vite proxy in development to bypass CORS
- */
-function getProxiedUrl(url: string): string {
-  if (import.meta.env.DEV && url.includes('s3.us-east-1.amazonaws.com')) {
-    return url.replace('https://s3.us-east-1.amazonaws.com', '/s3-proxy')
-  }
-  return url
 }

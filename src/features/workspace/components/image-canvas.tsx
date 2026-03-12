@@ -36,13 +36,20 @@ export function ImageCanvas({ imageUrl, isLoading, username }: ImageCanvasProps)
   }
 
   if (isConverting) {
-    <div className="flex-1 h-full flex items-center justify-center bg-muted/20">
-      <div className="flex flex-col items-center gap-3">
-        <Skeleton className="h-64 w-64" />
-          <span className="text-sm text-muted-foreground">{t('imageCanvas.converting')}</span>
+    return (
+      <div className="flex h-full flex-col">
+        <div className="flex items-center justify-between border-b border-border bg-muted/30 px-3 py-2">
+          <span className="text-sm font-medium">{t('imageCanvas.sourceImage')}</span>
         </div>
-    </div>
-    }
+        <div className="flex flex-1 items-center justify-center bg-muted/20">
+          <div className="flex flex-col items-center gap-3">
+            <Skeleton className="h-64 w-64" />
+            <span className="text-sm text-muted-foreground">{t('imageCanvas.converting')}</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (error) {
     return (
