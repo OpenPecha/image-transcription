@@ -1,8 +1,12 @@
+import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Trash2, BookOpen } from 'lucide-react'
+import { Trash2, BookOpen, Check } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { ScriptLabelCard } from './script-label-card'
-import { SCRIPT_TYPES } from '@/types'
-import type { ScriptType, ClassificationTask } from '@/types'
+import { ScriptStyleGroup } from './script-style-group'
+import { ReviewerCoreBadge } from './reviewer-core-badge'
+import { SCRIPT_STYLE_GROUPS, isSubStyleOf } from '@/types'
+import type { ScriptType, ClassificationTask, ScriptStyleGroup as ScriptStyleGroupType } from '@/types'
 
 type BadgeVariant = 'a' | 'b' | 'ab'
 
@@ -14,13 +18,26 @@ interface ScriptLabelGridProps {
   onOpenGuide?: () => void
 }
 
-function getBadge(
+function getSubStyleBadge(
   label: ScriptType,
   classificationA: ScriptType | null,
   classificationB: ScriptType | null,
 ): BadgeVariant | undefined {
   const matchA = classificationA === label
   const matchB = classificationB === label
+  if (matchA && matchB) return 'ab'
+  if (matchA) return 'a'
+  if (matchB) return 'b'
+  return undefined
+}
+
+function getCoreBadge(
+  core: ScriptType,
+  classificationA: ScriptType | null,
+  classificationB: ScriptType | null,
+): BadgeVariant | undefined {
+  const matchA = classificationA !== null && isSubStyleOf(core, classificationA)
+  const matchB = classificationB !== null && isSubStyleOf(core, classificationB)
   if (matchA && matchB) return 'ab'
   if (matchA) return 'a'
   if (matchB) return 'b'
@@ -36,6 +53,63 @@ export function ScriptLabelGrid({
 }: ScriptLabelGridProps) {
   const { t } = useTranslation('workspace')
   const isReviewer = task.state === 'reviewing'
+
+  const [expandedCore, setExpandedCore] = useState<ScriptType | null>(null)
+  const [selectedStyle, setSelectedStyle] = useState<ScriptType | null>(null)
+
+  const expandedGroup: ScriptStyleGroupType | undefined = expandedCore
+    ? SCRIPT_STYLE_GROUPS.find((g) => g.core === expandedCore)
+    : undefined
+
+  const handleCoreClick = useCallback(
+    (core: ScriptType) => {
+      const group = SCRIPT_STYLE_GROUPS.find((g) => g.core === core)
+      if (!group) return
+
+      if (group.subStyles.length === 0) {
+        if (selectedStyle === core) {
+          setSelectedStyle(null)
+        } else {
+          setExpandedCore(null)
+          setSelectedStyle(core)
+        }
+        return
+      }
+
+      if (expandedCore === core) {
+        setExpandedCore(null)
+        setSelectedStyle(null)
+      } else {
+        setExpandedCore(core)
+        setSelectedStyle(null)
+      }
+    },
+    [expandedCore, selectedStyle],
+  )
+
+  const handleSubStyleSelect = useCallback((style: ScriptType) => {
+    setSelectedStyle((prev) => (prev === style ? null : style))
+  }, [])
+
+  const handleBack = useCallback(() => {
+    setExpandedCore(null)
+    setSelectedStyle(null)
+  }, [])
+
+  const handleSubmit = useCallback(() => {
+    if (!selectedStyle) return
+    onSelect(selectedStyle)
+    setExpandedCore(null)
+    setSelectedStyle(null)
+  }, [selectedStyle, onSelect])
+
+  const getSubBadge = useCallback(
+    (style: ScriptType) =>
+      getSubStyleBadge(style, task.classification_a, task.classification_b),
+    [task.classification_a, task.classification_b],
+  )
+
+  const isLeafSelected = selectedStyle && !expandedCore
 
   return (
     <div className="border-t border-border bg-card px-6 py-4">
@@ -57,17 +131,36 @@ export function ScriptLabelGrid({
             </button>
           )}
         </div>
-        {onTrash && (
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={onTrash}
-            className="flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/8 px-3 py-1.5 text-xs font-semibold text-destructive transition-colors hover:bg-destructive/15 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            {t('actions.trash')}
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {isLeafSelected && (
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={handleSubmit}
+              className={cn(
+                'flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-semibold',
+                'bg-primary text-primary-foreground shadow-sm',
+                'transition-all duration-150',
+                'hover:bg-primary/90 hover:shadow-md',
+                'disabled:cursor-not-allowed disabled:opacity-50',
+              )}
+            >
+              <Check className="h-3.5 w-3.5" />
+              {t('classification.submit', { name: selectedStyle })}
+            </button>
+          )}
+          {onTrash && (
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={onTrash}
+              className="flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/8 px-3 py-1.5 text-xs font-semibold text-destructive transition-colors hover:bg-destructive/15 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              {t('actions.trash')}
+            </button>
+          )}
+        </div>
       </div>
 
       {isReviewer && (
@@ -87,25 +180,59 @@ export function ScriptLabelGrid({
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-2.5">
-        {SCRIPT_TYPES.map((scriptType) => (
-          <ScriptLabelCard
-            key={scriptType}
-            label={scriptType}
-            badge={
-              isReviewer
-                ? getBadge(
-                    scriptType,
-                    task.classification_a,
-                    task.classification_b,
-                  )
-                : undefined
-            }
-            disabled={disabled}
-            onSelect={onSelect}
-          />
-        ))}
+      <div className="flex flex-wrap gap-2.5">
+        {SCRIPT_STYLE_GROUPS.map((group) => {
+          const isExpanded = expandedCore === group.core
+          const hasSubStyles = group.subStyles.length > 0
+          const isLeafNode = !hasSubStyles
+          const coreBadge = isReviewer
+            ? getCoreBadge(group.core, task.classification_a, task.classification_b)
+            : undefined
+
+          return (
+            <div key={group.core} className="relative">
+              {coreBadge && (
+                <ReviewerCoreBadge
+                  variant={coreBadge}
+                  hintA={
+                    task.classification_a && isSubStyleOf(group.core, task.classification_a)
+                      ? task.classification_a
+                      : undefined
+                  }
+                  hintB={
+                    task.classification_b && isSubStyleOf(group.core, task.classification_b)
+                      ? task.classification_b
+                      : undefined
+                  }
+                />
+              )}
+              <ScriptLabelCard
+                label={group.core}
+                hasSubStyles={hasSubStyles}
+                expanded={isExpanded}
+                selected={isLeafNode && selectedStyle === group.core}
+                disabled={disabled}
+                onSelect={handleCoreClick}
+              />
+            </div>
+          )
+        })}
       </div>
+
+      {expandedGroup && expandedGroup.subStyles.length > 0 && (
+        <div className="mt-3">
+          <ScriptStyleGroup
+            group={expandedGroup}
+            selectedStyle={selectedStyle}
+            disabled={disabled}
+            isTransitioning={disabled}
+            getBadge={isReviewer ? getSubBadge : undefined}
+            onSelectStyle={handleSubStyleSelect}
+            onBack={handleBack}
+            onSubmit={handleSubmit}
+          />
+        </div>
+      )}
     </div>
   )
 }

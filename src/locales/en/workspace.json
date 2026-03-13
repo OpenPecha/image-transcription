@@ -79,8 +79,9 @@
     "triggerLabel": "Script Guide"
   },
   "classification": {
-    "selectScript": "Select Script Type",
+    "selectScript": "Select Script Style",
     "selectFinal": "Reviewer — Select Final Classification",
+    "submit": "Submit: {{name}}",
     "annotatorA": "Annotator A's pick",
     "annotatorB": "Annotator B's pick",
     "toast": {

@@ -79,8 +79,9 @@
     "triggerLabel": "ཡིག་རིགས་ལམ་སྟོན།"
   },
   "classification": {
-    "selectScript": "ཡིག་རིགས་འདེམས།",
+    "selectScript": "ཡིག་གཟུགས་འདེམས།",
     "selectFinal": "བསྐྱར་ཞིབ་པ — མཐའ་མའི་དབྱེ་བ་འདེམས།",
+    "submit": "འབུལ་བ། {{name}}",
     "annotatorA": "མཆན་བྲིས་པ་ཀ་གི་འདེམས་ཚན།",
     "annotatorB": "མཆན་བྲིས་པ་ཁ་གི་འདེམས་ཚན།",
     "toast": {

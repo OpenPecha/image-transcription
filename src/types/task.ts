@@ -105,17 +105,45 @@ export interface AssignedTask {
   review_rejection_count: number
 }
 
-// Script classification types
-export type ScriptType = 'Uchen' | 'Druma' | 'Danyig' | 'Tsugdri' | 'Cursive' | 'Unknown'
+// Script classification types — 25 styles organized into core + sub-styles
+export type ScriptType =
+  | 'Uchen' | 'Sugring' | 'Sugthung' | 'Shachen' | 'Shachung' | 'Zabchen' | 'Zabchung'
+  | 'Ume'
+  | 'Druma' | 'Dhumri' | 'Druma Sugthung' | 'Druma Sugring' | 'Druchen'
+  | 'Danyig' | 'Tsegdrig' | 'Danthung' | 'Danyig Sugring' | 'Gongshabma'
+  | 'Tsugdri' | 'Petsug' | 'Peri'
+  | 'Cursive' | 'Yigchung' | 'Tsumakhyuk'
+  | 'Unknown'
 
-export const SCRIPT_TYPES: ScriptType[] = [
-  'Uchen',
-  'Druma',
-  'Danyig',
-  'Tsugdri',
-  'Cursive',
-  'Unknown',
+export interface ScriptStyleGroup {
+  core: ScriptType
+  subStyles: ScriptType[]
+}
+
+export const SCRIPT_STYLE_GROUPS: ScriptStyleGroup[] = [
+  { core: 'Uchen', subStyles: ['Sugring', 'Sugthung', 'Shachen', 'Shachung', 'Zabchen', 'Zabchung'] },
+  { core: 'Ume', subStyles: [] },
+  { core: 'Druma', subStyles: ['Dhumri', 'Druma Sugthung', 'Druma Sugring', 'Druchen'] },
+  { core: 'Danyig', subStyles: ['Tsegdrig', 'Danthung', 'Danyig Sugring', 'Gongshabma'] },
+  { core: 'Tsugdri', subStyles: ['Petsug', 'Peri'] },
+  { core: 'Cursive', subStyles: ['Yigchung', 'Tsumakhyuk'] },
+  { core: 'Unknown', subStyles: [] },
 ]
+
+export const SCRIPT_TYPES: ScriptType[] = SCRIPT_STYLE_GROUPS.flatMap(
+  (g) => [g.core, ...g.subStyles],
+)
+
+export function getGroupForStyle(style: ScriptType): ScriptStyleGroup | undefined {
+  return SCRIPT_STYLE_GROUPS.find(
+    (g) => g.core === style || g.subStyles.includes(style),
+  )
+}
+
+export function isSubStyleOf(core: ScriptType, value: ScriptType): boolean {
+  const group = SCRIPT_STYLE_GROUPS.find((g) => g.core === core)
+  return !!group && (group.core === value || group.subStyles.includes(value))
+}
 
 export type ClassificationTaskState = 'annotating' | 'annotating_b' | 'reviewing'
 

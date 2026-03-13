@@ -1,4 +1,6 @@
 export { ClassificationWorkspace } from './classification-workspace'
 export { ScriptLabelGrid } from './script-label-grid'
 export { ScriptLabelCard } from './script-label-card'
+export { ScriptStyleGroup } from './script-style-group'
 export { ReviewerBadge } from './reviewer-badge'
+export { ReviewerCoreBadge } from './reviewer-core-badge'
