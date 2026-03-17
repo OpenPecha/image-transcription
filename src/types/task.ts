@@ -105,14 +105,14 @@ export interface AssignedTask {
   review_rejection_count: number
 }
 
-// Script classification types — 25 styles organized into core + sub-styles
+// Script classification types — 32 styles organized into core + sub-styles
 export type ScriptType =
-  | 'Uchen' | 'Sugring' | 'Sugthung' | 'Shachen' | 'Shachung' | 'Zabchen' | 'Zabchung'
+  | 'Uchen' | 'Sugring' | 'Sugthung' | 'Shachen' | 'Shachung' | 'Zabchen' | 'Zabchung' | 'Woodblock' | 'Metal Type' | 'Digital Type'
   | 'Ume'
-  | 'Druma' | 'Dhumri' | 'Druma Sugthung' | 'Druma Sugring' | 'Druchen'
-  | 'Danyig' | 'Tsegdrig' | 'Danthung' | 'Danyig Sugring' | 'Gongshabma'
-  | 'Tsugdri' | 'Petsug' | 'Peri'
-  | 'Cursive' | 'Yigchung' | 'Tsumakhyuk'
+  | 'Druma' | 'Dhumri' | 'Druthung' | 'Drudring' | 'Druring' | 'Druchen'
+  | 'Danyig' | 'Tsegdrig' | 'Danthung' | 'Dandring' | 'Danring' | 'Gongshabma'
+  | 'Tsugdri' | 'Peri' | 'Pestug' | 'Tsugthung' | 'Tsugchung' | 'Trinyig'
+  | 'Cursive' | 'Yigchung' | 'Tsumakhyuk' | 'Khyuyig' | 'Dren'
   | 'Unknown'
 
 export interface ScriptStyleGroup {
@@ -121,12 +121,12 @@ export interface ScriptStyleGroup {
 }
 
 export const SCRIPT_STYLE_GROUPS: ScriptStyleGroup[] = [
-  { core: 'Uchen', subStyles: ['Sugring', 'Sugthung', 'Shachen', 'Shachung', 'Zabchen', 'Zabchung'] },
+  { core: 'Uchen', subStyles: ['Sugring', 'Sugthung', 'Shachen', 'Shachung', 'Zabchen', 'Zabchung', 'Woodblock', 'Metal Type', 'Digital Type'] },
   { core: 'Ume', subStyles: [] },
-  { core: 'Druma', subStyles: ['Dhumri', 'Druma Sugthung', 'Druma Sugring', 'Druchen'] },
-  { core: 'Danyig', subStyles: ['Tsegdrig', 'Danthung', 'Danyig Sugring', 'Gongshabma'] },
-  { core: 'Tsugdri', subStyles: ['Petsug', 'Peri'] },
-  { core: 'Cursive', subStyles: ['Yigchung', 'Tsumakhyuk'] },
+  { core: 'Druma', subStyles: ['Dhumri', 'Druthung', 'Drudring', 'Druring', 'Druchen'] },
+  { core: 'Danyig', subStyles: ['Tsegdrig', 'Danthung', 'Dandring', 'Danring', 'Gongshabma'] },
+  { core: 'Tsugdri', subStyles: ['Peri', 'Pestug', 'Tsugthung', 'Tsugchung', 'Trinyig'] },
+  { core: 'Cursive', subStyles: ['Yigchung', 'Tsumakhyuk', 'Khyuyig', 'Dren'] },
   { core: 'Unknown', subStyles: [] },
 ]
 
