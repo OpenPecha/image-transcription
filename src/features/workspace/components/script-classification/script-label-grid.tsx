@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils'
 import { ScriptLabelCard } from './script-label-card'
 import { ScriptStyleGroup } from './script-style-group'
 import { ReviewerCoreBadge } from './reviewer-core-badge'
-import { SCRIPT_STYLE_GROUPS, isSubStyleOf } from '@/types'
-import type { ScriptType, ClassificationTask, ScriptStyleGroup as ScriptStyleGroupType } from '@/types'
+import { useScriptStyles } from '../../hooks/use-script-styles'
+import type { ScriptType, ScriptStyle, ClassificationTask } from '@/types'
 
 type BadgeVariant = 'a' | 'b' | 'ab'
 
@@ -19,12 +19,12 @@ interface ScriptLabelGridProps {
 }
 
 function getSubStyleBadge(
-  label: ScriptType,
+  id: ScriptType,
   classificationA: ScriptType | null,
   classificationB: ScriptType | null,
 ): BadgeVariant | undefined {
-  const matchA = classificationA === label
-  const matchB = classificationB === label
+  const matchA = classificationA === id
+  const matchB = classificationB === id
   if (matchA && matchB) return 'ab'
   if (matchA) return 'a'
   if (matchB) return 'b'
@@ -32,12 +32,13 @@ function getSubStyleBadge(
 }
 
 function getCoreBadge(
-  core: ScriptType,
+  parentId: ScriptType,
   classificationA: ScriptType | null,
   classificationB: ScriptType | null,
+  isChild: (parentId: ScriptType, childId: ScriptType) => boolean,
 ): BadgeVariant | undefined {
-  const matchA = classificationA !== null && isSubStyleOf(core, classificationA)
-  const matchB = classificationB !== null && isSubStyleOf(core, classificationB)
+  const matchA = classificationA !== null && isChild(parentId, classificationA)
+  const matchB = classificationB !== null && isChild(parentId, classificationB)
   if (matchA && matchB) return 'ab'
   if (matchA) return 'a'
   if (matchB) return 'b'
@@ -52,64 +53,68 @@ export function ScriptLabelGrid({
   onOpenGuide,
 }: ScriptLabelGridProps) {
   const { t } = useTranslation('workspace')
+  const { parentStyles, getChildren, getName, isChild } = useScriptStyles()
   const isReviewer = task.state === 'reviewing'
 
-  const [expandedCore, setExpandedCore] = useState<ScriptType | null>(null)
+  const [expandedParent, setExpandedParent] = useState<ScriptType | null>(null)
   const [selectedStyle, setSelectedStyle] = useState<ScriptType | null>(null)
 
-  const expandedGroup: ScriptStyleGroupType | undefined = expandedCore
-    ? SCRIPT_STYLE_GROUPS.find((g) => g.core === expandedCore)
+  const expandedChildren: ScriptStyle[] = expandedParent
+    ? getChildren(expandedParent)
+    : []
+
+  const expandedParentStyle: ScriptStyle | undefined = expandedParent
+    ? parentStyles.find((s) => s.id === expandedParent)
     : undefined
 
   const handleCoreClick = useCallback(
-    (core: ScriptType) => {
-      const group = SCRIPT_STYLE_GROUPS.find((g) => g.core === core)
-      if (!group) return
+    (id: ScriptType) => {
+      const children = getChildren(id)
 
-      if (group.subStyles.length === 0) {
-        if (selectedStyle === core) {
+      if (children.length === 0) {
+        if (selectedStyle === id) {
           setSelectedStyle(null)
         } else {
-          setExpandedCore(null)
-          setSelectedStyle(core)
+          setExpandedParent(null)
+          setSelectedStyle(id)
         }
         return
       }
 
-      if (expandedCore === core) {
-        setExpandedCore(null)
+      if (expandedParent === id) {
+        setExpandedParent(null)
         setSelectedStyle(null)
       } else {
-        setExpandedCore(core)
+        setExpandedParent(id)
         setSelectedStyle(null)
       }
     },
-    [expandedCore, selectedStyle],
+    [expandedParent, selectedStyle, getChildren],
   )
 
-  const handleSubStyleSelect = useCallback((style: ScriptType) => {
-    setSelectedStyle((prev) => (prev === style ? null : style))
+  const handleSubStyleSelect = useCallback((id: ScriptType) => {
+    setSelectedStyle((prev) => (prev === id ? null : id))
   }, [])
 
   const handleBack = useCallback(() => {
-    setExpandedCore(null)
+    setExpandedParent(null)
     setSelectedStyle(null)
   }, [])
 
   const handleSubmit = useCallback(() => {
     if (!selectedStyle) return
     onSelect(selectedStyle)
-    setExpandedCore(null)
+    setExpandedParent(null)
     setSelectedStyle(null)
   }, [selectedStyle, onSelect])
 
   const getSubBadge = useCallback(
-    (style: ScriptType) =>
-      getSubStyleBadge(style, task.classification_a, task.classification_b),
+    (id: ScriptType) =>
+      getSubStyleBadge(id, task.classification_a, task.classification_b),
     [task.classification_a, task.classification_b],
   )
 
-  const isLeafSelected = selectedStyle && !expandedCore
+  const isLeafSelected = selectedStyle && !expandedParent
 
   return (
     <div className="border-t border-border bg-card px-6 py-4">
@@ -146,7 +151,7 @@ export function ScriptLabelGrid({
               )}
             >
               <Check className="h-3.5 w-3.5" />
-              {t('classification.submit', { name: selectedStyle })}
+              {t('classification.submit', { name: getName(selectedStyle) })}
             </button>
           )}
           {onTrash && (
@@ -181,36 +186,38 @@ export function ScriptLabelGrid({
       )}
 
       <div className="flex flex-wrap gap-2.5">
-        {SCRIPT_STYLE_GROUPS.map((group) => {
-          const isExpanded = expandedCore === group.core
-          const hasSubStyles = group.subStyles.length > 0
-          const isLeafNode = !hasSubStyles
+        {parentStyles.map((style) => {
+          const children = getChildren(style.id)
+          const isExpanded = expandedParent === style.id
+          const hasChildren = children.length > 0
+          const isLeafNode = !hasChildren
           const coreBadge = isReviewer
-            ? getCoreBadge(group.core, task.classification_a, task.classification_b)
+            ? getCoreBadge(style.id, task.classification_a, task.classification_b, isChild)
             : undefined
 
           return (
-            <div key={group.core} className="relative">
+            <div key={style.id} className="relative">
               {coreBadge && (
                 <ReviewerCoreBadge
                   variant={coreBadge}
                   hintA={
-                    task.classification_a && isSubStyleOf(group.core, task.classification_a)
-                      ? task.classification_a
+                    task.classification_a && isChild(style.id, task.classification_a)
+                      ? getName(task.classification_a)
                       : undefined
                   }
                   hintB={
-                    task.classification_b && isSubStyleOf(group.core, task.classification_b)
-                      ? task.classification_b
+                    task.classification_b && isChild(style.id, task.classification_b)
+                      ? getName(task.classification_b)
                       : undefined
                   }
                 />
               )}
               <ScriptLabelCard
-                label={group.core}
-                hasSubStyles={hasSubStyles}
+                id={style.id}
+                displayName={getName(style.id)}
+                hasSubStyles={hasChildren}
                 expanded={isExpanded}
-                selected={isLeafNode && selectedStyle === group.core}
+                selected={isLeafNode && selectedStyle === style.id}
                 disabled={disabled}
                 onSelect={handleCoreClick}
               />
@@ -219,13 +226,15 @@ export function ScriptLabelGrid({
         })}
       </div>
 
-      {expandedGroup && expandedGroup.subStyles.length > 0 && (
+      {expandedParentStyle && expandedChildren.length > 0 && (
         <div className="mt-3">
           <ScriptStyleGroup
-            group={expandedGroup}
+            parentStyle={expandedParentStyle}
+            children={expandedChildren}
             selectedStyle={selectedStyle}
             disabled={disabled}
             isTransitioning={disabled}
+            getName={getName}
             getBadge={isReviewer ? getSubBadge : undefined}
             onSelectStyle={handleSubStyleSelect}
             onBack={handleBack}

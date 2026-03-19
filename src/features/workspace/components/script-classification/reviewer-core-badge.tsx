@@ -1,12 +1,11 @@
 import { cn } from '@/lib/utils'
-import type { ScriptType } from '@/types'
 
 type BadgeVariant = 'a' | 'b' | 'ab'
 
 interface ReviewerCoreBadgeProps {
   variant: BadgeVariant
-  hintA?: ScriptType
-  hintB?: ScriptType
+  hintA?: string
+  hintB?: string
   className?: string
 }
 
@@ -16,7 +15,7 @@ const variantStyles: Record<BadgeVariant, string> = {
   ab: 'bg-emerald-100 text-emerald-700 border-emerald-300 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-700',
 }
 
-function buildHintText(variant: BadgeVariant, hintA?: ScriptType, hintB?: ScriptType): string {
+function buildHintText(variant: BadgeVariant, hintA?: string, hintB?: string): string {
   if (variant === 'ab') {
     if (hintA && hintB && hintA !== hintB) return `A: ${hintA} · B: ${hintB}`
     if (hintA) return `A & B: ${hintA}`

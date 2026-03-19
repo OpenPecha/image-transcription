@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { BATCH_STATS_CONFIG, type BatchTask } from '@/types'
+import { useScriptStyles } from '@/features/workspace/hooks/use-script-styles'
 
 interface TaskPreviewProps {
   task: BatchTask | null
@@ -91,6 +92,7 @@ export function TaskPreview({
 
 function ClassificationMetadata({ task }: { task: BatchTask }) {
   const { t } = useTranslation('admin')
+  const { getName } = useScriptStyles()
 
   const hasAnnotatorA = task.annotator_a_username != null
   const hasAnnotatorB = task.annotator_b_username != null
@@ -107,7 +109,7 @@ function ClassificationMetadata({ task }: { task: BatchTask }) {
           <MetadataField
             label={t('batches.annotatorA')}
             username={task.annotator_a_username!}
-            value={task.classification_a}
+            value={task.classification_a ? getName(task.classification_a) : null}
           />
         )}
 
@@ -115,7 +117,7 @@ function ClassificationMetadata({ task }: { task: BatchTask }) {
           <MetadataField
             label={t('batches.annotatorB')}
             username={task.annotator_b_username!}
-            value={task.classification_b}
+            value={task.classification_b ? getName(task.classification_b) : null}
           />
         )}
 
@@ -126,7 +128,7 @@ function ClassificationMetadata({ task }: { task: BatchTask }) {
             <span className="font-medium">{task.reviewer_username}</span>
             {task.final_script && (
               <Badge variant="outline" className="ml-1 text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200">
-                {task.final_script}
+                {getName(task.final_script)}
               </Badge>
             )}
           </div>

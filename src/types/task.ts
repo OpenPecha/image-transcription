@@ -105,44 +105,50 @@ export interface AssignedTask {
   review_rejection_count: number
 }
 
-// Script classification types — 32 styles organized into core + sub-styles
+// Script classification types — 31 styles organized into parent + children
 export type ScriptType =
-  | 'Uchen' | 'Sugring' | 'Sugthung' | 'Shachen' | 'Shachung' | 'Zabchen' | 'Zabchung' | 'Woodblock' | 'Metal Type' | 'Digital Type'
-  | 'Ume'
-  | 'Druma' | 'Dhumri' | 'Druthung' | 'Drudring' | 'Druring' | 'Druchen'
-  | 'Danyig' | 'Tsegdrig' | 'Danthung' | 'Dandring' | 'Danring' | 'Gongshabma'
-  | 'Tsugdri' | 'Peri' | 'Pestug' | 'Tsugthung' | 'Tsugchung' | 'Trinyig'
-  | 'Cursive' | 'Yigchung' | 'Tsumakhyuk' | 'Khyuyig' | 'Dren'
-  | 'Unknown'
+  | 'uchen' | 'uchen_sugthung' | 'uchen_sugdring' | 'uchen_sugring'
+  | 'druma' | 'dhumri' | 'druthung' | 'drudring' | 'druring' | 'druchen'
+  | 'danyig' | 'tsegdrig' | 'drathung' | 'dradring' | 'draring' | 'gongshabma'
+  | 'pedri' | 'peri' | 'petsuk'
+  | 'tsugdri' | 'tsugthung' | 'tsugchung' | 'trinyig'
+  | 'gyuyig' | 'yigchung' | 'tsumachug' | 'khyuyig'
+  | 'multi_scripts'
+  | 'other' | 'non_tibetan' | 'difficult'
 
-export interface ScriptStyleGroup {
-  core: ScriptType
-  subStyles: ScriptType[]
+export interface ScriptStyle {
+  id: ScriptType
+  name_en: string
+  name_bo: string | null
+  parent: ScriptType | null
 }
 
-export const SCRIPT_STYLE_GROUPS: ScriptStyleGroup[] = [
-  { core: 'Uchen', subStyles: ['Sugring', 'Sugthung', 'Shachen', 'Shachung', 'Zabchen', 'Zabchung', 'Woodblock', 'Metal Type', 'Digital Type'] },
-  { core: 'Ume', subStyles: [] },
-  { core: 'Druma', subStyles: ['Dhumri', 'Druthung', 'Drudring', 'Druring', 'Druchen'] },
-  { core: 'Danyig', subStyles: ['Tsegdrig', 'Danthung', 'Dandring', 'Danring', 'Gongshabma'] },
-  { core: 'Tsugdri', subStyles: ['Peri', 'Pestug', 'Tsugthung', 'Tsugchung', 'Trinyig'] },
-  { core: 'Cursive', subStyles: ['Yigchung', 'Tsumakhyuk', 'Khyuyig', 'Dren'] },
-  { core: 'Unknown', subStyles: [] },
-]
-
-export const SCRIPT_TYPES: ScriptType[] = SCRIPT_STYLE_GROUPS.flatMap(
-  (g) => [g.core, ...g.subStyles],
-)
-
-export function getGroupForStyle(style: ScriptType): ScriptStyleGroup | undefined {
-  return SCRIPT_STYLE_GROUPS.find(
-    (g) => g.core === style || g.subStyles.includes(style),
-  )
+export function getParentStyles(styles: ScriptStyle[]): ScriptStyle[] {
+  return styles.filter((s) => s.parent === null)
 }
 
-export function isSubStyleOf(core: ScriptType, value: ScriptType): boolean {
-  const group = SCRIPT_STYLE_GROUPS.find((g) => g.core === core)
-  return !!group && (group.core === value || group.subStyles.includes(value))
+export function getChildStyles(styles: ScriptStyle[], parentId: ScriptType): ScriptStyle[] {
+  return styles.filter((s) => s.parent === parentId)
+}
+
+export function getStyleById(styles: ScriptStyle[], id: ScriptType): ScriptStyle | undefined {
+  return styles.find((s) => s.id === id)
+}
+
+export function isChildOf(styles: ScriptStyle[], parentId: ScriptType, childId: ScriptType): boolean {
+  if (parentId === childId) return true
+  return styles.some((s) => s.id === childId && s.parent === parentId)
+}
+
+export function getDisplayName(
+  styles: ScriptStyle[],
+  id: string,
+  language: 'en' | 'bo' = 'en',
+): string {
+  const style = styles.find((s) => s.id === id)
+  if (!style) return id
+  if (language === 'bo' && style.name_bo) return style.name_bo
+  return style.name_en
 }
 
 export type ClassificationTaskState = 'annotating' | 'annotating_b' | 'reviewing'

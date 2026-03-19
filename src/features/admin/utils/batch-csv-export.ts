@@ -1,6 +1,7 @@
 import Papa from 'papaparse'
 
-import type { BatchExportTask } from '@/types'
+import type { BatchExportTask, ScriptStyle } from '@/types'
+import { getDisplayName } from '@/types'
 
 /**
  * CSV column headers mapping to BatchExportTask fields
@@ -20,31 +21,34 @@ const CSV_COLUMNS = [
   { key: 'trashed_by', header: 'Trashed By' },
 ] as const satisfies ReadonlyArray<{ key: keyof BatchExportTask; header: string }>
 
+const CLASSIFICATION_FIELDS = new Set<string>(['classification_a', 'classification_b', 'final_script'])
+
 /**
- * Transforms a BatchExportTask to a CSV row with all fields
- * Null values are converted to empty strings
+ * Transforms a BatchExportTask to a CSV row
+ * Classification fields are resolved to display names via the styles lookup
  */
-function transformTaskToCsvRow(task: BatchExportTask): Record<string, string | number> {
+function transformTaskToCsvRow(
+  task: BatchExportTask,
+  styles: ScriptStyle[],
+): Record<string, string | number> {
   const row: Record<string, string | number> = {}
 
   for (const { key, header } of CSV_COLUMNS) {
     const value = task[key]
-    row[header] = value ?? ''
+    if (value != null && CLASSIFICATION_FIELDS.has(key)) {
+      row[header] = getDisplayName(styles, String(value))
+    } else {
+      row[header] = value ?? ''
+    }
   }
 
   return row
 }
 
-/**
- * Sanitizes filename by removing invalid characters
- */
 function sanitizeFilename(name: string): string {
   return name.replace(/[/\\?%*:|"<>]/g, '-').trim() || 'batch-export'
 }
 
-/**
- * Triggers a browser download for the given content
- */
 function downloadFile(content: string, filename: string): void {
   const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
@@ -66,13 +70,18 @@ function downloadFile(content: string, filename: string): void {
  *
  * @param tasks - Array of batch export tasks to export
  * @param batchName - Name of the batch (used for filename)
+ * @param styles - Script styles for display name resolution
  */
-export function exportBatchTasksToCsv(tasks: BatchExportTask[], batchName: string): void {
+export function exportBatchTasksToCsv(
+  tasks: BatchExportTask[],
+  batchName: string,
+  styles: ScriptStyle[],
+): void {
   if (tasks.length === 0) {
     return
   }
 
-  const csvRows = tasks.map(transformTaskToCsvRow)
+  const csvRows = tasks.map((task) => transformTaskToCsvRow(task, styles))
   const headers = CSV_COLUMNS.map(({ header }) => header)
 
   const csvContent = Papa.unparse(csvRows, {

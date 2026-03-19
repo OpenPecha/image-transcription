@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { STATE_CONFIG } from '../constants'
+import { useScriptStyles } from '@/features/workspace/hooks/use-script-styles'
 import type { ClassificationTask } from '@/types'
 
 interface TaskCardProps {
@@ -13,6 +14,7 @@ interface TaskCardProps {
 
 export function TaskCard({ task, onContinue }: TaskCardProps) {
   const { t } = useTranslation('dashboard')
+  const { getName } = useScriptStyles()
   const stateConfig = STATE_CONFIG[task.state]
 
   return (
@@ -58,13 +60,13 @@ export function TaskCard({ task, onContinue }: TaskCardProps) {
             {task.classification_a && (
               <span className="inline-flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1 font-medium text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300">
                 <span className="font-bold">A:</span>
-                {task.classification_a}
+                {getName(task.classification_a)}
               </span>
             )}
             {task.classification_b && (
               <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 font-medium text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
                 <span className="font-bold">B:</span>
-                {task.classification_b}
+                {getName(task.classification_b)}
               </span>
             )}
           </div>

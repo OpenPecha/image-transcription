@@ -23,17 +23,18 @@ export type {
   BulkCreateTasksRequest,
   BulkCreateTasksResponse,
   ScriptType,
-  ScriptStyleGroup,
+  ScriptStyle,
   ClassificationTaskState,
   ClassificationTask,
   ReviewerChoice,
 } from './task'
 
 export {
-  SCRIPT_TYPES,
-  SCRIPT_STYLE_GROUPS,
-  getGroupForStyle,
-  isSubStyleOf,
+  getParentStyles,
+  getChildStyles,
+  getStyleById,
+  isChildOf,
+  getDisplayName,
 } from './task'
 
 // Group types

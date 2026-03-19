@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 
 import { exportBatch } from '../api/batch'
 import { exportBatchTasksToCsv } from '../utils/batch-csv-export'
+import { useGetScriptTypes } from '@/features/workspace/api/script-type'
 
 type UseBatchCsvDownloadOptions = {
   batchId: string
@@ -24,6 +25,7 @@ export function useBatchCsvDownload({
   onError,
 }: UseBatchCsvDownloadOptions): UseBatchCsvDownloadReturn {
   const [isDownloading, setIsDownloading] = useState(false)
+  const { data: styles = [] } = useGetScriptTypes()
 
   const download = useCallback(async () => {
     if (!batchId || isDownloading) return
@@ -38,14 +40,14 @@ export function useBatchCsvDownload({
         return
       }
 
-      exportBatchTasksToCsv(response.tasks, response.batch_name)
+      exportBatchTasksToCsv(response.tasks, response.batch_name, styles)
     } catch (error) {
       const errorMessage = error instanceof Error ? error : new Error('Failed to download batch export')
       onError?.(errorMessage)
     } finally {
       setIsDownloading(false)
     }
-  }, [batchId, isDownloading, onError])
+  }, [batchId, isDownloading, onError, styles])
 
   return { download, isDownloading }
 }

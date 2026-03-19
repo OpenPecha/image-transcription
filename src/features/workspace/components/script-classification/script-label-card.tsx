@@ -6,18 +6,20 @@ import type { ScriptType } from '@/types'
 type BadgeVariant = 'a' | 'b' | 'ab'
 
 interface ScriptLabelCardProps {
-  label: ScriptType
+  id: ScriptType
+  displayName: string
   badge?: BadgeVariant
   disabled?: boolean
   selected?: boolean
   expanded?: boolean
   hasSubStyles?: boolean
   isGeneral?: boolean
-  onSelect: (label: ScriptType) => void
+  onSelect: (id: ScriptType) => void
 }
 
 export function ScriptLabelCard({
-  label,
+  id,
+  displayName,
   badge,
   disabled,
   selected,
@@ -30,7 +32,7 @@ export function ScriptLabelCard({
     <button
       type="button"
       disabled={disabled}
-      onClick={() => onSelect(label)}
+      onClick={() => onSelect(id)}
       className={cn(
         'relative flex items-center justify-center gap-1.5 rounded-lg border-2',
         'px-4 py-3 text-sm font-semibold',
@@ -46,7 +48,7 @@ export function ScriptLabelCard({
       )}
     >
       {badge && <ReviewerBadge variant={badge} />}
-      <span className="truncate">{label}</span>
+      <span className="truncate">{displayName}</span>
       {hasSubStyles && (
         expanded
           ? <ChevronUp className="h-3.5 w-3.5 shrink-0 opacity-60" />

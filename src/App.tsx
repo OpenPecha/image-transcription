@@ -5,16 +5,24 @@ import { ThemeProvider } from '@/components/common'
 import { router } from '@/routes'
 import AuthProvider from './features/auth/AuthProvider'
 import { useLanguageSync } from '@/hooks'
+import { scriptTypeKeys } from '@/features/workspace/api/script-type/script-type-keys'
+import { apiClient } from '@/lib/axios'
+import type { ScriptStyle } from '@/types'
 
-// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 5,
       retry: 1,
       refetchOnWindowFocus: false,
     },
   },
+})
+
+queryClient.prefetchQuery({
+  queryKey: scriptTypeKeys.all,
+  queryFn: (): Promise<ScriptStyle[]> => apiClient.get('/script-type/'),
+  staleTime: Infinity,
 })
 
 // This code is only for TypeScript

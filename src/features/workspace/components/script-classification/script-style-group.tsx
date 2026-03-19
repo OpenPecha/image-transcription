@@ -2,33 +2,37 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ScriptLabelCard } from './script-label-card'
-import type { ScriptType, ScriptStyleGroup as ScriptStyleGroupType } from '@/types'
+import type { ScriptType, ScriptStyle } from '@/types'
 
 type BadgeVariant = 'a' | 'b' | 'ab'
 
 interface ScriptStyleGroupProps {
-  group: ScriptStyleGroupType
+  parentStyle: ScriptStyle
+  children: ScriptStyle[]
   selectedStyle: ScriptType | null
   disabled?: boolean
   isTransitioning?: boolean
-  getBadge?: (style: ScriptType) => BadgeVariant | undefined
-  onSelectStyle: (style: ScriptType) => void
+  getName: (id: string) => string
+  getBadge?: (id: ScriptType) => BadgeVariant | undefined
+  onSelectStyle: (id: ScriptType) => void
   onBack: () => void
   onSubmit: () => void
 }
 
 export function ScriptStyleGroup({
-  group,
+  parentStyle,
+  children,
   selectedStyle,
   disabled,
   isTransitioning,
+  getName,
   getBadge,
   onSelectStyle,
   onBack,
   onSubmit,
 }: ScriptStyleGroupProps) {
   const { t } = useTranslation('workspace')
-  const allOptions: ScriptType[] = [group.core, ...group.subStyles]
+  const allOptions: ScriptStyle[] = [parentStyle, ...children]
 
   return (
     <div className="animate-in slide-in-from-top-2 fade-in duration-200 rounded-lg border border-border bg-muted/30 p-3">
@@ -39,7 +43,7 @@ export function ScriptStyleGroup({
           className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          {group.core}
+          {getName(parentStyle.id)}
         </button>
 
         {selectedStyle && (
@@ -56,7 +60,7 @@ export function ScriptStyleGroup({
             )}
           >
             <Check className="h-4 w-4" />
-            {t('classification.submit', { name: selectedStyle })}
+            {t('classification.submit', { name: getName(selectedStyle) })}
           </button>
         )}
       </div>
@@ -64,11 +68,12 @@ export function ScriptStyleGroup({
       <div className="flex flex-wrap gap-2">
         {allOptions.map((style) => (
           <ScriptLabelCard
-            key={style}
-            label={style}
-            isGeneral={style === group.core}
-            selected={selectedStyle === style}
-            badge={getBadge?.(style)}
+            key={style.id}
+            id={style.id}
+            displayName={getName(style.id)}
+            isGeneral={style.id === parentStyle.id}
+            selected={selectedStyle === style.id}
+            badge={getBadge?.(style.id)}
             disabled={disabled}
             onSelect={onSelectStyle}
           />
