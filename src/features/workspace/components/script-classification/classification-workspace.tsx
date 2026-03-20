@@ -4,7 +4,6 @@ import { ImageCanvas } from '../image-canvas'
 import { WorkspaceSidebar } from '../workspace-sidebar'
 import { TrashConfirmationDialog } from '../trash-confirmation-dialog'
 import { EmptyTasksState } from '../empty-tasks-state'
-import { ScriptGuideDialog } from '../guide/script-guide-dialog'
 import { ScriptLabelGrid } from './script-label-grid'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/features/auth'
@@ -15,13 +14,14 @@ import {
 } from '../../api/classification'
 import type { ScriptType, ReviewerChoice } from '@/types'
 
+const GUIDE_URL = 'https://docs.google.com/document/d/1sOvikJdn4TwEfZMo67gQ7KNZsD6MSLtdbFoH1XMHV2Y/edit?tab=t.0'
+
 export function ClassificationWorkspace() {
   const { t } = useTranslation('workspace')
   const { currentUser } = useAuth()
   const { addToast } = useUIStore()
 
   const [trashDialogOpen, setTrashDialogOpen] = useState(false)
-  const [guideOpen, setGuideOpen] = useState(false)
 
   const {
     data: task,
@@ -143,7 +143,10 @@ export function ClassificationWorkspace() {
 
   const isAnnotator = task?.state === 'annotating' || task?.state === 'annotating_b'
 
-  const openGuide = useCallback(() => setGuideOpen(true), [])
+  const openGuide = useCallback(
+    () => window.open(GUIDE_URL, '_blank', 'noopener,noreferrer'),
+    [],
+  )
 
   if (isLoading) {
     return (
@@ -159,7 +162,6 @@ export function ClassificationWorkspace() {
             <Skeleton className="m-4 h-full w-full rounded-lg" />
           </div>
         </main>
-        <ScriptGuideDialog open={guideOpen} onOpenChange={setGuideOpen} />
       </div>
     )
   }
@@ -179,7 +181,6 @@ export function ClassificationWorkspace() {
             isLoading={isLoading}
           />
         </main>
-        <ScriptGuideDialog open={guideOpen} onOpenChange={setGuideOpen} />
       </div>
     )
   }
@@ -218,7 +219,6 @@ export function ClassificationWorkspace() {
         isLoading={submitMutation.isPending}
         taskName={task.task_name}
       />
-      <ScriptGuideDialog open={guideOpen} onOpenChange={setGuideOpen} />
     </div>
   )
 }

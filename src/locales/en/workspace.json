@@ -73,9 +73,6 @@
     "appName": "Script Classification"
   },
   "guide": {
-    "title": "Scripts Identification Guide",
-    "english": "English",
-    "tibetan": "བོད་ཡིག",
     "triggerLabel": "Script Guide"
   },
   "classification": {
