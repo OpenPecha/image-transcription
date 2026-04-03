@@ -1,17 +1,19 @@
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/axios'
-import { type UserContribution, type UserContributionFilters } from '@/types'
+import { type UserContributionResponse, type UserContributionFilters } from '@/types'
 import { userKeys } from './user-keys'
 
 const getUserContributions = async (
   userId: string,
   filters: UserContributionFilters
-): Promise<UserContribution[]> => {
+): Promise<UserContributionResponse> => {
   const params = new URLSearchParams()
   params.append('start_date', filters.start_date)
   params.append('end_date', filters.end_date)
 
-  return apiClient.get(`/user/${userId}/contributions?${params.toString()}`)
+  return apiClient.get(
+    `/tasks/scriptclassification/${userId}/contributions?${params.toString()}`
+  )
 }
 
 export const useGetUserContributions = (

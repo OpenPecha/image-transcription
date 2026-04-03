@@ -20,16 +20,16 @@
       "apply": "སྤྱོད།",
       "contributions": "བྱས་རྗེས།",
       "summary": {
-        "tasksCompleted": "ལས་ཀ་བསྒྲུབས།",
-        "totalChars": "ཡིག་འབྲུ་བསྡོམས།",
-        "batchesWorked": "ཚོ་སྒྲིག་བཀོལ་བ།",
+        "totalCount": "ལས་ཀ་བསྡོམས།",
+        "agreedCount": "མོས་མཐུན།",
         "rejectionCount": "བསྐྱར་ཞིབ་བྱས་རྗེས།"
       },
       "table": {
         "imageName": "རི་མོའི་མིང་།",
         "batch": "ཚོ་སྒྲིག",
         "role": "འགན་བཞེས།",
-        "chars": "ཡིག་འབྲུ།",
+        "scriptType": "ཡིག་གཟུགས།",
+        "agreed": "མོས་མཐུན།",
         "date": "ཚེས་གྲངས།"
       },
       "noContributions": "བྱས་རྗེས་མ་རྙེད།",

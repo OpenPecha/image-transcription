@@ -64,11 +64,20 @@ export const ROLE_CONFIG: Record<UserRole, { label: string; description: string 
 export interface UserContribution {
   task_id: string
   name: string
-  char_diff: number
   batch_name: string
-  rejection_count: number
   updated_time: string
   role: 'annotator' | 'reviewer' | 'final reviewer'
+  script_type: string
+  agreed: boolean
+  rejection_count: number
+}
+
+// Wrapped response from /tasks/scriptclassification/{userId}/contributions
+export interface UserContributionResponse {
+  total_count: number
+  agreed_count: number
+  rejection_count: number
+  items: UserContribution[]
 }
 
 // User contribution filters

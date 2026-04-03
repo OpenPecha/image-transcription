@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BarChart3, Calendar, FileText } from 'lucide-react'
+import { BarChart3, Calendar, Check, FileText, X } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -51,11 +51,13 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
   const [endDate, setEndDate] = useState(defaultRange.end_date)
   const [appliedFilters, setAppliedFilters] = useState(defaultRange)
 
-  const { data: contributions = [], isLoading } = useGetUserContributions(
+  const { data, isLoading } = useGetUserContributions(
     user.id ?? '',
     appliedFilters,
     open
   )
+
+  const contributions = data?.items ?? []
 
   const handleApplyFilter = () => {
     setAppliedFilters({
@@ -123,7 +125,12 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
         </div>
 
         {/* Summary Cards */}
-        <UserReportSummary contributions={contributions} isLoading={isLoading} />
+        <UserReportSummary
+          totalCount={data?.total_count ?? 0}
+          agreedCount={data?.agreed_count ?? 0}
+          rejectionCount={data?.rejection_count ?? 0}
+          isLoading={isLoading}
+        />
 
         {/* Contributions Table */}
         <div className="flex-1 min-h-0 overflow-hidden flex flex-col gap-2">
@@ -146,8 +153,11 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
                       <th className="text-left px-3 py-2 font-medium">
                         {t('users.report.table.role')}
                       </th>
-                      <th className="text-right px-3 py-2 font-medium">
-                        {t('users.report.table.chars')}
+                      <th className="text-left px-3 py-2 font-medium">
+                        {t('users.report.table.scriptType')}
+                      </th>
+                      <th className="text-center px-3 py-2 font-medium">
+                        {t('users.report.table.agreed')}
                       </th>
                       <th className="text-right px-3 py-2 font-medium">
                         {t('users.report.table.date')}
@@ -184,8 +194,17 @@ function ContributionRow({ contribution }: ContributionRowProps) {
         </span>
       </td>
       <td className="px-3 py-2 capitalize">{contribution.role}</td>
-      <td className="px-3 py-2 text-right font-mono text-xs">
-        {contribution.char_diff >= 0 ? '+' : ''}{contribution.char_diff}
+      <td className="px-3 py-2">
+        <span className="inline-flex items-center rounded-md bg-violet-50 dark:bg-violet-950/50 px-2 py-0.5 text-xs font-medium text-violet-700 dark:text-violet-300">
+          {contribution.script_type}
+        </span>
+      </td>
+      <td className="px-3 py-2 text-center">
+        {contribution.agreed ? (
+          <Check className="h-4 w-4 text-emerald-600 mx-auto" />
+        ) : (
+          <X className="h-4 w-4 text-muted-foreground mx-auto" />
+        )}
       </td>
       <td className="px-3 py-2 text-right text-muted-foreground text-xs">
         {formatDateTime(contribution.updated_time)}
@@ -217,16 +236,18 @@ function ContributionsTableSkeleton() {
         <Skeleton className="h-4 w-32" />
         <Skeleton className="h-4 w-16" />
         <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-4 w-12 ml-auto" />
-        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-8" />
+        <Skeleton className="h-4 w-24 ml-auto" />
       </div>
       {[...Array(5)].map((_, i) => (
         <div key={i} className="flex items-center gap-4 px-3 py-2 border-t">
           <Skeleton className="h-4 w-40" />
           <Skeleton className="h-5 w-12 rounded-md" />
           <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-4 w-10 ml-auto" />
-          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-5 w-14 rounded-md" />
+          <Skeleton className="h-4 w-4 rounded-full" />
+          <Skeleton className="h-4 w-20 ml-auto" />
         </div>
       ))}
     </div>

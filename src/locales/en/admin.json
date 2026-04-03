@@ -20,16 +20,16 @@
       "apply": "Apply",
       "contributions": "Contributions",
       "summary": {
-        "tasksCompleted": "Tasks Completed",
-        "totalChars": "Total Characters",
-        "batchesWorked": "Batches Worked",
-        "rejectionCount": "Rejection Count"
+        "totalCount": "Total Tasks",
+        "agreedCount": "Agreed",
+        "rejectionCount": "Rejections"
       },
       "table": {
         "imageName": "Image Name",
         "batch": "Batch",
         "role": "Role",
-        "chars": "Chars",
+        "scriptType": "Script Type",
+        "agreed": "Agreed",
         "date": "Date"
       },
       "noContributions": "No contributions found",
