@@ -163,6 +163,7 @@ export interface ClassificationTask {
   orientation: TaskOrientation
   classification_a: ScriptType | null
   classification_b: ScriptType | null
+  rejection_count: number
 }
 
 export type ReviewerChoice = 'a' | 'b' | 'own'

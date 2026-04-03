@@ -12,7 +12,8 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useUIStore } from '@/store/use-ui-store'
-import { useGetBatchTasks, useRestoreTask, useGetBatchReport } from '../../../api/batch'
+import { useAuth } from '@/features/auth'
+import { useGetBatchTasks, useRestoreTask, useRejectTask, useGetBatchReport } from '../../../api/batch'
 import { useBatchCsvDownload } from '../../../hooks/use-batch-csv-download'
 import { TaskListSidebar } from './task-list-sidebar'
 import { TaskPreview } from './task-preview'
@@ -34,6 +35,7 @@ export function BatchTaskView() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
   const { addToast } = useUIStore()
+  const { currentUser } = useAuth()
 
   // Get state filter from URL, default to 'all'
   const stateFilter = (searchParams.get('state') as BatchTaskState | 'all') || 'all'
@@ -44,6 +46,7 @@ export function BatchTaskView() {
   const { data: report, isLoading: isLoadingReport } = useGetBatchReport(batchId!, true)
   const { data: tasks = [], isLoading: isLoadingTasks } = useGetBatchTasks(batchId!, stateFilter)
   const restoreTask = useRestoreTask()
+  const rejectTask = useRejectTask()
 
   // CSV download hook
   const { download: downloadCsv, isDownloading } = useBatchCsvDownload({
@@ -115,6 +118,30 @@ export function BatchTaskView() {
       }
     )
   }, [selectedTask, batchId, restoreTask, addToast, t])
+
+  const handleReject = useCallback(() => {
+    if (!selectedTask || !batchId || !currentUser?.id) return
+
+    rejectTask.mutate(
+      { taskId: selectedTask.task_id, batchId, userId: currentUser.id },
+      {
+        onSuccess: () => {
+          addToast({
+            title: t('batches.taskRejected'),
+            description: t('batches.taskRejectedDescription', { name: selectedTask.task_name }),
+            variant: 'success',
+          })
+        },
+        onError: (error: Error) => {
+          addToast({
+            title: t('batches.rejectFailed'),
+            description: error.message,
+            variant: 'destructive',
+          })
+        },
+      }
+    )
+  }, [selectedTask, batchId, currentUser, rejectTask, addToast, t])
 
   // Get task count for current filter
   const getTaskCount = useCallback(
@@ -228,6 +255,8 @@ export function BatchTaskView() {
             task={selectedTask}
             onRestore={handleRestore}
             isRestoring={restoreTask.isPending}
+            onReject={handleReject}
+            isRejecting={rejectTask.isPending}
             isLoading={isLoadingTasks && !selectedTask}
           />
         </div>

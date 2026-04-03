@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { RotateCcw, User, CheckCircle2, XCircle } from 'lucide-react'
+import { RotateCcw, Undo2, User, CheckCircle2, XCircle } from 'lucide-react'
 import { ImageCanvas } from '@/features/workspace/components/image-canvas'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,6 +12,8 @@ interface TaskPreviewProps {
   task: BatchTask | null
   onRestore: () => void
   isRestoring: boolean
+  onReject: () => void
+  isRejecting: boolean
   isLoading: boolean
 }
 
@@ -19,6 +21,8 @@ export function TaskPreview({
   task,
   onRestore,
   isRestoring,
+  onReject,
+  isRejecting,
   isLoading,
 }: TaskPreviewProps) {
   const { t } = useTranslation('admin')
@@ -41,6 +45,7 @@ export function TaskPreview({
   }
 
   const canRestore = task.state === 'trashed'
+  const canReject = task.state === 'accepted'
   const stateConfig = BATCH_STATS_CONFIG[task.state]
 
   return (
@@ -83,6 +88,21 @@ export function TaskPreview({
           >
             <RotateCcw className={cn('h-4 w-4 mr-2', isRestoring && 'animate-spin')} />
             {isRestoring ? t('batches.restoring') : t('batches.restore')}
+          </Button>
+        </div>
+      )}
+
+      {/* Reject footer for accepted tasks */}
+      {canReject && (
+        <div className="border-t border-border bg-card px-4 py-3 flex justify-center shrink-0">
+          <Button
+            variant="outline"
+            onClick={onReject}
+            disabled={isRejecting}
+            className="min-w-[140px] hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+          >
+            <Undo2 className={cn('h-4 w-4 mr-2', isRejecting && 'animate-spin')} />
+            {isRejecting ? t('batches.rejecting') : t('batches.reject')}
           </Button>
         </div>
       )}

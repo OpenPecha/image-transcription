@@ -1,7 +1,7 @@
 import { useCallback, useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { Diamond, LogOut, RefreshCw, FileText, Users, LayoutDashboard, Loader2, Settings, BookOpen } from 'lucide-react'
+import { AlertTriangle, Diamond, LogOut, RefreshCw, FileText, Users, LayoutDashboard, Loader2, Settings, BookOpen } from 'lucide-react'
 import { cn, getInitials } from '@/lib/utils'
 import { useAuth } from '@/features/auth'
 import { Button } from '@/components/ui/button'
@@ -164,6 +164,12 @@ export function WorkspaceSidebar({
                       {task.review_rejection_count > 0 && (
                         <span>Review rejections: {task.review_rejection_count}</span>
                       )}
+                    </div>
+                  )}
+                  {classificationTask && classificationTask.rejection_count > 0 && (
+                    <div className="flex items-center gap-1.5 mt-2 text-xs text-amber-600 bg-amber-50 dark:bg-amber-950/30 rounded-md px-2 py-1">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                      <span>{t('sidebar.rejectedByAdmin', { count: classificationTask.rejection_count })}</span>
                     </div>
                   )}
                 </div>

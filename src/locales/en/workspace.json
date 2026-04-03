@@ -67,7 +67,8 @@
     "getTask": "Get Task",
     "dashboard": "Dashboard",
     "logout": "Logout",
-    "noRole": "No Role"
+    "noRole": "No Role",
+    "rejectedByAdmin": "Rejected by admin — please re-review ({{count}})"
   },
   "branding": {
     "appName": "Script Classification"
