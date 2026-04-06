@@ -1,27 +1,34 @@
 import { useTranslation } from 'react-i18next'
-import { CheckCircle, ThumbsUp, XCircle } from 'lucide-react'
+import { CheckCircle, Eye, ShieldCheck, XCircle } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { UserRole } from '@/types'
 
 interface UserReportSummaryProps {
   totalCount: number
-  agreedCount: number
+  approvedCount: number
+  reviewedCount: number
   rejectionCount: number
+  role: UserRole
   isLoading: boolean
 }
 
 export function UserReportSummary({
   totalCount,
-  agreedCount,
+  approvedCount,
+  reviewedCount,
   rejectionCount,
+  role,
   isLoading,
 }: UserReportSummaryProps) {
   const { t } = useTranslation('admin')
 
   if (isLoading) {
-    return <UserReportSummarySkeleton />
+    return <UserReportSummarySkeleton role={role} />
   }
 
-  const stats = [
+  const isAnnotator = role === UserRole.Annotator
+
+  const annotatorStats = [
     {
       icon: CheckCircle,
       value: totalCount,
@@ -30,11 +37,28 @@ export function UserReportSummary({
       bg: 'bg-emerald-50 dark:bg-emerald-950/30',
     },
     {
-      icon: ThumbsUp,
-      value: agreedCount,
-      label: t('users.report.summary.agreedCount'),
+      icon: ShieldCheck,
+      value: approvedCount,
+      label: t('users.report.summary.approvedCount'),
       color: 'text-blue-600',
       bg: 'bg-blue-50 dark:bg-blue-950/30',
+    },
+    {
+      icon: Eye,
+      value: reviewedCount,
+      label: t('users.report.summary.reviewedCount'),
+      color: 'text-violet-600',
+      bg: 'bg-violet-50 dark:bg-violet-950/30',
+    },
+  ]
+
+  const reviewerStats = [
+    {
+      icon: CheckCircle,
+      value: totalCount,
+      label: t('users.report.summary.totalCount'),
+      color: 'text-emerald-600',
+      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
     },
     {
       icon: XCircle,
@@ -45,8 +69,10 @@ export function UserReportSummary({
     },
   ]
 
+  const stats = isAnnotator ? annotatorStats : reviewerStats
+
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className={`grid gap-3 ${isAnnotator ? 'grid-cols-3' : 'grid-cols-2'}`}>
       {stats.map((stat) => (
         <div
           key={stat.label}
@@ -61,10 +87,12 @@ export function UserReportSummary({
   )
 }
 
-function UserReportSummarySkeleton() {
+function UserReportSummarySkeleton({ role }: { role: UserRole }) {
+  const count = role === UserRole.Annotator ? 3 : 2
+
   return (
-    <div className="grid grid-cols-3 gap-3">
-      {[...Array(3)].map((_, i) => (
+    <div className={`grid gap-3 ${count === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+      {[...Array(count)].map((_, i) => (
         <div key={i} className="flex flex-col items-center justify-center rounded-lg bg-muted/50 p-4">
           <Skeleton className="h-5 w-5 mb-1" />
           <Skeleton className="h-6 w-12 mb-1" />
@@ -74,4 +102,3 @@ function UserReportSummarySkeleton() {
     </div>
   )
 }
-

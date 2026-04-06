@@ -21,7 +21,8 @@
       "contributions": "བྱས་རྗེས།",
       "summary": {
         "totalCount": "ལས་ཀ་བསྡོམས།",
-        "agreedCount": "མོས་མཐུན།",
+        "approvedCount": "ཆོག་མཆན།",
+        "reviewedCount": "བསྐྱར་ཞིབ།",
         "rejectionCount": "བསྐྱར་ཞིབ་བྱས་རྗེས།"
       },
       "table": {
@@ -29,7 +30,9 @@
         "batch": "ཚོ་སྒྲིག",
         "role": "འགན་བཞེས།",
         "scriptType": "ཡིག་གཟུགས།",
-        "agreed": "མོས་མཐུན།",
+        "approved": "ཆོག་མཆན།",
+        "reviewed": "བསྐྱར་ཞིབ།",
+        "rejectionCount": "དགག་གྲངས།",
         "date": "ཚེས་གྲངས།"
       },
       "noContributions": "བྱས་རྗེས་མ་རྙེད།",

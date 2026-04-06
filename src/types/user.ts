@@ -67,15 +67,17 @@ export interface UserContribution {
   batch_name: string
   updated_time: string
   role: 'annotator' | 'reviewer' | 'final reviewer'
-  script_type: string
-  agreed: boolean
+  script_type: string | null
+  approved: boolean | null
+  reviewed: boolean | null
   rejection_count: number
 }
 
 // Wrapped response from /tasks/scriptclassification/{userId}/contributions
 export interface UserContributionResponse {
   total_count: number
-  agreed_count: number
+  approved_count: number
+  reviewed_count: number
   rejection_count: number
   items: UserContribution[]
 }

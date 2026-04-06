@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BarChart3, Calendar, Check, FileText, X } from 'lucide-react'
+import { BarChart3, Calendar, Check, FileText, Minus, X } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGetUserContributions } from '../../api/user'
 import { UserReportSummary } from './user-report-summary'
-import type { User, UserContribution } from '@/types'
+import { UserRole, type User, type UserContribution } from '@/types'
 
 interface UserReportDialogProps {
   open: boolean
@@ -58,6 +58,8 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
   )
 
   const contributions = data?.items ?? []
+  const userRole = user.role ?? UserRole.Annotator
+  const isAnnotator = userRole === UserRole.Annotator
 
   const handleApplyFilter = () => {
     setAppliedFilters({
@@ -74,7 +76,7 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col">
+      <DialogContent className="sm:max-w-4xl max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-primary" />
@@ -127,8 +129,10 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
         {/* Summary Cards */}
         <UserReportSummary
           totalCount={data?.total_count ?? 0}
-          agreedCount={data?.agreed_count ?? 0}
+          approvedCount={data?.approved_count ?? 0}
+          reviewedCount={data?.reviewed_count ?? 0}
           rejectionCount={data?.rejection_count ?? 0}
+          role={userRole}
           isLoading={isLoading}
         />
 
@@ -137,7 +141,7 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
           <h4 className="text-sm font-medium">{t('users.report.contributions')}</h4>
           <div className="border rounded-lg overflow-auto flex-1">
               {isLoading ? (
-                <ContributionsTableSkeleton />
+                <ContributionsTableSkeleton isAnnotator={isAnnotator} />
               ) : contributions.length === 0 ? (
                 <EmptyContributions />
               ) : (
@@ -156,9 +160,20 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
                       <th className="text-left px-3 py-2 font-medium">
                         {t('users.report.table.scriptType')}
                       </th>
-                      <th className="text-center px-3 py-2 font-medium">
-                        {t('users.report.table.agreed')}
-                      </th>
+                      {isAnnotator ? (
+                        <>
+                          <th className="text-center px-3 py-2 font-medium">
+                            {t('users.report.table.approved')}
+                          </th>
+                          <th className="text-center px-3 py-2 font-medium">
+                            {t('users.report.table.reviewed')}
+                          </th>
+                        </>
+                      ) : (
+                        <th className="text-center px-3 py-2 font-medium">
+                          {t('users.report.table.rejectionCount')}
+                        </th>
+                      )}
                       <th className="text-right px-3 py-2 font-medium">
                         {t('users.report.table.date')}
                       </th>
@@ -166,7 +181,11 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
                   </thead>
                   <tbody className="h-full">
                     {contributions.map((item) => (
-                      <ContributionRow key={item.task_id} contribution={item} />
+                      <ContributionRow
+                        key={item.task_id}
+                        contribution={item}
+                        isAnnotator={isAnnotator}
+                      />
                     ))}
                   </tbody>
                 </table>
@@ -180,9 +199,21 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
 
 interface ContributionRowProps {
   contribution: UserContribution
+  isAnnotator: boolean
 }
 
-function ContributionRow({ contribution }: ContributionRowProps) {
+function NullableBooleanCell({ value }: { value: boolean | null }) {
+  if (value === null) {
+    return <Minus className="h-4 w-4 text-muted-foreground mx-auto" />
+  }
+  return value ? (
+    <Check className="h-4 w-4 text-emerald-600 mx-auto" />
+  ) : (
+    <X className="h-4 w-4 text-red-500 mx-auto" />
+  )
+}
+
+function ContributionRow({ contribution, isAnnotator }: ContributionRowProps) {
   return (
     <tr className="border-t hover:bg-muted/30 transition-colors">
       <td className="px-3 py-2 truncate max-w-[180px]" title={contribution.name}>
@@ -195,17 +226,30 @@ function ContributionRow({ contribution }: ContributionRowProps) {
       </td>
       <td className="px-3 py-2 capitalize">{contribution.role}</td>
       <td className="px-3 py-2">
-        <span className="inline-flex items-center rounded-md bg-violet-50 dark:bg-violet-950/50 px-2 py-0.5 text-xs font-medium text-violet-700 dark:text-violet-300">
-          {contribution.script_type}
-        </span>
-      </td>
-      <td className="px-3 py-2 text-center">
-        {contribution.agreed ? (
-          <Check className="h-4 w-4 text-emerald-600 mx-auto" />
+        {contribution.script_type ? (
+          <span className="inline-flex items-center rounded-md bg-violet-50 dark:bg-violet-950/50 px-2 py-0.5 text-xs font-medium text-violet-700 dark:text-violet-300">
+            {contribution.script_type}
+          </span>
         ) : (
-          <X className="h-4 w-4 text-muted-foreground mx-auto" />
+          <span className="text-muted-foreground">—</span>
         )}
       </td>
+      {isAnnotator ? (
+        <>
+          <td className="px-3 py-2 text-center">
+            <NullableBooleanCell value={contribution.approved} />
+          </td>
+          <td className="px-3 py-2 text-center">
+            <NullableBooleanCell value={contribution.reviewed} />
+          </td>
+        </>
+      ) : (
+        <td className="px-3 py-2 text-center">
+          <span className={contribution.rejection_count > 0 ? 'text-red-600 font-medium' : 'text-muted-foreground'}>
+            {contribution.rejection_count}
+          </span>
+        </td>
+      )}
       <td className="px-3 py-2 text-right text-muted-foreground text-xs">
         {formatDateTime(contribution.updated_time)}
       </td>
@@ -229,28 +273,23 @@ function EmptyContributions() {
   )
 }
 
-function ContributionsTableSkeleton() {
+function ContributionsTableSkeleton({ isAnnotator }: { isAnnotator: boolean }) {
+  const colCount = isAnnotator ? 7 : 6
+
   return (
     <div className="space-y-0">
       <div className="flex items-center gap-4 px-3 py-2 bg-muted/50">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-4 w-16" />
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-4 w-16" />
-        <Skeleton className="h-4 w-8" />
-        <Skeleton className="h-4 w-24 ml-auto" />
+        {[...Array(colCount)].map((_, i) => (
+          <Skeleton key={i} className={`h-4 ${i === 0 ? 'w-32' : i === colCount - 1 ? 'w-24 ml-auto' : 'w-16'}`} />
+        ))}
       </div>
       {[...Array(5)].map((_, i) => (
         <div key={i} className="flex items-center gap-4 px-3 py-2 border-t">
-          <Skeleton className="h-4 w-40" />
-          <Skeleton className="h-5 w-12 rounded-md" />
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-5 w-14 rounded-md" />
-          <Skeleton className="h-4 w-4 rounded-full" />
-          <Skeleton className="h-4 w-20 ml-auto" />
+          {[...Array(colCount)].map((_, j) => (
+            <Skeleton key={j} className={`h-4 ${j === 0 ? 'w-40' : j === colCount - 1 ? 'w-20 ml-auto' : 'w-14'}`} />
+          ))}
         </div>
       ))}
     </div>
   )
 }
-

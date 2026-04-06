@@ -21,7 +21,8 @@
       "contributions": "Contributions",
       "summary": {
         "totalCount": "Total Tasks",
-        "agreedCount": "Agreed",
+        "approvedCount": "Approved",
+        "reviewedCount": "Reviewed",
         "rejectionCount": "Rejections"
       },
       "table": {
@@ -29,7 +30,9 @@
         "batch": "Batch",
         "role": "Role",
         "scriptType": "Script Type",
-        "agreed": "Agreed",
+        "approved": "Approved",
+        "reviewed": "Reviewed",
+        "rejectionCount": "Rejections",
         "date": "Date"
       },
       "noContributions": "No contributions found",
