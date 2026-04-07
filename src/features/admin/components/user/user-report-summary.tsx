@@ -28,6 +28,10 @@ export function UserReportSummary({
 
   const isAnnotator = role === UserRole.Annotator
 
+  const approvedPercentage = totalCount > 0
+    ? Math.round((approvedCount / totalCount) * 100)
+    : 0
+
   const annotatorStats = [
     {
       icon: CheckCircle,
@@ -39,6 +43,7 @@ export function UserReportSummary({
     {
       icon: ShieldCheck,
       value: approvedCount,
+      percentage: approvedPercentage,
       label: t('users.report.summary.approvedCount'),
       color: 'text-blue-600',
       bg: 'bg-blue-50 dark:bg-blue-950/30',
@@ -79,7 +84,14 @@ export function UserReportSummary({
           className={`flex flex-col items-center justify-center rounded-lg p-4 ${stat.bg}`}
         >
           <stat.icon className={`h-5 w-5 ${stat.color} mb-1`} />
-          <span className="text-xl font-bold">{stat.value}</span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-xl font-bold">{stat.value}</span>
+            {'percentage' in stat && (
+              <span className={`text-sm font-medium ${stat.color}`}>
+                ({stat.percentage}%)
+              </span>
+            )}
+          </div>
           <span className="text-xs text-muted-foreground text-center">{stat.label}</span>
         </div>
       ))}
