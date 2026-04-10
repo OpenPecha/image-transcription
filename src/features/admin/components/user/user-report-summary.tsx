@@ -43,7 +43,7 @@ export function UserReportSummary({
     {
       icon: ShieldCheck,
       value: approvedCount,
-      percentage: approvedPercentage,
+      percentage: approvedPercentage as number,
       label: t('users.report.summary.approvedCount'),
       color: 'text-blue-600',
       bg: 'bg-blue-50 dark:bg-blue-950/30',
