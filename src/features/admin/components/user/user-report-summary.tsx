@@ -1,7 +1,21 @@
 import { useTranslation } from 'react-i18next'
-import { CheckCircle, Eye, ShieldCheck, XCircle } from 'lucide-react'
+import { CheckCircle, Eye, ShieldCheck, XCircle, LucideIcon } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { UserRole } from '@/types'
+
+interface BaseStat {
+  icon: LucideIcon
+  value: number
+  label: string
+  color: string
+  bg: string
+}
+
+interface StatWithPercentage extends BaseStat {
+  percentage: number
+}
+
+type Stat = BaseStat | StatWithPercentage
 
 interface UserReportSummaryProps {
   totalCount: number
@@ -32,7 +46,7 @@ export function UserReportSummary({
     ? Math.round((approvedCount / totalCount) * 100)
     : 0
 
-  const annotatorStats = [
+  const annotatorStats: Stat[] = [
     {
       icon: CheckCircle,
       value: totalCount,
@@ -43,7 +57,7 @@ export function UserReportSummary({
     {
       icon: ShieldCheck,
       value: approvedCount,
-      percentage: approvedPercentage as number,
+      percentage: approvedPercentage,
       label: t('users.report.summary.approvedCount'),
       color: 'text-blue-600',
       bg: 'bg-blue-50 dark:bg-blue-950/30',
@@ -57,7 +71,7 @@ export function UserReportSummary({
     },
   ]
 
-  const reviewerStats = [
+  const reviewerStats: Stat[] = [
     {
       icon: CheckCircle,
       value: totalCount,
@@ -74,7 +88,7 @@ export function UserReportSummary({
     },
   ]
 
-  const stats = isAnnotator ? annotatorStats : reviewerStats
+  const stats: Stat[] = isAnnotator ? annotatorStats : reviewerStats
 
   return (
     <div className={`grid gap-3 ${isAnnotator ? 'grid-cols-3' : 'grid-cols-2'}`}>
@@ -88,7 +102,7 @@ export function UserReportSummary({
             <span className="text-xl font-bold">{stat.value}</span>
             {'percentage' in stat && (
               <span className={`text-sm font-medium ${stat.color}`}>
-                ({stat.percentage}%)
+                ({(stat as StatWithPercentage).percentage}%)
               </span>
             )}
           </div>
