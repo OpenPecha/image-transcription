@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { CheckCircle, Eye, ShieldCheck, XCircle, LucideIcon } from 'lucide-react'
+import { CheckCircle, Eye, ShieldCheck, XCircle, type LucideIcon } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { UserRole } from '@/types'
 
