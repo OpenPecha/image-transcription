@@ -87,6 +87,8 @@
     "status": "གནས་སྟངས།",
     "accepted": "དང་ལེན། {{percentage}}%",
     "trashed": "བསུབས། {{count}}",
+    "scriptTypeBreakdown": "དང་ལེན་བྱས་པའི་ཡིག་གཟུགས་རིགས། ({{count}})",
+    "showAllScriptTypes": "ཡིག་གཟུགས་རིགས་ {{count}} ཚང་མ་མཐོང།",
     "viewTasks": "ལས་ཀ་ལྟ།",
     "batchTasks": "ཚོ་སྒྲིག་ལས་ཀ།",
     "back": "ཕྱིར་ལོག",

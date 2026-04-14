@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { BatchReport } from '@/types'
-import { StackedProgressBar } from './progress-bar'
+import { StackedProgressBar, getAcceptedPercentage } from './progress-bar'
 import { BatchStatsFooter } from './batch-stats-footer'
-import { getAcceptedPercentage } from './progress-bar'
+import { ScriptTypeBreakdown } from './script-type-breakdown'
 
 interface BatchStatsProps {
   batchId: string
@@ -26,7 +26,6 @@ export function BatchStats({ batchId, report, isLoading }: BatchStatsProps) {
     )
   }
 
-  // Handle empty batch
   if (report.total_tasks === 0) {
     return (
       <div className="flex items-center justify-center h-16 bg-slate-50 rounded-lg text-sm text-muted-foreground border border-dashed">
@@ -40,7 +39,14 @@ export function BatchStats({ batchId, report, isLoading }: BatchStatsProps) {
   return (
     <div className="space-y-3">
       <StackedProgressBar report={report} />
-      
+
+      {report.accepted_script_type_counts && report.accepted_script_type_counts.length > 0 && (
+        <ScriptTypeBreakdown
+          counts={report.accepted_script_type_counts}
+          totalAccepted={report.accepted}
+        />
+      )}
+
       <BatchStatsFooter
         batchId={batchId}
         trashedCount={report.trashed}
@@ -53,17 +59,12 @@ export function BatchStats({ batchId, report, isLoading }: BatchStatsProps) {
 function BatchStatsSkeleton() {
   return (
     <div className="space-y-3">
-      {/* Progress bar skeleton */}
       <Skeleton className="h-8 w-full rounded-lg" />
-      
-      {/* Legend skeleton */}
       <div className="flex gap-4">
         {[...Array(4)].map((_, i) => (
           <Skeleton key={i} className="h-4 w-16" />
         ))}
       </div>
-      
-      {/* Footer skeleton */}
       <div className="flex justify-between pt-2">
         <div className="flex gap-4">
           <Skeleton className="h-5 w-24" />

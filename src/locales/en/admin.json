@@ -87,6 +87,8 @@
     "status": "Status",
     "accepted": "{{percentage}}% Accepted",
     "trashed": "{{count}} Trashed",
+    "scriptTypeBreakdown": "Accepted Script Types ({{count}})",
+    "showAllScriptTypes": "Show all {{count}} types",
     "viewTasks": "View Tasks",
     "batchTasks": "Batch Tasks",
     "back": "Back",

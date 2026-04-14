@@ -16,15 +16,10 @@ export function BatchItem({ batch }: BatchItemProps) {
   const { t } = useTranslation('admin')
   const [isExpanded, setIsExpanded] = useState(false)
 
-  // Fetch report only when expanded
   const { data: report, isLoading: isLoadingReport } = useGetBatchReport(
     batch.id,
     isExpanded
   )
-
-  const toggleExpand = () => {
-    setIsExpanded((prev) => !prev)
-  }
 
   const formattedDate = new Date(batch.created).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -36,7 +31,7 @@ export function BatchItem({ batch }: BatchItemProps) {
     <Card className="overflow-hidden transition-all duration-200">
       <CardHeader className="p-0">
         <button
-          onClick={toggleExpand}
+          onClick={() => setIsExpanded((prev) => !prev)}
           className="flex w-full items-center justify-between p-4 text-left hover:bg-muted/50 transition-colors"
         >
           <div className="flex-1 min-w-0">
@@ -87,7 +82,6 @@ export function BatchItem({ batch }: BatchItemProps) {
   )
 }
 
-// Skeleton for loading state
 export function BatchItemSkeleton() {
   return (
     <Card>
@@ -106,4 +100,3 @@ export function BatchItemSkeleton() {
     </Card>
   )
 }
-

@@ -7,6 +7,12 @@ export interface Batch {
   group_name: string
 }
 
+// Script type count in accepted tasks
+export interface AcceptedScriptTypeCount {
+  script_type: string
+  count: number
+}
+
 // Individual task from batch export endpoint
 export type BatchExportTask = {
   file_number: string
@@ -55,6 +61,7 @@ export interface BatchReport extends Batch {
   annotated: number
   accepted: number
   trashed: number
+  accepted_script_type_counts?: AcceptedScriptTypeCount[]
 }
 
 // Individual task in upload JSON
