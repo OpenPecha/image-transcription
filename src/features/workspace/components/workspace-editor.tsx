@@ -70,9 +70,9 @@ export function WorkspaceEditor() {
   if (task && task.task_id !== currentTaskId) {
     setCurrentTaskId(task.task_id)
     // Restore from local draft if available, otherwise use server transcript
-    const restoredText = savedDraft ?? task.task_transcript
+    const restoredText = savedDraft ?? task.task_transcript ?? ''
     setText(restoredText)
-    setOriginalOcrText(task.task_transcript)
+    setOriginalOcrText(task.task_transcript ?? '')
   } else if (!task && currentTaskId !== null) {
     setCurrentTaskId(null)
     setText('')
