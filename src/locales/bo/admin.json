@@ -22,6 +22,7 @@
       "summary": {
         "tasksCompleted": "ལས་ཀ་བསྒྲུབས།",
         "totalChars": "ཡིག་འབྲུ་བསྡོམས།",
+        "totalLines": "ཐིག་བསྡོམས།",
         "batchesWorked": "ཚོ་སྒྲིག་བཀོལ་བ།",
         "rejectionCount": "བསྐྱར་ཞིབ་བྱས་རྗེས།"
       },
@@ -29,7 +30,9 @@
         "imageName": "རི་མོའི་མིང་།",
         "batch": "ཚོ་སྒྲིག",
         "role": "འགན་བཞེས།",
+        "metric": "ཐོན་འབྲས།",
         "chars": "ཡིག་འབྲུ།",
+        "lineCount": "ཐིག་ {{count}}",
         "date": "ཚེས་གྲངས།"
       },
       "noContributions": "བྱས་རྗེས་མ་རྙེད།",

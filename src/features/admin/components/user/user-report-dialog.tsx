@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGetUserContributions } from '../../api/user'
 import { UserReportSummary } from './user-report-summary'
+import { isLineAlignmentContribution } from '@/types'
 import type { User, UserContribution } from '@/types'
 
 interface UserReportDialogProps {
@@ -147,7 +148,7 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
                         {t('users.report.table.role')}
                       </th>
                       <th className="text-right px-3 py-2 font-medium">
-                        {t('users.report.table.chars')}
+                        {t('users.report.table.metric')}
                       </th>
                       <th className="text-right px-3 py-2 font-medium">
                         {t('users.report.table.date')}
@@ -173,6 +174,9 @@ interface ContributionRowProps {
 }
 
 function ContributionRow({ contribution }: ContributionRowProps) {
+  const { t } = useTranslation('admin')
+  const isLineAlignment = isLineAlignmentContribution(contribution)
+
   return (
     <tr className="border-t hover:bg-muted/30 transition-colors">
       <td className="px-3 py-2 truncate max-w-[180px]" title={contribution.name}>
@@ -185,7 +189,10 @@ function ContributionRow({ contribution }: ContributionRowProps) {
       </td>
       <td className="px-3 py-2 capitalize">{contribution.role}</td>
       <td className="px-3 py-2 text-right font-mono text-xs">
-        {contribution.char_diff >= 0 ? '+' : ''}{contribution.char_diff}
+        {isLineAlignment
+          ? t('users.report.table.lineCount', { count: contribution.line_count ?? 0 })
+          : `${contribution.char_diff >= 0 ? '+' : ''}${contribution.char_diff}`
+        }
       </td>
       <td className="px-3 py-2 text-right text-muted-foreground text-xs">
         {formatDateTime(contribution.updated_time)}

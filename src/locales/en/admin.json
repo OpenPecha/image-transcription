@@ -22,6 +22,7 @@
       "summary": {
         "tasksCompleted": "Tasks Completed",
         "totalChars": "Total Characters",
+        "totalLines": "Total Lines",
         "batchesWorked": "Batches Worked",
         "rejectionCount": "Rejection Count"
       },
@@ -29,7 +30,9 @@
         "imageName": "Image Name",
         "batch": "Batch",
         "role": "Role",
+        "metric": "Output",
         "chars": "Chars",
+        "lineCount": "{{count}} lines",
         "date": "Date"
       },
       "noContributions": "No contributions found",

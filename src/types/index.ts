@@ -1,5 +1,5 @@
 // User types
-export { UserRole, ROLE_CONFIG } from './user'
+export { UserRole, ROLE_CONFIG, isLineAlignmentContribution } from './user'
 export type * from './user'
 
 // Task types

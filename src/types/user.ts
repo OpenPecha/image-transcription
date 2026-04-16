@@ -69,6 +69,11 @@ export interface UserContribution {
   rejection_count: number
   updated_time: string
   role: 'annotator' | 'reviewer' | 'final reviewer'
+  line_count: number | null
+}
+
+export function isLineAlignmentContribution(item: UserContribution): boolean {
+  return item.line_count !== null
 }
 
 // User contribution filters
