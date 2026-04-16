@@ -376,7 +376,7 @@ export function WorkspaceEditor() {
                 <Button
                   variant="success"
                   onClick={handleSubmit}
-                  disabled={showOverlay || !canEdit || text.length === 0}
+                  disabled={showOverlay || !canEdit}
                 >
                   <Send className="h-4 w-4 mr-2" />
                   {submitTask.isPending ? t('actions.submitting') : t('actions.submit')}
