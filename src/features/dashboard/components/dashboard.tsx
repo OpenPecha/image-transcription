@@ -8,12 +8,16 @@ import {
   TaskCardSkeleton,
   WelcomeHeader,
 } from '@/features/dashboard'
-
+import { UserRole } from '@/types'
 export function Dashboard() {
   const { t } = useTranslation('dashboard')
   const navigate = useNavigate()
   const { currentUser } = useAuth()
-  const { data: task, isLoading } = useGetAssignedTask(currentUser?.id)
+  const isAdmin = currentUser?.role === UserRole.Admin
+  const { data: task, isLoading } = useGetAssignedTask(
+    isAdmin ? undefined : currentUser?.id
+  )
+
 
   if (!currentUser) return null
 
@@ -24,7 +28,7 @@ export function Dashboard() {
   return (
     <div className="space-y-8 animate-fade-in">
       <WelcomeHeader user={currentUser} />
-
+    {!isAdmin && (
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">{t('currentTask')}</h2>
 
@@ -36,6 +40,8 @@ export function Dashboard() {
           <TaskCard task={task} onContinue={handleContinue} />
         )}
       </div>
+      )}
     </div>
+    
   )
 }
