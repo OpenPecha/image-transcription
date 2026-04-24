@@ -39,7 +39,14 @@ export function ApplicationBatchSummary({ report, isLoading }: ApplicationBatchS
 
   return (
     <div className="space-y-3 pb-4">
-      <div className="text-sm font-semibold tracking-tight">{report.name}</div>
+      <div className="space-y-0.5">
+        <div className="text-sm font-semibold tracking-tight">
+          {report.name} — all batches
+        </div>
+        <div className="text-xs text-muted-foreground">
+          All-batches summary for this application
+        </div>
+      </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {stats.map((item) => (
           <div key={item.label} className="rounded-lg border bg-card px-3 py-2">
