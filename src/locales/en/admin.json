@@ -80,6 +80,8 @@
     "uploadFirstBatch": "Upload First Batch",
     "noBatches": "No batches yet",
     "noBatchesDescription": "Upload your first batch of image transcription tasks to get started.",
+    "allBatchesSummary": "All-batches summary for this application",
+    "total": "Total",
     "tasks": "{{count}} tasks",
     "task": "{{count}} task",
     "failedToLoadStats": "Failed to load batch statistics",

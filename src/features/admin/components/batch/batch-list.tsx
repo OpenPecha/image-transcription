@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
 import { useGetBatches } from '../../api/batch'
+import { ApplicationReportSummary } from './application-report-summary'
 import { BatchItem, BatchItemSkeleton } from './batch-item'
 import { BatchUploadDialog } from './batch-upload-dialog'
 
@@ -27,9 +27,6 @@ export function BatchList() {
               <Package className="h-5 w-5" />
               {t('batches.cardTitle')}
             </CardTitle>
-            <CardDescription className="mt-1.5">
-              {t('batches.cardDescription')}
-            </CardDescription>
           </div>
           <Button onClick={() => setUploadDialogOpen(true)} size="sm">
             <Upload className="mr-2 h-4 w-4" />
@@ -37,6 +34,7 @@ export function BatchList() {
           </Button>
         </CardHeader>
         <CardContent className="pt-0">
+          <ApplicationReportSummary />
           {isLoading ? (
             <div className="space-y-3">
               {[...Array(4)].map((_, i) => (
