@@ -61,7 +61,7 @@ export interface BatchReport extends Batch {
   annotated: number
   accepted: number
   trashed: number
-  accepted_script_type_counts?: AcceptedScriptTypeCount[]
+  script_types?: Record<string, number>
 }
 
 // Individual task in upload JSON
