@@ -5,17 +5,19 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { useGetBatches } from '../../api/batch'
+import { useGetApplicationBatchReport, useGetBatches } from '../../api/batch'
+import { ApplicationBatchSummary } from './application-batch-summary'
 import { BatchItem, BatchItemSkeleton } from './batch-item'
 import { BatchUploadDialog } from './batch-upload-dialog'
 
 export function BatchList() {
   const { t } = useTranslation('admin')
   const { data: batches = [], isLoading } = useGetBatches()
+  const { data: applicationReport, isLoading: isApplicationReportLoading } =
+    useGetApplicationBatchReport('imagetranscription')
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
 
   return (
@@ -27,9 +29,6 @@ export function BatchList() {
               <Package className="h-5 w-5" />
               {t('batches.cardTitle')}
             </CardTitle>
-            <CardDescription className="mt-1.5">
-              {t('batches.cardDescription')}
-            </CardDescription>
           </div>
           <Button onClick={() => setUploadDialogOpen(true)} size="sm">
             <Upload className="mr-2 h-4 w-4" />
@@ -37,6 +36,10 @@ export function BatchList() {
           </Button>
         </CardHeader>
         <CardContent className="pt-0">
+          <ApplicationBatchSummary
+            report={applicationReport}
+            isLoading={isApplicationReportLoading}
+          />
           {isLoading ? (
             <div className="space-y-3">
               {[...Array(4)].map((_, i) => (
