@@ -7,6 +7,8 @@ export const batchKeys = {
   detail: (id: string) => [...batchKeys.details(), id] as const,
   reports: () => [...batchKeys.all, 'report'] as const,
   report: (id: string) => [...batchKeys.reports(), id] as const,
+  applicationReport: (applicationName: string) =>
+    [...batchKeys.all, 'application-report', applicationName] as const,
   tasks: (batchId: string, state?: string) => 
     [...batchKeys.all, 'tasks', batchId, state] as const,
 }

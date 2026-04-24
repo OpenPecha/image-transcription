@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { BatchReport } from '@/types'
+import type { AcceptedScriptTypeCount, BatchReport } from '@/types'
 import { StackedProgressBar, getAcceptedPercentage } from './progress-bar'
 import { BatchStatsFooter } from './batch-stats-footer'
 import { ScriptTypeBreakdown } from './script-type-breakdown'
@@ -35,14 +35,18 @@ export function BatchStats({ batchId, report, isLoading }: BatchStatsProps) {
   }
 
   const acceptedPercentage = getAcceptedPercentage(report)
+  const acceptedScriptTypeCounts: AcceptedScriptTypeCount[] = Object.entries(report.script_types ?? {})
+    .filter(([, count]) => typeof count === 'number' && Number.isFinite(count) && count > 0)
+    .map(([script_type, count]) => ({ script_type, count }))
+    .sort((a, b) => b.count - a.count)
 
   return (
     <div className="space-y-3">
       <StackedProgressBar report={report} />
 
-      {report.accepted_script_type_counts && report.accepted_script_type_counts.length > 0 && (
+      {acceptedScriptTypeCounts.length > 0 && (
         <ScriptTypeBreakdown
-          counts={report.accepted_script_type_counts}
+          counts={acceptedScriptTypeCounts}
           totalAccepted={report.accepted}
         />
       )}

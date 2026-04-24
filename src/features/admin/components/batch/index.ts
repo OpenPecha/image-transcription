@@ -1,4 +1,5 @@
 export { BatchList } from './batch-list'
+export { ApplicationReportSummary } from './application-report-summary'
 export { BatchItem, BatchItemSkeleton } from './batch-item'
 export { BatchStats } from './batch-stats'
 export { BatchStatsFooter } from './batch-stats-footer'
