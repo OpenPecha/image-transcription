@@ -37,11 +37,15 @@ export function ApplicationBatchSummary({ report, isLoading }: ApplicationBatchS
     { label: 'Trashed', value: report.trashed, meta: `${percent(report.trashed, total)}%` },
   ] as const
 
+  const title = report.name.toLowerCase().includes('all batches')
+    ? report.name
+    : `${report.name} — all batches`
+
   return (
     <div className="space-y-3 pb-4">
       <div className="space-y-0.5">
         <div className="text-sm font-semibold tracking-tight">
-          {report.name} — all batches
+          {title}
         </div>
         <div className="text-xs text-muted-foreground">
           All-batches summary for this application
