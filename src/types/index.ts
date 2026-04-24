@@ -32,6 +32,7 @@ export { BATCH_STATS_CONFIG, WORKFLOW_STATS } from './batch'
 export type {
   Batch,
   BatchReport,
+  ApplicationBatchReport,
   BatchUploadTask,
   BatchUploadRequest,
   BatchStatKey,
