@@ -9,16 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { useGetUsers } from '../../api/user'
+import { useGetAllUsers } from '../../api/user'
 import { useGetGroups } from '../../api/group'
 import { useDebouncedValue } from '@/hooks'
 import { UserFilters } from './user-filters'
 import { UserItem, UserItemSkeleton } from './user-item'
 import { UserDialog } from './user-dialog'
-import { UserPagination } from './user-pagination'
 import { UserRole } from '@/types'
 
-const PAGE_SIZE = 15
 const ALL_FILTER = 'all'
 
 export function UserList() {
@@ -27,42 +25,34 @@ export function UserList() {
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState(ALL_FILTER)
   const [groupFilter, setGroupFilter] = useState(ALL_FILTER)
-  const [offset, setOffset] = useState(0)
 
   const debouncedSearch = useDebouncedValue(search, 300)
   const { data: groups = [] } = useGetGroups()
 
-  const { data, isLoading, isFetching } = useGetUsers({
+  const { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage } = useGetAllUsers({
     search: debouncedSearch || undefined,
     role: roleFilter !== ALL_FILTER ? (roleFilter as UserRole) : undefined,
     group_id: groupFilter !== ALL_FILTER ? groupFilter : undefined,
-    offset,
-    limit: PAGE_SIZE,
   })
 
-  const users = data?.items ?? []
-  const total = data?.total ?? 0
-  const totalPages = Math.ceil(total / PAGE_SIZE)
-  const currentPage = Math.floor(offset / PAGE_SIZE) + 1
+  const pages = data?.pages ?? []
+  const users = pages.flatMap((page) => page.items)
+  const total = pages[0]?.total ?? 0
 
-  // Reset offset when filters change
+  if (hasNextPage && !isFetchingNextPage) {
+    void fetchNextPage()
+  }
+
   const handleSearchChange = (value: string) => {
     setSearch(value)
-    setOffset(0)
   }
 
   const handleRoleFilterChange = (value: string) => {
     setRoleFilter(value)
-    setOffset(0)
   }
 
   const handleGroupFilterChange = (value: string) => {
     setGroupFilter(value)
-    setOffset(0)
-  }
-
-  const handlePageChange = (page: number) => {
-    setOffset((page - 1) * PAGE_SIZE)
   }
 
   return (
@@ -111,7 +101,6 @@ export function UserList() {
                   setSearch('')
                   setRoleFilter(ALL_FILTER)
                   setGroupFilter(ALL_FILTER)
-                  setOffset(0)
                 }}
                 onCreateClick={() => setCreateDialogOpen(true)}
               />
@@ -124,17 +113,6 @@ export function UserList() {
             )}
           </div>
 
-          {/* Pagination - Sticky at bottom */}
-          {totalPages > 1 && (
-            <div className="sticky bottom-0 border-t border-border bg-card pt-2">
-              <UserPagination
-                page={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-                isLoading={isFetching}
-              />
-            </div>
-          )}
         </CardContent>
       </Card>
 
