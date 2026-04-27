@@ -59,6 +59,19 @@ export interface BatchReport extends Batch {
   trashed: number
 }
 
+export type ApplicationBatchReport = {
+  id: string
+  name: string
+  created: string
+  group_id: string
+  total_tasks: number
+  pending: number
+  annotated: number
+  reviewed: number
+  finalised: number
+  trashed: number
+}
+
 // Individual task in upload JSON
 export interface BatchUploadTask {
   name: string
