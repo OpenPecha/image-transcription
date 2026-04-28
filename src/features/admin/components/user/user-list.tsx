@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { UserPlus, Users } from 'lucide-react'
+import { UserPlus, Users, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -9,16 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { useGetUsers } from '../../api/user'
+import { useGetAllUsers } from '../../api/user'
 import { useGetGroups } from '../../api/group'
 import { useDebouncedValue } from '@/hooks'
 import { UserFilters } from './user-filters'
 import { UserItem, UserItemSkeleton } from './user-item'
 import { UserDialog } from './user-dialog'
-import { UserPagination } from './user-pagination'
 import { UserRole } from '@/types'
 
-const PAGE_SIZE = 15
 const ALL_FILTER = 'all'
 
 export function UserList() {
@@ -27,42 +25,36 @@ export function UserList() {
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState(ALL_FILTER)
   const [groupFilter, setGroupFilter] = useState(ALL_FILTER)
-  const [offset, setOffset] = useState(0)
 
   const debouncedSearch = useDebouncedValue(search, 300)
   const { data: groups = [] } = useGetGroups()
 
-  const { data, isLoading, isFetching } = useGetUsers({
+  const { data, isLoading, isFetching, fetchNextPage, hasNextPage } = useGetAllUsers({
     search: debouncedSearch || undefined,
     role: roleFilter !== ALL_FILTER ? (roleFilter as UserRole) : undefined,
     group_id: groupFilter !== ALL_FILTER ? groupFilter : undefined,
-    offset,
-    limit: PAGE_SIZE,
   })
 
-  const users = data?.items ?? []
-  const total = data?.total ?? 0
-  const totalPages = Math.ceil(total / PAGE_SIZE)
-  const currentPage = Math.floor(offset / PAGE_SIZE) + 1
+  // Auto-fetch all pages
+  useEffect(() => {
+    if (hasNextPage && !isFetching) {
+      fetchNextPage()
+    }
+  }, [hasNextPage, isFetching, fetchNextPage])
 
-  // Reset offset when filters change
+  const users = data?.pages.flatMap((page) => page.items) ?? []
+  const total = data?.pages[0]?.total ?? 0
+
   const handleSearchChange = (value: string) => {
     setSearch(value)
-    setOffset(0)
   }
 
   const handleRoleFilterChange = (value: string) => {
     setRoleFilter(value)
-    setOffset(0)
   }
 
   const handleGroupFilterChange = (value: string) => {
     setGroupFilter(value)
-    setOffset(0)
-  }
-
-  const handlePageChange = (page: number) => {
-    setOffset((page - 1) * PAGE_SIZE)
   }
 
   return (
@@ -97,7 +89,7 @@ export function UserList() {
           />
 
           {/* User List - Scrollable */}
-          <div className="flex-1 overflow-y-auto rounded-lg border border-border">
+          <div className="flex-1 overflow-y-auto rounded-lg border border-border relative">
             {isLoading ? (
               <div>
                 {[...Array(5)].map((_, i) => (
@@ -111,30 +103,22 @@ export function UserList() {
                   setSearch('')
                   setRoleFilter(ALL_FILTER)
                   setGroupFilter(ALL_FILTER)
-                  setOffset(0)
                 }}
                 onCreateClick={() => setCreateDialogOpen(true)}
               />
             ) : (
-              <div className={isFetching ? 'opacity-60' : ''}>
+              <div className={isFetching && !hasNextPage ? 'opacity-60' : ''}>
                 {users.map((user) => (
                   <UserItem key={user.username} user={user} groups={groups} />
                 ))}
+                {isFetching && hasNextPage && (
+                  <div className="flex justify-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                )}
               </div>
             )}
           </div>
-
-          {/* Pagination - Sticky at bottom */}
-          {totalPages > 1 && (
-            <div className="sticky bottom-0 border-t border-border bg-card pt-2">
-              <UserPagination
-                page={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-                isLoading={isFetching}
-              />
-            </div>
-          )}
         </CardContent>
       </Card>
 

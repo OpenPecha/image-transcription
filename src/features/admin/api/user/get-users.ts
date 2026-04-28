@@ -1,4 +1,4 @@
-import { useQuery, keepPreviousData } from '@tanstack/react-query'
+import { useQuery, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/axios'
 import { type UserListResponse, type UserFilters } from '@/types'
 import { userKeys } from './user-keys'
@@ -23,5 +23,23 @@ export const useGetUsers = (filters: UserFilters = {}) => {
     staleTime: 1000 * 60 * 5,
     placeholderData: keepPreviousData,
     retry: 1,
+  })
+}
+
+export const useGetAllUsers = (filters: Omit<UserFilters, 'offset' | 'limit'> = {}) => {
+  return useInfiniteQuery({
+    queryKey: userKeys.allList(filters),
+    queryFn: async ({ pageParam = 0 }) => {
+      return getUsers({ ...filters, offset: pageParam, limit: 15 })
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      const currentLoaded = allPages.reduce((acc, page) => acc + page.items.length, 0)
+      if (currentLoaded < lastPage.total) {
+        return currentLoaded
+      }
+      return undefined
+    },
+    staleTime: 1000 * 60 * 5,
   })
 }
