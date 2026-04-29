@@ -16,7 +16,7 @@ import { BatchUploadDialog } from './batch-upload-dialog'
 export function BatchList() {
   const { t } = useTranslation('admin')
   const { data: batches = [], isLoading } = useGetBatches()
-  const { data: applicationReport, isLoading: isApplicationReportLoading } =
+  const { data: applicationReports, isLoading: isApplicationReportLoading } =
     useGetApplicationBatchReport('imagetranscription')
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
 
@@ -36,10 +36,29 @@ export function BatchList() {
           </Button>
         </CardHeader>
         <CardContent className="pt-0">
-          <ApplicationBatchSummary
-            report={applicationReport}
-            isLoading={isApplicationReportLoading}
-          />
+          <div className="mb-6 space-y-2">
+            {isApplicationReportLoading ? (
+              <ApplicationBatchSummary
+                report={undefined}
+                isLoading={true}
+              />
+            ) : (
+              applicationReports?.map((report) => (
+                <ApplicationBatchSummary
+                  key={report.id}
+                  report={report}
+                  isLoading={false}
+                />
+              ))
+            )}
+          </div>
+
+          <div className="mb-4 border-b" />
+
+          <div className="mb-3 text-sm font-semibold tracking-tight">
+            Individual Batches
+          </div>
+
           {isLoading ? (
             <div className="space-y-3">
               {[...Array(4)].map((_, i) => (
