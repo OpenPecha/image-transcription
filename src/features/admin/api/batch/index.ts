@@ -6,5 +6,7 @@ export { useGetBatchTasks } from './get-batch-tasks'
 export { useUploadBatch } from './upload-batch'
 export { useRestoreTask } from './restore-task'
 export { useRejectTask } from './reject-task'
+export { useVerifyTask } from './verify-task'
+export { useUnverifyTask } from './unverify-task'
 export { exportBatch } from './export-batch'
 

@@ -51,6 +51,8 @@ export interface BatchTask {
   reviewer_username: string | null
   final_script: string | null
   trashed_by: string | null
+  is_previously_rejected: boolean
+  is_verified: boolean
 }
 
 // Batch with stats from report endpoint

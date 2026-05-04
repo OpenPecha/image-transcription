@@ -97,11 +97,23 @@
     "taskRestored": "ལས་ཀ་སླར་གསོས།",
     "taskRestoredDescription": "\"{{name}}\" ལེགས་གྲུབ་ངང་སླར་གསོས།",
     "restoreFailed": "ལས་ཀ་སླར་གསོ་མ་ཐུབ།",
+    "previouslyRejected": "སྔོན་ཆད་དགག་པ་བྱས་པ།",
     "reject": "དགག་པ།",
     "rejecting": "དགག་བཞིན།...",
     "taskRejected": "ལས་ཀ་དགག་པ་བྱས།",
     "taskRejectedDescription": "\"{{name}}\" བསྐྱར་ཞིབ་ཆེད་སླར་བསྐུར།",
     "rejectFailed": "ལས་ཀ་དགག་པ་བྱེད་མ་ཐུབ།",
+    "verify": "བདེན་དཔང་།",
+    "verifying": "བདེན་དཔང་བྱེད་བཞིན།...",
+    "taskVerified": "ལས་ཀ་བདེན་དཔང་བྱས།",
+    "taskVerifiedDescription": "\"{{name}}\" ལེགས་གྲུབ་ངང་བདེན་དཔང་བྱས།",
+    "verifyFailed": "ལས་ཀ་བདེན་དཔང་བྱེད་མ་ཐུབ།",
+    "unverify": "བདེན་དཔང་ཕྱིར་འཐེན།",
+    "unverifying": "བདེན་དཔང་ཕྱིར་འཐེན་བྱེད་བཞིན།...",
+    "taskUnverified": "ལས་ཀ་བདེན་དཔང་ཕྱིར་འཐེན་བྱས།",
+    "taskUnverifiedDescription": "\"{{name}}\" ལེགས་གྲུབ་ངང་བདེན་དཔང་ཕྱིར་འཐེན་བྱས།",
+    "unverifyFailed": "ལས་ཀ་བདེན་དཔང་ཕྱིར་འཐེན་བྱེད་མ་ཐུབ།",
+    "verified": "བདེན་དཔང་བྱས་པ།",
     "taskList": "ལས་ཀའི་ཐོ།",
     "noTasksFound": "ལས་ཀ་མ་རྙེད།",
     "noTaskSelected": "ལས་ཀ་བདམས་མེད།",
@@ -122,7 +134,13 @@
       "half_annotated": "མཆན་ཕྱེད་བཀོད།",
       "annotated": "མཆན་བཀོད།",
       "accepted": "དང་ལེན་བྱས།",
-      "trashed": "བསུབས།"
+      "trashed": "གད་སྙིགས་སུ་བཅུག་པ།"
+    },
+    "filterByVerification": "བདེན་དཔང་གིས་འཚག་པ།",
+    "verificationStates": {
+      "all": "ཚང་མ།",
+      "verified": "བདེན་དཔང་བྱས་ཟིན་པ།",
+      "unverified": "བདེན་དཔང་མ་བྱས་པ།"
     },
     "upload": {
       "title": "ཚོ་སྒྲིག་འགེལ།",

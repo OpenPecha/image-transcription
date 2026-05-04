@@ -65,6 +65,7 @@ interface TaskListItemProps {
 }
 
 function TaskListItem({ task, isSelected, onClick }: TaskListItemProps) {
+  const { t } = useTranslation('admin')
   const stateConfig = BATCH_STATS_CONFIG[task.state as BatchTaskState]
 
   return (
@@ -79,7 +80,27 @@ function TaskListItem({ task, isSelected, onClick }: TaskListItemProps) {
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="truncate font-medium">{task.task_name}</span>
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="flex gap-1 shrink-0 w-4 justify-center">
+            {task.state === 'accepted' && (
+              <>
+                {task.is_previously_rejected && (
+                  <div 
+                    className="h-1.5 w-1.5 rounded-full bg-red-500" 
+                    title={t('batches.previouslyRejected')} 
+                  />
+                )}
+                {task.is_verified && (
+                  <div 
+                    className="h-1.5 w-1.5 rounded-full bg-emerald-500" 
+                    title={t('batches.verified')} 
+                  />
+                )}
+              </>
+            )}
+          </div>
+          <span className="truncate font-medium">{task.task_name}</span>
+        </div>
         <span
           className={cn(
             'shrink-0 text-[10px] px-1.5 py-0.5 rounded font-medium',
