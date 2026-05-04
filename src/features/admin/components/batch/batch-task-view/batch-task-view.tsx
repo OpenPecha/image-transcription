@@ -13,7 +13,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useUIStore } from '@/store/use-ui-store'
 import { useAuth } from '@/features/auth'
-import { useGetBatchTasks, useRestoreTask, useRejectTask, useGetBatchReport } from '../../../api/batch'
+import { useGetBatchTasks, useRestoreTask, useRejectTask, useVerifyTask, useUnverifyTask, useGetBatchReport } from '../../../api/batch'
 import { useBatchCsvDownload } from '../../../hooks/use-batch-csv-download'
 import { TaskListSidebar } from './task-list-sidebar'
 import { TaskPreview } from './task-preview'
@@ -39,14 +39,27 @@ export function BatchTaskView() {
 
   // Get state filter from URL, default to 'all'
   const stateFilter = (searchParams.get('state') as BatchTaskState | 'all') || 'all'
+  const verificationFilter = (searchParams.get('verification') as 'all' | 'verified' | 'unverified') || 'all'
   const taskIdFromUrl = searchParams.get('task_id')
 
 
   // API hooks
   const { data: report, isLoading: isLoadingReport } = useGetBatchReport(batchId!, true)
-  const { data: tasks = [], isLoading: isLoadingTasks } = useGetBatchTasks(batchId!, stateFilter)
+  const { data: rawTasks = [], isLoading: isLoadingTasks } = useGetBatchTasks(batchId!, stateFilter)
   const restoreTask = useRestoreTask()
   const rejectTask = useRejectTask()
+  const verifyTask = useVerifyTask()
+  const unverifyTask = useUnverifyTask()
+
+  // Client-side filtering for verification
+  const tasks = useMemo(() => {
+    if (stateFilter === 'accepted' && verificationFilter !== 'all') {
+      return rawTasks.filter(task =>
+        verificationFilter === 'verified' ? task.is_verified : !task.is_verified
+      )
+    }
+    return rawTasks
+  }, [rawTasks, stateFilter, verificationFilter])
 
   // CSV download hook
   const { download: downloadCsv, isDownloading } = useBatchCsvDownload({
@@ -63,12 +76,12 @@ export function BatchTaskView() {
   // Set selected task from URL or first task
   const selectedTask = useMemo(() => {
     if (tasks.length === 0) return null;
-    
+
     if (taskIdFromUrl) {
       const taskFromUrl = tasks.find((t) => t.task_id === taskIdFromUrl);
       if (taskFromUrl) return taskFromUrl;
     }
-    
+
     return tasks[0];
   }, [tasks, taskIdFromUrl]);
 
@@ -82,17 +95,42 @@ export function BatchTaskView() {
     [searchParams, setSearchParams]
   )
 
-  // Handle state filter change
+  // Handle filter changes
   const handleStateChange = useCallback(
     (value: string) => {
       setSearchParams((prev) => {
         prev.set('state', value)
         prev.delete('task_id') // Reset task selection when filter changes
+        if (value !== 'accepted') {
+          prev.delete('verification')
+        }
         return prev
       })
     },
     [setSearchParams]
   )
+
+  const handleVerificationChange = useCallback(
+    (value: string) => {
+      setSearchParams((prev) => {
+        prev.set('verification', value)
+        prev.delete('task_id')
+        return prev
+      })
+    },
+    [setSearchParams]
+  )
+
+  // Helper to format error messages
+  const formatErrorMessage = useCallback((error: any, task: BatchTask | null) => {
+    // Try to extract the detailed message from the API response
+    const serverMessage = error?.response?.data?.error || error?.response?.data?.message;
+    const message = serverMessage || error?.message || 'Unknown error';
+
+    if (!task) return message;
+    // Replace task ID with task name if present in message
+    return message.replace(task.task_id, task.task_name);
+  }, []);
 
   // Handle restore
   const handleRestore = useCallback(() => {
@@ -111,13 +149,13 @@ export function BatchTaskView() {
         onError: (error: Error) => {
           addToast({
             title: t('batches.restoreFailed'),
-            description: error.message,
+            description: formatErrorMessage(error, selectedTask),
             variant: 'destructive',
           })
         },
       }
     )
-  }, [selectedTask, batchId, restoreTask, addToast, t])
+  }, [selectedTask, batchId, restoreTask, addToast, t, formatErrorMessage])
 
   const handleReject = useCallback(() => {
     if (!selectedTask || !batchId || !currentUser?.id) return
@@ -135,13 +173,61 @@ export function BatchTaskView() {
         onError: (error: Error) => {
           addToast({
             title: t('batches.rejectFailed'),
-            description: error.message,
+            description: formatErrorMessage(error, selectedTask),
             variant: 'destructive',
           })
         },
       }
     )
-  }, [selectedTask, batchId, currentUser, rejectTask, addToast, t])
+  }, [selectedTask, batchId, currentUser, rejectTask, addToast, t, formatErrorMessage])
+
+  const handleVerify = useCallback(() => {
+    if (!selectedTask || !batchId || !currentUser?.id) return
+
+    verifyTask.mutate(
+      { taskId: selectedTask.task_id, batchId, userId: currentUser.id },
+      {
+        onSuccess: () => {
+          addToast({
+            title: t('batches.taskVerified'),
+            description: t('batches.taskVerifiedDescription', { name: selectedTask.task_name }),
+            variant: 'success',
+          })
+        },
+        onError: (error: Error) => {
+          addToast({
+            title: t('batches.verifyFailed'),
+            description: formatErrorMessage(error, selectedTask),
+            variant: 'destructive',
+          })
+        },
+      }
+    )
+  }, [selectedTask, batchId, currentUser, verifyTask, addToast, t, formatErrorMessage])
+
+  const handleUnverify = useCallback(() => {
+    if (!selectedTask || !batchId || !currentUser?.id) return
+
+    unverifyTask.mutate(
+      { taskId: selectedTask.task_id, batchId, userId: currentUser.id },
+      {
+        onSuccess: () => {
+          addToast({
+            title: t('batches.taskUnverified'),
+            description: t('batches.taskUnverifiedDescription', { name: selectedTask.task_name }),
+            variant: 'success',
+          })
+        },
+        onError: (error: Error) => {
+          addToast({
+            title: t('batches.unverifyFailed'),
+            description: formatErrorMessage(error, selectedTask),
+            variant: 'destructive',
+          })
+        },
+      }
+    )
+  }, [selectedTask, batchId, currentUser, unverifyTask, addToast, t, formatErrorMessage])
 
   // Get task count for current filter
   const getTaskCount = useCallback(
@@ -195,8 +281,8 @@ export function BatchTaskView() {
             <SelectContent>
               {STATE_OPTION_KEYS.map((option) => {
                 const count = getTaskCount(option.value)
-                const config = option.value !== 'all' 
-                  ? BATCH_STATS_CONFIG[option.value] 
+                const config = option.value !== 'all'
+                  ? BATCH_STATS_CONFIG[option.value]
                   : null
                 return (
                   <SelectItem key={option.value} value={option.value}>
@@ -218,6 +304,22 @@ export function BatchTaskView() {
               })}
             </SelectContent>
           </Select>
+
+          {/* Verification filter - only shown when state is 'accepted' */}
+          {stateFilter === 'accepted' && (
+            <Select value={verificationFilter} onValueChange={handleVerificationChange}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder={t('batches.filterByVerification')} />
+              </SelectTrigger>
+              <SelectContent>
+                {['all', 'verified', 'unverified'].map((val) => (
+                  <SelectItem key={val} value={val}>
+                    {t(`batches.verificationStates.${val}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
 
           {/* Download CSV */}
           <Button
@@ -242,6 +344,7 @@ export function BatchTaskView() {
         {/* Task List Sidebar */}
         <div className="w-64 shrink-0">
           <TaskListSidebar
+            key={`${stateFilter}-${verificationFilter}-${batchId}`}
             tasks={tasks}
             selectedTaskId={selectedTask?.task_id || null}
             onSelectTask={handleSelectTask}
@@ -257,6 +360,10 @@ export function BatchTaskView() {
             isRestoring={restoreTask.isPending}
             onReject={handleReject}
             isRejecting={rejectTask.isPending}
+            onVerify={handleVerify}
+            isVerifying={verifyTask.isPending}
+            onUnverify={handleUnverify}
+            isUnverifying={unverifyTask.isPending}
             isLoading={isLoadingTasks && !selectedTask}
           />
         </div>

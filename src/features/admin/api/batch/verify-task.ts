@@ -3,24 +3,24 @@ import { apiClient } from '@/lib/axios'
 import { batchKeys } from './batch-keys'
 import { APPLICATION_NAME } from '@/lib/constant'
 
-interface RejectTaskParams {
+interface VerifyTaskParams {
   taskId: string
   batchId: string
   userId: string
 }
 
-const rejectTask = async ({ taskId, userId }: RejectTaskParams): Promise<void> => {
+const verifyTask = async ({ taskId, userId }: VerifyTaskParams): Promise<void> => {
   return apiClient.post(`/tasks/${APPLICATION_NAME}/submit/${taskId}`, {
     user_id: userId,
-    action: 'REJECT',
+    action: 'VERIFY',
   })
 }
 
-export const useRejectTask = () => {
+export const useVerifyTask = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: rejectTask,
+    mutationFn: verifyTask,
     onSuccess: (_, { batchId }) => {
       queryClient.invalidateQueries({
         queryKey: batchKeys.report(batchId),

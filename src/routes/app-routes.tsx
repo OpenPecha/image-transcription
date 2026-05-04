@@ -16,10 +16,15 @@ const AdminBatchTasksPage = lazy(() => import('@/pages/admin/admin-batch-tasks-p
 const WorkspacePage = lazy(() => import('@/pages/workspace/workspace-page').then(m => ({ default: m.WorkspacePage })))
 const NotFoundPage = lazy(() => import('@/pages/not-found').then(m => ({ default: m.NotFoundPage })))
 
+import { ErrorBoundary } from '@/components/error-boundary'
+
 const fallback = <></>
 
 export const router = createBrowserRouter([
-  // Auth routes (public)
+  {
+    errorElement: <ErrorBoundary />,
+    children: [
+      // Auth routes (public)
   {
     element: <AuthLayout />,
     children: [
@@ -110,5 +115,7 @@ export const router = createBrowserRouter([
   {
     path: '*',
     element: <Suspense fallback={fallback}><NotFoundPage /></Suspense>,
+  },
+    ],
   },
 ])
