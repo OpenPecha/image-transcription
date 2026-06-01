@@ -25,10 +25,10 @@ export function NoGroupDialog() {
             <Users className="h-6 w-6" />
           </div>
           <DialogTitle className="text-xl font-bold text-foreground">
-            No Group Assigned
+            Group Not Assigned
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground mt-2">
-            You are not assigned to any group yet. You cannot access this application until you are assigned to a group.
+            Group is not assigned so you won't be able to receive tasks.
           </DialogDescription>
         </DialogHeader>
 

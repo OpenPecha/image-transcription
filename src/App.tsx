@@ -30,13 +30,14 @@ if (import.meta.env.DEV) {
 }
 
 function AuthGuard() {
-  const { wrongAppUrl, hasNoGroup } = useAuth()
+  const { currentUser, wrongAppUrl, hasNoGroup } = useAuth()
 
   if (wrongAppUrl !== null) {
     return <WrongAppDialog url={wrongAppUrl} />
   }
 
-  if (hasNoGroup) {
+  // Only show group dialog if the user has a role assigned (role error is handled by pending-approval page)
+  if (currentUser?.role && hasNoGroup) {
     return <NoGroupDialog />
   }
 
