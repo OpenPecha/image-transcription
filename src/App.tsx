@@ -5,6 +5,8 @@ import { ThemeProvider } from '@/components/common'
 import { router } from '@/routes'
 import { AuthProvider, useAuth, WrongAppDialog, NoGroupDialog } from '@/features/auth'
 import { useLanguageSync } from '@/hooks'
+import { APPLICATION_NAME, APPLICATION_URLS } from '@/lib/constant'
+import { UserRole } from '@/types'
 
 // Create a client
 const queryClient = new QueryClient({
@@ -30,11 +32,16 @@ if (import.meta.env.DEV) {
 }
 
 function AuthGuard() {
-  const { currentUser, wrongAppUrl, hasNoGroup } = useAuth()
+  const { currentUser } = useAuth()
 
-  if (wrongAppUrl !== null) {
+  const isWrongApp = currentUser && currentUser.role !== UserRole.Admin && currentUser.application && currentUser.application !== APPLICATION_NAME
+
+  if (isWrongApp) {
+    const wrongAppUrl = currentUser.application ? (APPLICATION_URLS[currentUser.application] ?? null) : null
     return <WrongAppDialog url={wrongAppUrl} />
   }
+
+  const hasNoGroup = currentUser && currentUser.role !== UserRole.Admin && !currentUser.group_id
 
   // Only show group dialog if the user has a role assigned (role error is handled by pending-approval page)
   if (currentUser?.role && hasNoGroup) {
@@ -50,12 +57,12 @@ function App() {
 
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
           <AuthGuard />
           <RouterProvider router={router} />
-        </QueryClientProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   )
 }
