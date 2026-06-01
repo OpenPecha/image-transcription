@@ -11,6 +11,7 @@ import { AuthContext } from './auth-context'
 import { UserRole } from '@/types'
 import type { User } from '@/types'
 import { apiClient } from '@/lib/axios'
+import { APPLICATION_NAME, WRONG_APP_URLS } from '@/lib/constant'
 interface AuthProviderProps {
   children: ReactNode
 }
@@ -35,6 +36,8 @@ const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [isUserLoading, setIsUserLoading] = useState(false)
+  const [wrongAppUrl, setWrongAppUrl] = useState<string | null>(null)
+  const [hasNoGroup, setHasNoGroup] = useState(false)
 
   // Combined loading state
   // We consider it loading if Auth0 is loading, we are syncing the user,
@@ -65,6 +68,21 @@ const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log('user', user)
         setCurrentUser(user)
 
+        // Case 4: Wrong application validation
+        if (user.application && user.application !== APPLICATION_NAME) {
+          const redirectUrl = WRONG_APP_URLS[user.application] ?? null
+          setWrongAppUrl(redirectUrl)
+        } else {
+          setWrongAppUrl(null)
+        }
+
+        // Case 2: No group validation
+        if (!user.group_id) {
+          setHasNoGroup(true)
+        } else {
+          setHasNoGroup(false)
+        }
+
         // Store token for API calls
         localStorage.setItem('auth_token', token)
       } catch (err) {
@@ -72,6 +90,8 @@ const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setCurrentUser({
           email: auth0User.email
         })
+        setWrongAppUrl(null)
+        setHasNoGroup(false)
       } finally {
         setIsUserLoading(false)
       }
@@ -105,6 +125,8 @@ const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Clear stored tokens and user
     localStorage.removeItem('auth_token')
     setCurrentUser(null)
+    setWrongAppUrl(null)
+    setHasNoGroup(false)
 
     auth0Logout({
       logoutParams: {
@@ -121,7 +143,9 @@ const AuthContextProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     getToken,
     error: error?.message || null,
-  }), [isAuthenticated, isLoading, currentUser, login, logout, getToken, error])
+    wrongAppUrl,
+    hasNoGroup,
+  }), [isAuthenticated, isLoading, currentUser, login, logout, getToken, error, wrongAppUrl, hasNoGroup])
 
   return (
     <AuthContext.Provider value={contextValue}>
@@ -177,6 +201,8 @@ const DevAuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     getToken,
     error: null,
+    wrongAppUrl: null,
+    hasNoGroup: false,
   }), [currentUser, isLoading, login, logout, getToken])
 
   return (

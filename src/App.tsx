@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { ThemeProvider } from '@/components/common'
 import { router } from '@/routes'
-import AuthProvider from './features/auth/AuthProvider'
+import { AuthProvider, useAuth, WrongAppDialog, NoGroupDialog } from '@/features/auth'
 import { useLanguageSync } from '@/hooks'
 
 // Create a client
@@ -29,6 +29,20 @@ if (import.meta.env.DEV) {
   window.__TANSTACK_QUERY_CLIENT__ = queryClient;
 }
 
+function AuthGuard() {
+  const { wrongAppUrl, hasNoGroup } = useAuth()
+
+  if (wrongAppUrl !== null) {
+    return <WrongAppDialog url={wrongAppUrl} />
+  }
+
+  if (hasNoGroup) {
+    return <NoGroupDialog />
+  }
+
+  return null
+}
+
 function App() {
   // Sync i18n language with Zustand store
   useLanguageSync()
@@ -37,6 +51,7 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
+          <AuthGuard />
           <RouterProvider router={router} />
         </QueryClientProvider>
       </AuthProvider>
