@@ -36,11 +36,13 @@ export function UserItem({ user, groups }: UserItemProps) {
   const { addToast } = useUIStore()
 
   const handleRoleChange = async (newRole: string) => {
-    if (newRole === user.role) return
+    const mappedRole = newRole === 'none' ? null : (newRole as UserRole)
+    const currentRole = user.role || null
+    if (mappedRole === currentRole) return
     try {
       await updateUser.mutateAsync({
         id: user.id!,
-        data: { new_role: newRole as UserRole },
+        data: { new_role: mappedRole },
       })
     } catch (error) {
       console.error('Failed to update role:', error)
@@ -48,11 +50,13 @@ export function UserItem({ user, groups }: UserItemProps) {
   }
 
   const handleGroupChange = async (new_group_id: string) => {
-    if (new_group_id === user.group_id) return
+    const mappedGroupId = new_group_id === 'none' ? null : new_group_id
+    const currentGroupId = user.group_id || null
+    if (mappedGroupId === currentGroupId) return
     try {
       await updateUser.mutateAsync({
         id: user.id!,
-        data: { new_group_id: new_group_id },
+        data: { new_group_id: mappedGroupId },
       })
     } catch (error) {
       console.error('Failed to update group:', error)
@@ -119,7 +123,7 @@ export function UserItem({ user, groups }: UserItemProps) {
 
         {/* Role Select */}
         <Select
-          value={user.role}
+          value={user.role || 'none'}
           onValueChange={handleRoleChange}
           disabled={isActionPending || user.active === false}
         >
@@ -127,6 +131,7 @@ export function UserItem({ user, groups }: UserItemProps) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="none">-</SelectItem>
             {Object.values(UserRole).map((role) => (
               <SelectItem key={role} value={role}>
                 {ROLE_CONFIG[role].label}
@@ -137,7 +142,7 @@ export function UserItem({ user, groups }: UserItemProps) {
 
         {/* Group Select */}
         <Select
-          value={user.group_id || ''}
+          value={user.group_id || 'none'}
           onValueChange={handleGroupChange}
           disabled={isActionPending || user.active === false}
         >
@@ -145,6 +150,7 @@ export function UserItem({ user, groups }: UserItemProps) {
             <SelectValue placeholder="-" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="none">-</SelectItem>
             {groups.map((group) => (
               <SelectItem key={group.id} value={group.id}>
                 {group.name}
